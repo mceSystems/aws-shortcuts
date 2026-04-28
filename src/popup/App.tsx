@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Onboarding } from './onboarding/Onboarding';
+import { Button } from './components/Button';
 import { getSync } from '@/shared/storage';
 import type { SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
@@ -25,6 +26,12 @@ function readCached(): Bootstrap | undefined {
 
 function writeCached(boot: Bootstrap): void {
   try {
+    // Only cache once there's actual config to skip the onboarding flash on
+    // subsequent opens. No ssoConfig = no point caching defaults.
+    if (!boot.ssoConfig) {
+      window.localStorage.removeItem(CACHE_KEY);
+      return;
+    }
     window.localStorage.setItem(CACHE_KEY, JSON.stringify(boot));
   } catch {
     // ignore
@@ -75,6 +82,40 @@ export function App() {
     setPhase(isReady(next) ? 'ready' : 'onboarding');
   }
 
+  async function wipeAll() {
+    const ok = window.confirm(
+      'Wipe ALL extension data? Sync + local + session + cache + dnr rules. Cannot undo.',
+    );
+    if (!ok) return;
+    try {
+      await Promise.all([
+        chrome.storage.sync.clear(),
+        chrome.storage.local.clear(),
+        chrome.storage.session.clear(),
+      ]);
+    } catch (e) {
+      console.error('[aws-shortcut] storage wipe failed', e);
+    }
+    try {
+      const existing = await chrome.declarativeNetRequest.getDynamicRules();
+      if (existing.length > 0) {
+        await chrome.declarativeNetRequest.updateDynamicRules({
+          removeRuleIds: existing.map((r) => r.id),
+        });
+      }
+    } catch (e) {
+      console.error('[aws-shortcut] dnr wipe failed', e);
+    }
+    try {
+      window.localStorage.clear();
+    } catch {
+      // ignore
+    }
+    // Hard reload popup so no in-memory React state survives + storage
+    // listeners can't repopulate the cache mid-wipe.
+    window.location.reload();
+  }
+
   if (phase === 'onboarding') {
     return (
       <div className={styles.app}>
@@ -89,7 +130,16 @@ export function App() {
 
   return (
     <div className={`${styles.app} ${styles.placeholder}`}>
-      AWS Shortcut · ready ({ssoConfig?.portalHost})
+      <div className={styles.readyMain}>
+        <div>AWS Shortcut · ready</div>
+        <div className={styles.readyMeta}>{ssoConfig?.portalHost}</div>
+      </div>
+      <div className={styles.devTools}>
+        <span className={styles.devLabel}>DEV</span>
+        <Button variant="ghost" onClick={wipeAll}>
+          Wipe all storage
+        </Button>
+      </div>
     </div>
   );
 }
