@@ -1,0 +1,15 @@
+.app {
+  width: 420px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  color: var(--ink-700);
+}
+
+.placeholder {
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-500);
+  font-size: 13px;
+}

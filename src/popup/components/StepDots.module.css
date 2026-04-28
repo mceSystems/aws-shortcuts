@@ -1,0 +1,16 @@
+.steps {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ink-200);
+  transition: background var(--dur-base) var(--ease-out);
+}
+
+.active {
+  background: var(--accent);
+}
