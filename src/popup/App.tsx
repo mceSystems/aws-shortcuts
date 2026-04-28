@@ -1,37 +1,52 @@
 import { useEffect, useState } from 'react';
 import { Onboarding } from './onboarding/Onboarding';
-import { getSsoConfig } from '@/shared/storage';
-import type { SsoConfig } from '@/shared/types';
+import { getSync } from '@/shared/storage';
+import type { Prefs, SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
 
 type Phase = 'onboarding' | 'ready';
 
-const CACHE_KEY = 'aws-shortcut:ssoConfig';
+const CACHE_KEY = 'aws-shortcut:bootstrap';
 
-function readCached(): SsoConfig | undefined {
+type Bootstrap = {
+  ssoConfig?: SsoConfig;
+  multiSessionVerified: boolean;
+};
+
+function readCached(): Bootstrap | undefined {
   try {
     const raw = window.localStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as SsoConfig) : undefined;
+    return raw ? (JSON.parse(raw) as Bootstrap) : undefined;
   } catch {
     return undefined;
   }
 }
 
-function writeCached(cfg: SsoConfig | undefined): void {
+function writeCached(boot: Bootstrap): void {
   try {
-    if (cfg) window.localStorage.setItem(CACHE_KEY, JSON.stringify(cfg));
-    else window.localStorage.removeItem(CACHE_KEY);
+    window.localStorage.setItem(CACHE_KEY, JSON.stringify(boot));
   } catch {
     // ignore
   }
 }
 
+function isReady(boot: Bootstrap | undefined): boolean {
+  return Boolean(boot?.ssoConfig && boot?.multiSessionVerified);
+}
+
+function entryStep(boot: Bootstrap | undefined): number {
+  if (!boot?.ssoConfig) return 0;
+  if (!boot?.multiSessionVerified) return 1;
+  return 0;
+}
+
 export function App() {
-  // Hydrate initial state synchronously from localStorage so returning users
-  // skip the onboarding flash. chrome.storage.sync revalidates async.
   const cached = readCached();
-  const [phase, setPhase] = useState<Phase>(cached ? 'ready' : 'onboarding');
-  const [ssoConfig, setSsoConfig] = useState<SsoConfig | undefined>(cached);
+  const [phase, setPhase] = useState<Phase>(isReady(cached) ? 'ready' : 'onboarding');
+  const [ssoConfig, setSsoConfig] = useState<SsoConfig | undefined>(cached?.ssoConfig);
+  const [prefs, setPrefs] = useState<Pick<Prefs, 'multiSessionVerified'>>({
+    multiSessionVerified: cached?.multiSessionVerified ?? false,
+  });
 
   useEffect(() => {
     void hydrate();
@@ -39,23 +54,32 @@ export function App() {
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
-      if (area === 'sync' && changes.ssoConfig) void hydrate();
+      if (area === 'sync' && (changes.ssoConfig || changes.prefs)) void hydrate();
     };
     chrome.storage.onChanged.addListener(handler);
     return () => chrome.storage.onChanged.removeListener(handler);
   }, []);
 
   async function hydrate() {
-    const cfg = await getSsoConfig();
-    writeCached(cfg);
-    setSsoConfig(cfg);
-    setPhase(cfg ? 'ready' : 'onboarding');
+    const sync = await getSync();
+    const boot: Bootstrap = {
+      ssoConfig: sync.ssoConfig,
+      multiSessionVerified: sync.prefs.multiSessionVerified,
+    };
+    writeCached(boot);
+    setSsoConfig(boot.ssoConfig);
+    setPrefs({ multiSessionVerified: boot.multiSessionVerified });
+    setPhase(isReady(boot) ? 'ready' : 'onboarding');
   }
 
   if (phase === 'onboarding') {
     return (
       <div className={styles.app}>
-        <Onboarding initialSsoConfig={ssoConfig} onComplete={() => setPhase('ready')} />
+        <Onboarding
+          initialSsoConfig={ssoConfig}
+          startStep={entryStep({ ssoConfig, multiSessionVerified: prefs.multiSessionVerified })}
+          onComplete={() => setPhase('ready')}
+        />
       </div>
     );
   }

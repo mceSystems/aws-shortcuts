@@ -1,0 +1,136 @@
+.wrap {
+  position: relative;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--c-iris) 6%, var(--surface-1)),
+    color-mix(in oklch, var(--c-mint) 4%, var(--surface-1))
+  );
+  border: 1px solid var(--ink-200);
+  box-shadow: var(--elev-1);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--surface-1);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--ink-200);
+  font-size: 10px;
+  color: var(--ink-500);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-200);
+}
+
+.barTitle {
+  flex: 1;
+  text-align: center;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  color: var(--ink-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.console {
+  margin-top: 10px;
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-xs);
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+.consoleBar {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--ink-200);
+  font-size: 10px;
+  color: var(--ink-500);
+}
+
+.aws {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-weight: 700;
+  color: var(--ink-900);
+  font-size: 11px;
+  letter-spacing: -0.02em;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.headerLink {
+  color: var(--ink-500);
+}
+
+.headerLinkPulse {
+  position: relative;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: highlight-pulse 2.4s var(--ease-out) infinite;
+}
+
+.headerLinkPulse::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent) 30%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 0%, transparent);
+  }
+}
+
+.consoleBody {
+  height: 60px;
+  background: linear-gradient(
+    180deg,
+    var(--ink-100),
+    var(--surface-1)
+  );
+  position: relative;
+}
+
+.consoleBody::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 8px;
+  background: var(--ink-100);
+  border-radius: 4px;
+  box-shadow:
+    0 16px 0 var(--ink-100),
+    0 32px 0 var(--ink-100);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headerLinkPulse { animation: none; }
+}
