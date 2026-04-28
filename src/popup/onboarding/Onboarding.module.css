@@ -10,6 +10,25 @@
     var(--surface-0);
 }
 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scene {
+  animation: fadeUp 280ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene { animation: none; }
+}
+
 .body {
   flex: 1;
   display: flex;

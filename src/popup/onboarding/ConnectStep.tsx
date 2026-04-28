@@ -25,10 +25,23 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [pickedTabId, setPickedTabId] = useState<number | null>(null);
 
   useEffect(() => {
     void findOpenPortalTabs().then(setSuggestions);
   }, []);
+
+  function pickSuggestion(s: Suggestion) {
+    setUrl(s.startUrl);
+    setPickedTabId(s.tabId ?? null);
+    if (error) setError(null);
+  }
+
+  function onUrlChange(value: string) {
+    setUrl(value);
+    if (pickedTabId !== null) setPickedTabId(null);
+    if (error) setError(null);
+  }
 
   async function handleContinue() {
     const parsed = parsePortalUrl(url);
@@ -46,7 +59,23 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
           region: 'us-east-1',
         },
       });
-      await chrome.tabs.create({ url: parsed.startUrl });
+      if (pickedTabId !== null) {
+        try {
+          const tab = await chrome.tabs.get(pickedTabId);
+          if (tab) {
+            await chrome.tabs.update(pickedTabId, { active: true });
+            if (tab.windowId !== undefined) {
+              await chrome.windows.update(tab.windowId, { focused: true });
+            }
+          } else {
+            await chrome.tabs.create({ url: parsed.startUrl });
+          }
+        } catch {
+          await chrome.tabs.create({ url: parsed.startUrl });
+        }
+      } else {
+        await chrome.tabs.create({ url: parsed.startUrl });
+      }
       onContinue();
     } catch (e) {
       setError((e as Error).message);
@@ -73,10 +102,7 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
             inputMode="url"
             placeholder={PLACEHOLDER}
             value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              if (error) setError(null);
-            }}
+            onChange={(e) => onUrlChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') void handleContinue();
             }}
@@ -102,10 +128,7 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
                   <button
                     type="button"
                     className={styles.suggestRow}
-                    onClick={() => {
-                      setUrl(s.startUrl);
-                      if (error) setError(null);
-                    }}
+                    onClick={() => pickSuggestion(s)}
                   >
                     <span className={styles.suggestIcon} aria-hidden>↳</span>
                     <span className={styles.suggestUrl}>{s.startUrl}</span>
@@ -119,7 +142,13 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
 
       <div className={styles.actions}>
         <Button onClick={handleContinue} disabled={busy || url.trim().length === 0}>
-          {busy ? 'Opening…' : 'Open & scan ▸'}
+          {busy
+            ? pickedTabId !== null
+              ? 'Scanning…'
+              : 'Opening…'
+            : pickedTabId !== null
+              ? 'Scan ▸'
+              : 'Open & scan ▸'}
         </Button>
       </div>
     </div>

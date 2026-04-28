@@ -9,7 +9,16 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      // Alias React → Preact/compat for ~140KB bundle savings.
+      // API-compatible with React 18, including createRoot + JSX runtime.
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react-dom/test-utils': 'preact/test-utils',
+      'react/jsx-runtime': 'preact/jsx-runtime',
     },
+  },
+  optimizeDeps: {
+    include: ['preact/compat', 'preact/jsx-runtime', 'preact/hooks'],
   },
   build: {
     rollupOptions: {
