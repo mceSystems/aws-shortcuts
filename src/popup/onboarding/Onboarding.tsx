@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ConnectStep } from './ConnectStep';
 import { MultiSessionStep } from './MultiSessionStep';
+import { ScanStep } from './ScanStep';
 import type { SsoConfig } from '@/shared/types';
 
 type Props = {
@@ -25,9 +26,13 @@ export function Onboarding({ initialSsoConfig, startStep = 0, onComplete }: Prop
     return (
       <MultiSessionStep
         onBack={() => setStep(0)}
-        onContinue={onComplete}
+        onContinue={() => setStep(2)}
       />
     );
+  }
+
+  if (step === 2) {
+    return <ScanStep onBack={() => setStep(1)} onComplete={onComplete} />;
   }
 
   return null;

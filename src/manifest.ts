@@ -15,6 +15,8 @@ export default defineManifest({
     'notifications',
     'scripting',
     'alarms',
+    'declarativeNetRequest',
+    'declarativeNetRequestWithHostAccess',
   ],
   host_permissions: [
     'https://*.awsapps.com/*',
