@@ -60,20 +60,17 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
         },
       });
       if (pickedTabId !== null) {
+        // Tab already open. Don't shift focus — keeps popup alive so the
+        // user lands in step 2 of the wizard.
         try {
-          const tab = await chrome.tabs.get(pickedTabId);
-          if (tab) {
-            await chrome.tabs.update(pickedTabId, { active: true });
-            if (tab.windowId !== undefined) {
-              await chrome.windows.update(tab.windowId, { focused: true });
-            }
-          } else {
-            await chrome.tabs.create({ url: parsed.startUrl });
-          }
+          await chrome.tabs.get(pickedTabId);
         } catch {
+          // Tab vanished between picking and clicking. Open a new one
+          // (will steal focus + close popup, but that's the lesser evil).
           await chrome.tabs.create({ url: parsed.startUrl });
         }
       } else {
+        // New tab path. User needs to log in there → focus shift is expected.
         await chrome.tabs.create({ url: parsed.startUrl });
       }
       onContinue();

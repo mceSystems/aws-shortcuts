@@ -21,6 +21,7 @@ export default defineConfig({
     include: ['preact/compat', 'preact/jsx-runtime', 'preact/hooks'],
   },
   build: {
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'src/popup/index.html'),
