@@ -82,7 +82,7 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
 
   return (
     <div className={styles.scene}>
-      <StepDots total={3} current={0} />
+      <StepDots total={3} current={1} />
       <div className={styles.body}>
         <Logo size={44} />
         <div className={styles.titleBlock}>

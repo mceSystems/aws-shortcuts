@@ -14,18 +14,13 @@ export function Onboarding({ initialSsoConfig, startStep = 0, onComplete }: Prop
   const [step, setStep] = useState(startStep);
 
   if (step === 0) {
-    return (
-      <ConnectStep
-        initialUrl={initialSsoConfig?.startUrl ?? ''}
-        onContinue={() => setStep(1)}
-      />
-    );
+    return <MultiSessionStep onContinue={() => setStep(1)} />;
   }
 
   if (step === 1) {
     return (
-      <MultiSessionStep
-        onBack={() => setStep(0)}
+      <ConnectStep
+        initialUrl={initialSsoConfig?.startUrl ?? ''}
         onContinue={() => setStep(2)}
       />
     );

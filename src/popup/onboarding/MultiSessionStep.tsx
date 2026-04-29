@@ -8,11 +8,10 @@ import illust from './MultiSessionIllust.module.css';
 const CONSOLE_URL = 'https://console.aws.amazon.com/';
 
 type Props = {
-  onBack: () => void;
   onContinue: () => void;
 };
 
-export function MultiSessionStep({ onBack, onContinue }: Props) {
+export function MultiSessionStep({ onContinue }: Props) {
   const [busy, setBusy] = useState(false);
 
   async function openConsole() {
@@ -34,7 +33,7 @@ export function MultiSessionStep({ onBack, onContinue }: Props) {
 
   return (
     <div className={styles.scene}>
-      <StepDots total={3} current={1} />
+      <StepDots total={3} current={0} />
       <div className={styles.body}>
         <div className={styles.titleBlock}>
           <h1 className={styles.title}>Enable multi-session</h1>
@@ -64,9 +63,6 @@ export function MultiSessionStep({ onBack, onContinue }: Props) {
       </div>
 
       <div className={styles.actionsRow}>
-        <Button variant="ghost" onClick={onBack}>
-          ← Back
-        </Button>
         <span className={styles.spacer} />
         <Button variant="ghost" onClick={openConsole}>
           Open console ↗

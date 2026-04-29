@@ -43,8 +43,8 @@ function isReady(boot: Bootstrap | undefined): boolean {
 }
 
 function entryStep(boot: Bootstrap | undefined): number {
-  if (!boot?.ssoConfig) return 0;
-  if (!boot?.multiSessionVerified) return 1;
+  if (!boot?.multiSessionVerified) return 0;
+  if (!boot?.ssoConfig) return 1;
   if (!boot?.hasAccounts) return 2;
   return 0;
 }

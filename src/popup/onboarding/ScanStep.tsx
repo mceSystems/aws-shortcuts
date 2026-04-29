@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../components/Button';
 import { StepDots } from '../components/StepDots';
 import { send } from '@/shared/messages';
 import { getSync } from '@/shared/storage';
-import type { Account } from '@/shared/types';
 import styles from './Onboarding.module.css';
 import scan from './ScanStep.module.css';
 
-type Phase = 'scanning' | 'success' | 'needsPortal';
+type Phase = 'scanning' | 'needsPortal';
 
 type PortalTabState = {
   tabId: number | null;
@@ -21,10 +20,12 @@ type Props = {
 
 export function ScanStep({ onBack, onComplete }: Props) {
   const [phase, setPhase] = useState<Phase>('scanning');
-  const [accounts, setAccounts] = useState<Account[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [portalTab, setPortalTab] = useState<PortalTabState | null>(null);
   const [reloading, setReloading] = useState(false);
+  // Auto-reload portal once on first scan miss; subsequent misses fall to
+  // the manual "Reload portal" screen so the user isn't trapped in a loop.
+  const autoReloadedRef = useRef(false);
 
   useEffect(() => {
     void runScan();
@@ -40,6 +41,7 @@ export function ScanStep({ onBack, onComplete }: Props) {
     };
     chrome.storage.onChanged.addListener(handler);
     return () => chrome.storage.onChanged.removeListener(handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function runScan() {
@@ -48,13 +50,24 @@ export function ScanStep({ onBack, onComplete }: Props) {
     setReloading(false);
     const res = await send({ type: 'SCAN_PORTAL' });
     if (res.ok) {
-      setAccounts(res.accounts ?? []);
-      setPhase('success');
+      onComplete();
       return;
     }
-    setError(res.error);
     const tab = await findPortalTab();
     setPortalTab(tab);
+    if (tab.tabId && !autoReloadedRef.current) {
+      autoReloadedRef.current = true;
+      setReloading(true);
+      try {
+        await chrome.tabs.reload(tab.tabId);
+        // Stay in scanning phase; bearer arrival via storage.onChanged retries.
+        return;
+      } catch (e) {
+        setError((e as Error).message);
+        setReloading(false);
+      }
+    }
+    setError(res.error);
     setPhase('needsPortal');
   }
 
@@ -83,15 +96,11 @@ export function ScanStep({ onBack, onComplete }: Props) {
       <StepDots total={3} current={2} />
       <div className={styles.body}>
         <div className={styles.titleBlock}>
-          <h1 className={styles.title}>
-            {phase === 'success' ? 'Found your accounts' : 'Scanning your portal'}
-          </h1>
+          <h1 className={styles.title}>Scanning your portal</h1>
           <p className={styles.lede}>
             {phase === 'scanning' && (reloading
               ? 'Reloading portal so we can capture the auth token…'
               : 'Reading accounts and roles from the portal API…')}
-            {phase === 'success' &&
-              `${accounts.length} account${accounts.length === 1 ? '' : 's'} ready. You can change defaults in settings later.`}
             {phase === 'needsPortal' && (portalTab?.tabId
               ? 'Your portal tab is open but we missed the auth token. Reload the page once and we\'ll grab it.'
               : 'We need to see the portal to capture an auth token. Open it once.')}
@@ -103,23 +112,6 @@ export function ScanStep({ onBack, onComplete }: Props) {
             <div className={scan.spinner} aria-hidden />
             <span>{reloading ? 'Waiting for portal…' : 'Talking to portal.sso…'}</span>
           </div>
-        )}
-
-        {phase === 'success' && (
-          <ul className={scan.accountList}>
-            {accounts.slice(0, 8).map((a) => (
-              <li key={a.accountId} className={scan.accountRow}>
-                <span className={scan.dot} style={{ background: a.color }} />
-                <span className={scan.accountName}>{a.name}</span>
-                <span className={scan.accountMeta}>
-                  {a.roles.length} role{a.roles.length === 1 ? '' : 's'}
-                </span>
-              </li>
-            ))}
-            {accounts.length > 8 && (
-              <li className={scan.accountMore}>+{accounts.length - 8} more</li>
-            )}
-          </ul>
         )}
 
         {phase === 'needsPortal' && error && (
@@ -140,7 +132,6 @@ export function ScanStep({ onBack, onComplete }: Props) {
         {phase === 'needsPortal' && !portalTab?.tabId && portalTab?.startUrl && (
           <Button onClick={openPortal}>Open portal ↗</Button>
         )}
-        {phase === 'success' && <Button onClick={onComplete}>Done ▸</Button>}
       </div>
     </div>
   );
