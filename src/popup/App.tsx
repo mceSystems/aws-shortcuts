@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Onboarding } from './onboarding/Onboarding';
-import { Button } from './components/Button';
+import { Main } from './main/Main';
 import { getSync } from '@/shared/storage';
 import type { SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
@@ -129,17 +129,11 @@ export function App() {
   }
 
   return (
-    <div className={`${styles.app} ${styles.placeholder}`}>
-      <div className={styles.readyMain}>
-        <div>AWS Shortcut · ready</div>
-        <div className={styles.readyMeta}>{ssoConfig?.portalHost}</div>
-      </div>
-      <div className={styles.devTools}>
-        <span className={styles.devLabel}>DEV</span>
-        <Button variant="ghost" onClick={wipeAll}>
-          Wipe all storage
-        </Button>
-      </div>
+    <div className={styles.app}>
+      <Main
+        onOpenSettings={() => chrome.runtime.openOptionsPage()}
+        onWipe={wipeAll}
+      />
     </div>
   );
 }

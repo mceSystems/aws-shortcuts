@@ -2,14 +2,36 @@ export type Role = {
   name: string;
 };
 
+export type RegionObservation = {
+  region: string;
+  hits: number;
+  lastSeenAt: number;
+};
+
+export type RoleObservation = {
+  roleName: string;
+  hits: number;
+  lastSeenAt: number;
+};
+
 export type Account = {
   accountId: string;
   name: string;
   email?: string;
   appInstanceId: string;
   roles: Role[];
+  /** Confirmed default role. Empty until single-role auto-set, user-confirmed, or manual pick. */
   defaultRoleName: string;
+  /** Observed roles from console visits. Drives the role suggestion banner. */
+  observedRoles?: RoleObservation[];
+  /** Roles the user has actively declined for default-role suggestion. */
+  dismissedRoles?: string[];
+  /** Confirmed default region. Empty until user explicitly confirms or sets manually. */
   defaultRegion: string;
+  /** Observed regions from console visits. Drives the region suggestion banner. */
+  observedRegions?: RegionObservation[];
+  /** Regions the user has actively declined for default-region suggestion. */
+  dismissedRegions?: string[];
   color: string;
 };
 

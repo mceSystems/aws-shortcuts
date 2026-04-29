@@ -69,4 +69,11 @@ export default defineManifest({
       matches: ['<all_urls>'],
     },
   ],
+  content_scripts: [
+    {
+      matches: ['https://*.console.aws.amazon.com/*'],
+      js: ['src/content/console.ts'],
+      run_at: 'document_idle',
+    },
+  ],
 });

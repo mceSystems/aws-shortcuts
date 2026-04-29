@@ -1,0 +1,104 @@
+.popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  width: 220px;
+  background: var(--surface-1);
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elev-3);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search {
+  height: 32px;
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  padding: 0 10px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-700);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  transition: background var(--dur-fast);
+}
+
+.row:hover { background: var(--ink-100); }
+
+.region { flex: 1; text-align: left; }
+
+.current {
+  background: var(--accent-soft);
+  color: var(--ink-900);
+}
+
+.tag,
+.tagAccent,
+.tagMuted {
+  font-size: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.tagAccent {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.tag {
+  background: var(--ink-100);
+  color: var(--ink-500);
+}
+
+.tagMuted {
+  background: color-mix(in oklch, var(--ink-200) 50%, transparent);
+  color: var(--ink-400);
+  font-style: italic;
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--ink-400);
+  font-style: italic;
+  padding: 8px 10px;
+  text-align: center;
+}

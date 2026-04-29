@@ -1,17 +1,24 @@
-export const ACCOUNT_COLORS = [
-  '#5A5BFE', // iris
-  '#16B8A6', // mint
-  '#F59E0B', // amber
-  '#EC4899', // rose
-  '#8B5CF6', // lilac
-  '#06B6D4', // sky
-  '#10B981', // sage
-  '#F43F5E', // coral
-] as const;
+// AWS console "Account colour" feature uses fixed named swatches.
+// We mirror the names → mapped to our token-derived hex values.
+// See: AWS console multi-session sidebar.
+export const AWS_COLOR_MAP: Record<string, string> = {
+  red: '#DC2626',
+  orange: '#F59E0B',
+  yellow: '#EAB308',
+  green: '#10B981',
+  teal: '#16B8A6',
+  blue: '#5A5BFE',
+  purple: '#8B5CF6',
+  pink: '#EC4899',
+};
 
-export function nextColor(used: string[]): string {
-  for (const c of ACCOUNT_COLORS) {
-    if (!used.includes(c)) return c;
-  }
-  return ACCOUNT_COLORS[used.length % ACCOUNT_COLORS.length];
+export const NEUTRAL_COLOR = '#8A92A0'; // ink-400, intentionally muted
+
+export function awsColorToHex(name: string | undefined): string | undefined {
+  if (!name) return undefined;
+  return AWS_COLOR_MAP[name.trim().toLowerCase()];
+}
+
+export function chipColor(stored: string | undefined): string {
+  return stored || NEUTRAL_COLOR;
 }
