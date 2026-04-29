@@ -34,3 +34,25 @@ function buildConsoleUrl(region: string, consolePath: string): string {
   const sep = path.includes('?') ? '&' : '?';
   return `https://${region}.console.aws.amazon.com/${path}${sep}region=${region}${hash}`;
 }
+
+type DirectInput = {
+  accountId: string;
+  sessionSubdomain: string;
+  region: string;
+  consolePath: string;
+};
+
+/** Multi-session direct URL. Bypasses portal federation, reuses an existing
+ * console session for the (accountId, role) tied to this sessionSubdomain. */
+export function buildDirectConsoleUrl({
+  accountId,
+  sessionSubdomain,
+  region,
+  consolePath,
+}: DirectInput): string {
+  const hashIdx = consolePath.indexOf('#');
+  const path = hashIdx === -1 ? consolePath : consolePath.slice(0, hashIdx);
+  const hash = hashIdx === -1 ? '' : consolePath.slice(hashIdx);
+  const sep = path.includes('?') ? '&' : '?';
+  return `https://${accountId}-${sessionSubdomain}.${region}.console.aws.amazon.com/${path}${sep}region=${region}${hash}`;
+}

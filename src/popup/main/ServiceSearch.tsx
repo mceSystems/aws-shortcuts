@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
 import { searchServices } from '@/shared/serviceCatalog';
-import { buildPortalLaunchUrl } from '@/shared/launcher';
+import { send } from '@/shared/messages';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
 import styles from './ServiceSearch.module.css';
 
@@ -42,16 +42,19 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
   const missingRegion = Boolean(account) && !region;
   const missingPortal = !ssoConfig?.portalHost;
 
-  function open(service: ServiceCatalogEntry, featurePath?: string) {
+  async function open(service: ServiceCatalogEntry, featurePath?: string) {
     if (!account || missingRole || missingRegion || missingPortal) return;
-    const url = buildPortalLaunchUrl({
-      portalHost: ssoConfig!.portalHost,
+    // SW resolves the URL: direct multi-session subdomain if a live session
+    // exists for (account, role), portal-shortcut redirect otherwise.
+    const res = await send({
+      type: 'RESOLVE_LAUNCH_URL',
       accountId: account.accountId,
       roleName: role,
       region,
       consolePath: featurePath ?? service.consolePath,
     });
-    void chrome.tabs.create({ url });
+    if (!res.ok || !res.url) return;
+    void chrome.tabs.create({ url: res.url });
   }
 
   function onKeyDown(e: React.KeyboardEvent) {

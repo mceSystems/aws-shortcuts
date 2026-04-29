@@ -13,13 +13,27 @@ export type Msg =
   | { type: 'RESCAN_OPEN_TABS' }
   | { type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' }
   | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] }
-  | { type: 'SET_ACCOUNT_ALIAS'; accountId: string; alias: string };
+  | { type: 'SET_ACCOUNT_ALIAS'; accountId: string; alias: string }
+  | {
+      type: 'SESSION_OBSERVED';
+      accountId: string;
+      sessionSubdomain: string;
+      region: string;
+      roleName: string;
+    }
+  | {
+      type: 'RESOLVE_LAUNCH_URL';
+      accountId: string;
+      roleName: string;
+      region: string;
+      consolePath: string;
+    };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };
 
 export type MsgResponse =
-  | { ok: true; bearer?: string; accounts?: Account[] }
+  | { ok: true; bearer?: string; accounts?: Account[]; url?: string; mode?: 'direct' | 'portal' }
   | { ok: false; error: string };
 
 export function send(msg: Msg): Promise<MsgResponse> {

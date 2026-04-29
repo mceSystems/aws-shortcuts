@@ -26,11 +26,27 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
   const match = MULTI_SESSION_HOST.exec(location.hostname);
   if (!match) return;
   const accountId = match[1];
+  const sessionSubdomain = match[2];
   const hostRegion = match[3];
 
   let lastReported: string | null = null;
   let lastRegion: string | null = null;
   let lastRole: string | null = null;
+  let lastSessionRoleReported: string | null = null;
+
+  function reportSession(roleName: string): void {
+    // Only emit when we have a role — otherwise SW can't key the session.
+    if (!roleName) return;
+    if (lastSessionRoleReported === roleName) return;
+    lastSessionRoleReported = roleName;
+    void chrome.runtime.sendMessage({
+      type: 'SESSION_OBSERVED',
+      accountId,
+      sessionSubdomain,
+      region: regionFromUrl(),
+      roleName,
+    });
+  }
 
   function reportRegion(region: string): void {
     if (!region || region === lastRegion) return;
@@ -71,6 +87,7 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
       lastReported = null;
       lastRole = null;
       lastRegion = null;
+      lastSessionRoleReported = null;
       reportRegion(regionFromUrl());
       tryScrape();
       reply?.({ ok: true });
@@ -106,6 +123,7 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
         roleName: role,
       });
     }
+    if (role) reportSession(role);
   }
 
   function findColorFromBand(): string | null {

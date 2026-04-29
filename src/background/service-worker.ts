@@ -1,8 +1,14 @@
 import type { Msg, MsgResponse } from '@/shared/messages';
 import type { Account } from '@/shared/types';
 import { getSync, mutateSync } from '@/shared/storage';
-import { getSessionState, setBearer } from '@/shared/sessionStorage';
+import {
+  getSessionState,
+  setBearer,
+  getConsoleSessions,
+  mutateConsoleSessions,
+} from '@/shared/sessionStorage';
 import { awsColorToHex } from '@/shared/colors';
+import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { fetchAccounts } from './portal-api';
 
 // ───── bearer capture ──────────────────────────────────────────────
@@ -47,6 +53,36 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onStartup.addListener(() => {
   void refreshOriginRule();
   void harvestOpenTabs();
+});
+
+// ───── console session lifecycle ───────────────────────────────────
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  void mutateConsoleSessions((cur) => {
+    let mutated = false;
+    const next = cur
+      .map((s) => {
+        if (!s.tabIds.includes(tabId)) return s;
+        mutated = true;
+        return { ...s, tabIds: s.tabIds.filter((t) => t !== tabId) };
+      })
+      .filter((s) => s.tabIds.length > 0);
+    return mutated ? next : cur;
+  });
+});
+
+// Reactive expiry: if a tab navigates from a multi-session subdomain to the
+// signin/portal hosts, the session is dead — drop it from the store.
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  if (details.frameId !== 0) return;
+  const url = details.url;
+  if (!/signin\.aws\.amazon\.com|awsapps\.com\/start/.test(url)) return;
+  void mutateConsoleSessions((cur) => {
+    if (!cur.some((s) => s.tabIds.includes(details.tabId))) return cur;
+    return cur
+      .map((s) => ({ ...s, tabIds: s.tabIds.filter((t) => t !== details.tabId) }))
+      .filter((s) => s.tabIds.length > 0);
+  });
 });
 
 async function harvestOpenTabs(): Promise<void> {
@@ -159,7 +195,8 @@ async function refreshOriginRule(): Promise<void> {
 
 // ───── message hub ─────────────────────────────────────────────────
 
-chrome.runtime.onMessage.addListener((msg: Msg, _sender, reply) => {
+chrome.runtime.onMessage.addListener((msg: Msg, sender, reply) => {
+  lastSenderTabId = sender.tab?.id;
   void handle(msg)
     .then((res) => reply(res))
     .catch((err: Error) => reply({ ok: false, error: err.message } satisfies MsgResponse));
@@ -306,6 +343,156 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       }));
       return { ok: true };
     }
+
+    case 'SESSION_OBSERVED': {
+      const tabId = chromeTabIdFromCurrentMessage();
+      await mutateConsoleSessions((cur) => {
+        const idx = cur.findIndex(
+          (s) =>
+            s.accountId === msg.accountId &&
+            s.sessionSubdomain === msg.sessionSubdomain,
+        );
+        const now = Date.now();
+        if (idx === -1) {
+          return [
+            ...cur,
+            {
+              accountId: msg.accountId,
+              roleName: msg.roleName,
+              sessionSubdomain: msg.sessionSubdomain,
+              region: msg.region,
+              tabIds: tabId !== undefined ? [tabId] : [],
+              observedAt: now,
+            },
+          ];
+        }
+        const existing = cur[idx];
+        const tabIds =
+          tabId !== undefined && !existing.tabIds.includes(tabId)
+            ? [...existing.tabIds, tabId]
+            : existing.tabIds;
+        const next = [...cur];
+        next[idx] = {
+          ...existing,
+          roleName: msg.roleName || existing.roleName,
+          region: msg.region || existing.region,
+          tabIds,
+          observedAt: now,
+        };
+        return next;
+      });
+      return { ok: true };
+    }
+
+    case 'RESOLVE_LAUNCH_URL': {
+      return resolveLaunchUrl(msg);
+    }
+  }
+}
+
+let lastSenderTabId: number | undefined;
+
+function chromeTabIdFromCurrentMessage(): number | undefined {
+  return lastSenderTabId;
+}
+
+async function resolveLaunchUrl(input: {
+  accountId: string;
+  roleName: string;
+  region: string;
+  consolePath: string;
+}): Promise<MsgResponse> {
+  const sync = await getSync();
+  const portalHost = sync.ssoConfig?.portalHost;
+  if (!portalHost) {
+    return { ok: false, error: 'No portal configured.' };
+  }
+
+  const sessions = await getConsoleSessions();
+  let match = sessions.find(
+    (s) => s.accountId === input.accountId && s.roleName === input.roleName,
+  );
+
+  // Real-time fallback: store may be empty on first click after install/reload
+  // before harvest has propagated. Probe open tabs directly.
+  if (!match) {
+    match = await findLiveSessionFromOpenTabs(input.accountId);
+    if (match) {
+      console.log(
+        '[aws-shortcut/launch] real-time tab probe matched',
+        'session=', match.sessionSubdomain,
+      );
+    }
+  }
+
+  if (match) {
+    const direct = buildDirectConsoleUrl({
+      accountId: input.accountId,
+      sessionSubdomain: match.sessionSubdomain,
+      region: input.region,
+      consolePath: input.consolePath,
+    });
+    const live = await isSessionLive(direct);
+    console.log(
+      '[aws-shortcut/launch]',
+      'account=', input.accountId,
+      'role=', input.roleName,
+      'session=', match.sessionSubdomain,
+      'live=', live,
+      'mode=', live ? 'direct' : 'portal-fallback',
+    );
+    if (live) {
+      return { ok: true, url: direct, mode: 'direct' };
+    }
+    // Cookie check failed → drop the stale session entry, fall through to portal.
+    await mutateConsoleSessions((cur) =>
+      cur.filter(
+        (s) =>
+          !(
+            s.accountId === input.accountId &&
+            s.sessionSubdomain === match.sessionSubdomain
+          ),
+      ),
+    );
+  } else {
+    console.log(
+      '[aws-shortcut/launch]',
+      'account=', input.accountId,
+      'role=', input.roleName,
+      'no session match — using portal',
+    );
+  }
+
+  const portal = buildPortalLaunchUrl({
+    portalHost,
+    accountId: input.accountId,
+    roleName: input.roleName,
+    region: input.region,
+    consolePath: input.consolePath,
+  });
+  return { ok: true, url: portal, mode: 'portal' };
+}
+
+// Pragmatic liveness check: if Chrome holds any non-expired cookies for the
+// multi-session subdomain, treat the session as live. Specific session-cookie
+// names vary across AWS console releases; presence-of-any is a stable signal.
+async function isSessionLive(url: string): Promise<boolean> {
+  try {
+    const cookies = await chrome.cookies.getAll({ url });
+    const now = Date.now() / 1000;
+    const live = cookies.filter(
+      (c) => !c.expirationDate || c.expirationDate > now,
+    );
+    console.log(
+      '[aws-shortcut/launch] cookie check',
+      'url=', url,
+      'count=', live.length,
+      'names=', live.map((c) => c.name),
+    );
+    return live.length > 0;
+  } catch (e) {
+    console.warn('[aws-shortcut/launch] cookie check failed', e);
+    return false;
   }
 }
 
@@ -457,6 +644,54 @@ async function findPortalTab(
   } catch {
     return undefined;
   }
+}
+
+const MULTI_SESSION_HOST_RE =
+  /^([0-9]{12})-([a-z0-9]+)\.([a-z0-9-]+)\.console\.aws\.amazon\.com$/;
+
+// Probe open tabs for a multi-session console tab matching `accountId`. Used
+// as a real-time fallback when our session store hasn't been populated yet.
+async function findLiveSessionFromOpenTabs(
+  accountId: string,
+): Promise<
+  | {
+      accountId: string;
+      roleName: string;
+      sessionSubdomain: string;
+      region: string;
+      tabIds: number[];
+      observedAt: number;
+    }
+  | undefined
+> {
+  try {
+    const tabs = await chrome.tabs.query({
+      url: ['https://*.console.aws.amazon.com/*'],
+    });
+    for (const tab of tabs) {
+      if (!tab.url || tab.id === undefined) continue;
+      let host: string;
+      try {
+        host = new URL(tab.url).hostname;
+      } catch {
+        continue;
+      }
+      const m = MULTI_SESSION_HOST_RE.exec(host);
+      if (!m) continue;
+      if (m[1] !== accountId) continue;
+      return {
+        accountId,
+        roleName: '',
+        sessionSubdomain: m[2],
+        region: m[3],
+        tabIds: [tab.id],
+        observedAt: Date.now(),
+      };
+    }
+  } catch (e) {
+    console.warn('[aws-shortcut/launch] tab probe failed', e);
+  }
+  return undefined;
 }
 
 async function getFocusedTabId(): Promise<number | undefined> {

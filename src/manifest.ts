@@ -10,6 +10,7 @@ export default defineManifest({
     'storage',
     'tabs',
     'webRequest',
+    'webNavigation',
     'sidePanel',
     'cookies',
     'notifications',
