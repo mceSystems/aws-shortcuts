@@ -13,9 +13,11 @@ type Props = {
 
 export function MultiSessionStep({ onContinue }: Props) {
   const [busy, setBusy] = useState(false);
+  const [opened, setOpened] = useState(false);
 
   async function openConsole() {
-    await chrome.tabs.create({ url: CONSOLE_URL });
+    await chrome.tabs.create({ url: CONSOLE_URL, active: false });
+    setOpened(true);
   }
 
   async function confirm() {
@@ -62,10 +64,17 @@ export function MultiSessionStep({ onContinue }: Props) {
         </ol>
       </div>
 
+      {opened && (
+        <p className={styles.fieldHelp}>
+          Console opened in background tab. Switch to it, enable multi-session,
+          then come back here and click <strong>I enabled it</strong>.
+        </p>
+      )}
+
       <div className={styles.actionsRow}>
         <span className={styles.spacer} />
         <Button variant="ghost" onClick={openConsole}>
-          Open console ↗
+          {opened ? 'Open again' : 'Open console ↗'}
         </Button>
         <Button onClick={confirm} disabled={busy}>
           {busy ? 'Saving…' : 'I enabled it ▸'}

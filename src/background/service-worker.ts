@@ -174,34 +174,11 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     }
 
     case 'SCAN_PORTAL': {
-      const session = await getSessionState();
-      if (!session.bearerToken) {
-        return {
-          ok: false,
-          error: 'No portal token captured yet. Open the portal tab once.',
-        };
-      }
-      let merged: Account[] = [];
-      let scanError: string | null = null;
-      await mutateSync(async (sync) => {
-        const portalHost = sync.ssoConfig?.portalHost;
-        if (!portalHost) {
-          scanError = 'No portal configured. Complete step 1 first.';
-          return null;
-        }
-        const apiHost =
-          session.bearerHost ??
-          `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
-        const accounts = await fetchAccounts(apiHost, session.bearerToken!);
-        merged = mergeAccounts(sync.accounts, accounts);
-        return { accounts: merged };
-      });
-      if (scanError) return { ok: false, error: scanError };
-      // Force any open console tabs to re-emit observations against the
-      // now-populated accounts list. Covers the case where a tab already
-      // detected color/role/region before scan and cached it in CS memory.
-      void harvestOpenTabs();
-      return { ok: true, accounts: merged };
+      return runScanPortal();
+    }
+
+    case 'CAPTURE_AND_SCAN_VIA_BG_TAB': {
+      return captureAndScanViaBgTab();
     }
 
     case 'ACCOUNT_COLOR_OBSERVED': {
@@ -296,6 +273,162 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return { ok: true };
     }
   }
+}
+
+async function runScanPortal(): Promise<MsgResponse> {
+  const session = await getSessionState();
+  if (!session.bearerToken) {
+    return {
+      ok: false,
+      error: 'No portal token captured yet. Open the portal tab once.',
+    };
+  }
+  let merged: Account[] = [];
+  let scanError: string | null = null;
+  await mutateSync(async (sync) => {
+    const portalHost = sync.ssoConfig?.portalHost;
+    if (!portalHost) {
+      scanError = 'No portal configured. Complete step 1 first.';
+      return null;
+    }
+    const apiHost =
+      session.bearerHost ??
+      `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
+    const accounts = await fetchAccounts(apiHost, session.bearerToken!);
+    merged = mergeAccounts(sync.accounts, accounts);
+    return { accounts: merged };
+  });
+  if (scanError) return { ok: false, error: scanError };
+  void harvestOpenTabs();
+  return { ok: true, accounts: merged };
+}
+
+// Capture a fresh bearer + run the scan, without breaking the user's flow.
+//
+// - If a portal tab exists AND is not the user's currently focused tab,
+//   reload it in place (no focus shift, popup survives). Don't close it after.
+// - Otherwise (no portal tab, or the user IS on the portal right now), open
+//   a new background tab, wait for the bearer, then close it after scan.
+//   Reloading the user's focused tab would steal focus and auto-close the
+//   popup, so we leave it alone.
+//
+// Concurrent callers share the same in-flight capture — strict-mode double
+// mounts and storage-onChanged retries used to spin up multiple tabs.
+let inFlightCapture: Promise<MsgResponse> | null = null;
+
+function captureAndScanViaBgTab(): Promise<MsgResponse> {
+  if (inFlightCapture) {
+    console.log('[aws-shortcut/bg-tab] coalescing into in-flight capture');
+    return inFlightCapture;
+  }
+  inFlightCapture = runCaptureAndScan().finally(() => {
+    inFlightCapture = null;
+  });
+  return inFlightCapture;
+}
+
+async function runCaptureAndScan(): Promise<MsgResponse> {
+  const sync = await getSync();
+  const startUrl = sync.ssoConfig?.startUrl;
+  const portalHost = sync.ssoConfig?.portalHost;
+  if (!startUrl || !portalHost) {
+    return { ok: false, error: 'No portal configured. Complete step 1 first.' };
+  }
+
+  const beforeCapturedAt = (await getSessionState()).bearerCapturedAt ?? 0;
+  const existing = await findPortalTab(portalHost);
+  const focusedTabId = await getFocusedTabId();
+  const userIsOnPortal = existing?.id !== undefined && existing.id === focusedTabId;
+  const branch = existing && !userIsOnPortal ? 'reload' : 'open-new';
+  console.log(
+    '[aws-shortcut/bg-tab] decision',
+    'existingUrl=', existing?.url ?? 'none',
+    'existingId=', existing?.id ?? 'none',
+    'focusedTabId=', focusedTabId ?? 'none',
+    'userIsOnPortal=', userIsOnPortal,
+    'branch=', branch,
+  );
+
+  let openedTabId: number | undefined;
+  if (existing && !userIsOnPortal) {
+    try {
+      await chrome.tabs.reload(existing.id!);
+    } catch {
+      // Reload failed (tab vanished?); fall back to opening a new bg tab.
+      const tab = await chrome.tabs.create({ url: startUrl, active: false });
+      openedTabId = tab.id;
+    }
+  } else {
+    const tab = await chrome.tabs.create({ url: startUrl, active: false });
+    openedTabId = tab.id;
+  }
+
+  try {
+    await waitForBearer(beforeCapturedAt);
+    return await runScanPortal();
+  } finally {
+    console.log('[aws-shortcut/bg-tab] finally openedTabId=', openedTabId ?? 'none');
+    if (openedTabId !== undefined) {
+      try {
+        await chrome.tabs.remove(openedTabId);
+        console.log('[aws-shortcut/bg-tab] removed tab', openedTabId);
+      } catch (e) {
+        console.warn('[aws-shortcut/bg-tab] tabs.remove failed', e);
+      }
+    } else {
+      console.log('[aws-shortcut/bg-tab] no openedTabId — branch was reload, skipping close');
+    }
+  }
+}
+
+async function findPortalTab(
+  portalHost: string,
+): Promise<chrome.tabs.Tab | undefined> {
+  try {
+    // Match the portal's hostname regardless of path (/start, /saml, /, etc.)
+    // so we don't miss tabs that navigated past the initial /start/ entry.
+    const tabs = await chrome.tabs.query({ url: ['https://*.awsapps.com/*'] });
+    const host = new URL(portalHost).hostname;
+    return tabs.find((t) => {
+      if (!t.url) return false;
+      try {
+        return new URL(t.url).hostname === host;
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return undefined;
+  }
+}
+
+async function getFocusedTabId(): Promise<number | undefined> {
+  try {
+    // Filter to normal browser windows so the popup / devtools window doesn't
+    // get returned as the "focused" window from a service worker context.
+    const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
+    const tabs = await chrome.tabs.query({ active: true, windowId: win.id });
+    return tabs[0]?.id;
+  } catch {
+    return undefined;
+  }
+}
+
+function waitForBearer(after: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const handler = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string,
+    ) => {
+      if (area !== 'session') return;
+      const next = changes.bearerCapturedAt?.newValue as number | undefined;
+      if (next && next > after) {
+        chrome.storage.onChanged.removeListener(handler);
+        resolve();
+      }
+    };
+    chrome.storage.onChanged.addListener(handler);
+  });
 }
 
 function recordRoleObservation(account: Account, roleName: string): Account {

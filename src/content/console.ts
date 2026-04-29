@@ -55,13 +55,13 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
 
   reportRegion(regionFromUrl());
 
-  let lastUrl = location.href;
-  window.setInterval(() => {
-    if (location.href !== lastUrl) {
-      lastUrl = location.href;
-      reportRegion(regionFromUrl());
-    }
-  }, 1500);
+  // SPA navigation: AWS console uses pushState/replaceState. Patch both to
+  // dispatch a custom event we can listen for, plus catch back/forward via
+  // popstate. No polling.
+  patchHistoryForUrlChange();
+  const onUrlChange = () => reportRegion(regionFromUrl());
+  window.addEventListener('aws-shortcut:urlchange', onUrlChange);
+  window.addEventListener('popstate', onUrlChange);
 
   // Allow background to ask us to re-scan on demand (e.g. user clicks refresh
   // in the popup, or extension boot harvesting existing tabs).
@@ -243,11 +243,29 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
     return null;
   }
 
-  // Initial pass + observe DOM changes (sidebar opens on click).
+  // Initial pass + observe DOM changes (sidebar opens on click, band loads
+  // late in some flows). MutationObserver is cheap; no timeout — runs as
+  // long as the tab lives.
   tryScrape();
   const observer = new MutationObserver(() => tryScrape());
   observer.observe(document.body, { childList: true, subtree: true });
-
-  // Safety: stop observing after 2 minutes to avoid long-lived overhead.
-  window.setTimeout(() => observer.disconnect(), 120_000);
 })();
+
+function patchHistoryForUrlChange(): void {
+  const w = window as unknown as { __awsShortcutHistoryPatched?: boolean };
+  if (w.__awsShortcutHistoryPatched) return;
+  w.__awsShortcutHistoryPatched = true;
+  const fire = () => window.dispatchEvent(new Event('aws-shortcut:urlchange'));
+  const origPush = history.pushState;
+  const origReplace = history.replaceState;
+  history.pushState = function (...args: Parameters<typeof origPush>) {
+    const ret = origPush.apply(this, args);
+    fire();
+    return ret;
+  };
+  history.replaceState = function (...args: Parameters<typeof origReplace>) {
+    const ret = origReplace.apply(this, args);
+    fire();
+    return ret;
+  };
+}

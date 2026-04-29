@@ -21,6 +21,7 @@ export function Onboarding({ initialSsoConfig, startStep = 0, onComplete }: Prop
     return (
       <ConnectStep
         initialUrl={initialSsoConfig?.startUrl ?? ''}
+        onBack={() => setStep(0)}
         onContinue={() => setStep(2)}
       />
     );

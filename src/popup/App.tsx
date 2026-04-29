@@ -83,10 +83,6 @@ export function App() {
   }
 
   async function wipeAll() {
-    const ok = window.confirm(
-      'Wipe ALL extension data? Sync + local + session + cache + dnr rules. Cannot undo.',
-    );
-    if (!ok) return;
     try {
       await Promise.all([
         chrome.storage.sync.clear(),

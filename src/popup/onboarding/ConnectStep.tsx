@@ -17,10 +17,11 @@ type Suggestion = {
 
 type Props = {
   initialUrl?: string;
+  onBack: () => void;
   onContinue: () => void;
 };
 
-export function ConnectStep({ initialUrl = '', onContinue }: Props) {
+export function ConnectStep({ initialUrl = '', onBack, onContinue }: Props) {
   const [url, setUrl] = useState(initialUrl);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -59,20 +60,10 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
           region: 'us-east-1',
         },
       });
-      if (pickedTabId !== null) {
-        // Tab already open. Don't shift focus — keeps popup alive so the
-        // user lands in step 2 of the wizard.
-        try {
-          await chrome.tabs.get(pickedTabId);
-        } catch {
-          // Tab vanished between picking and clicking. Open a new one
-          // (will steal focus + close popup, but that's the lesser evil).
-          await chrome.tabs.create({ url: parsed.startUrl });
-        }
-      } else {
-        // New tab path. User needs to log in there → focus shift is expected.
-        await chrome.tabs.create({ url: parsed.startUrl });
-      }
+      // Don't open the portal here. ScanStep's bg-tab capture flow is the
+      // single owner of "open portal" — opening here too would race the SW's
+      // findPortalTab (URL not yet committed on a fresh tab) and end up with
+      // two tabs.
       onContinue();
     } catch (e) {
       setError((e as Error).message);
@@ -137,7 +128,11 @@ export function ConnectStep({ initialUrl = '', onContinue }: Props) {
         )}
       </div>
 
-      <div className={styles.actions}>
+      <div className={styles.actionsRow}>
+        <Button variant="ghost" onClick={onBack}>
+          ← Back
+        </Button>
+        <span className={styles.spacer} />
         <Button onClick={handleContinue} disabled={busy || url.trim().length === 0}>
           {busy
             ? pickedTabId !== null
