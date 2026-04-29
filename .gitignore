@@ -137,6 +137,10 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+# Local AWS Architecture Icons source (drop ZIP contents here; outputs are
+# generated into src/assets/icons/ by scripts/build-icons.ts and are committed).
+vendor/aws-icons-source/
+
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

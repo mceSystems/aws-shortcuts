@@ -3,6 +3,7 @@ import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
 import { searchServices } from '@/shared/serviceCatalog';
 import { send } from '@/shared/messages';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
+import { ServiceIcon } from './ServiceIcon';
 import styles from './ServiceSearch.module.css';
 
 type Props = {
@@ -152,12 +153,11 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
               }
             }}
           >
-            <span
-              className={styles.swatch}
-              style={{ background: accountColor }}
-            >
-              {hit.service.name.charAt(0)}
-            </span>
+            <ServiceIcon
+              id={hit.service.id}
+              name={hit.service.name}
+              fallbackBg={accountColor}
+            />
             <span className={styles.name}>{hit.service.name}</span>
             {hit.service.features && hit.service.features.length > 0 && (
               <span className={styles.chevron} aria-hidden>›</span>
