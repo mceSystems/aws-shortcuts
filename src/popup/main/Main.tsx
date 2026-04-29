@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { Header } from './Header';
 import { AccountList } from './AccountList';
-import { RegionSuggestion } from './RegionSuggestion';
-import { RoleSuggestion } from './RoleSuggestion';
+import { SuggestionQueue } from './SuggestionQueue';
 import { useAccounts } from '../hooks/useAccounts';
+import { send } from '@/shared/messages';
 import styles from './Main.module.css';
 
 type Props = {
@@ -20,7 +20,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       <Header
         onSettings={onOpenSettings}
         onRefresh={() => {
-          // hooked up later when we wire SCAN_PORTAL re-run
+          void send({ type: 'RESCAN_OPEN_TABS' });
         }}
         onPalette={() => {
           // cmd+k overlay coming next
@@ -28,12 +28,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       />
 
       <div className={styles.body}>
-        {loaded && (
-          <>
-            <RoleSuggestion accounts={accounts} />
-            <RegionSuggestion accounts={accounts} />
-          </>
-        )}
+        {loaded && <SuggestionQueue accounts={accounts} />}
 
         <Section label="Account">
           {loaded ? (

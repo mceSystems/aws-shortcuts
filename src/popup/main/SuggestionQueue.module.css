@@ -1,0 +1,147 @@
+.banner {
+  --banner-color: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--banner-color) 5%, var(--surface-1));
+  border: 1px solid color-mix(in oklch, var(--banner-color) 22%, transparent);
+  box-shadow: var(--elev-1);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--banner-color);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--banner-color) 18%, transparent);
+  flex-shrink: 0;
+}
+
+.chipName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.navBtn,
+.close {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--ink-500);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.navBtn:hover:not(:disabled),
+.close:hover {
+  background: var(--ink-100);
+  color: var(--ink-900);
+}
+
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.count {
+  font-size: 11px;
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.question {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-900);
+}
+
+.value {
+  font-weight: 600;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 13px;
+  background: color-mix(in oklch, var(--banner-color) 12%, transparent);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--ink-500);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.secondary,
+.primary {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast), filter var(--dur-fast), transform var(--dur-fast);
+}
+
+.secondary {
+  border: 1px solid var(--ink-200);
+  background: var(--surface-1);
+  color: var(--ink-700);
+}
+
+.secondary:hover {
+  background: var(--ink-100);
+  color: var(--ink-900);
+}
+
+.primary {
+  border: none;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}

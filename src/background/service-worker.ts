@@ -1,6 +1,6 @@
 import type { Msg, MsgResponse } from '@/shared/messages';
 import type { Account } from '@/shared/types';
-import { getSync, setSync } from '@/shared/storage';
+import { getSync, mutateSync } from '@/shared/storage';
 import { getSessionState, setBearer } from '@/shared/sessionStorage';
 import { awsColorToHex } from '@/shared/colors';
 import { fetchAccounts } from './portal-api';
@@ -41,15 +41,70 @@ chrome.webRequest.onSendHeaders.addListener(
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[aws-shortcut] installed');
   void refreshOriginRule();
+  void harvestOpenTabs();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   void refreshOriginRule();
+  void harvestOpenTabs();
 });
 
+async function harvestOpenTabs(): Promise<void> {
+  try {
+    const tabs = await chrome.tabs.query({
+      url: ['https://*.console.aws.amazon.com/*'],
+    });
+    console.log('[aws-shortcut] harvest: matched', tabs.length, 'console tabs');
+    const consoleScript = chrome.runtime
+      .getManifest()
+      .content_scripts?.find((cs) =>
+        cs.matches?.some((m) => m.includes('console.aws.amazon.com')),
+      )
+      ?.js?.[0];
+    console.log('[aws-shortcut] harvest: script path', consoleScript);
+
+    await Promise.all(
+      tabs.map(async (tab) => {
+        if (!tab.id) return;
+        const tabId = tab.id;
+        try {
+          await chrome.tabs.sendMessage(tabId, { type: 'RESCAN_TAB' });
+          console.log('[aws-shortcut] sendMessage ok for tab', tabId, tab.url);
+        } catch (msgErr) {
+          console.log('[aws-shortcut] sendMessage failed for tab', tabId, msgErr);
+          if (!consoleScript) return;
+          try {
+            await chrome.scripting.executeScript({
+              target: { tabId },
+              files: [consoleScript],
+            });
+            console.log('[aws-shortcut] injected into tab', tabId);
+          } catch (injErr) {
+            console.warn('[aws-shortcut] inject failed for tab', tabId, injErr);
+          }
+        }
+      }),
+    );
+  } catch (e) {
+    console.warn('[aws-shortcut] harvest failed', e);
+  }
+}
+
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && changes.ssoConfig) {
+  if (area !== 'sync') return;
+  if (changes.ssoConfig) {
     void refreshOriginRule();
+  }
+  // Accounts list transitions empty → non-empty (first scan, sync from another
+  // device, import). Trigger harvest so any console tabs already open re-emit
+  // their cached color/role/region observations against the now-populated
+  // accounts table.
+  if (changes.accounts) {
+    const oldLen = (changes.accounts.oldValue as Account[] | undefined)?.length ?? 0;
+    const newLen = (changes.accounts.newValue as Account[] | undefined)?.length ?? 0;
+    if (oldLen === 0 && newLen > 0) {
+      void harvestOpenTabs();
+    }
   }
 });
 
@@ -119,11 +174,6 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     }
 
     case 'SCAN_PORTAL': {
-      const sync = await getSync();
-      const portalHost = sync.ssoConfig?.portalHost;
-      if (!portalHost) {
-        return { ok: false, error: 'No portal configured. Complete step 1 first.' };
-      }
       const session = await getSessionState();
       if (!session.bearerToken) {
         return {
@@ -131,96 +181,118 @@ async function handle(msg: Msg): Promise<MsgResponse> {
           error: 'No portal token captured yet. Open the portal tab once.',
         };
       }
-      const apiHost = session.bearerHost ?? `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
-      const accounts = await fetchAccounts(apiHost, session.bearerToken);
-      const merged = mergeAccounts(sync.accounts, accounts);
-      await setSync({ accounts: merged });
+      let merged: Account[] = [];
+      let scanError: string | null = null;
+      await mutateSync(async (sync) => {
+        const portalHost = sync.ssoConfig?.portalHost;
+        if (!portalHost) {
+          scanError = 'No portal configured. Complete step 1 first.';
+          return null;
+        }
+        const apiHost =
+          session.bearerHost ??
+          `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
+        const accounts = await fetchAccounts(apiHost, session.bearerToken!);
+        merged = mergeAccounts(sync.accounts, accounts);
+        return { accounts: merged };
+      });
+      if (scanError) return { ok: false, error: scanError };
+      // Force any open console tabs to re-emit observations against the
+      // now-populated accounts list. Covers the case where a tab already
+      // detected color/role/region before scan and cached it in CS memory.
+      void harvestOpenTabs();
       return { ok: true, accounts: merged };
     }
 
     case 'ACCOUNT_COLOR_OBSERVED': {
       const hex = awsColorToHex(msg.colorName);
       if (!hex) return { ok: true };
-      const sync = await getSync();
-      const next = sync.accounts.map((a) =>
-        a.accountId === msg.accountId && a.color !== hex ? { ...a, color: hex } : a,
-      );
-      const changed = next.some(
-        (a, i) => a.color !== sync.accounts[i]?.color,
-      );
-      if (changed) await setSync({ accounts: next });
+      await mutateSync((sync) => {
+        const next = sync.accounts.map((a) =>
+          a.accountId === msg.accountId && a.color !== hex ? { ...a, color: hex } : a,
+        );
+        const changed = next.some((a, i) => a.color !== sync.accounts[i]?.color);
+        return changed ? { accounts: next } : null;
+      });
       return { ok: true };
     }
 
     case 'ACCOUNT_REGION_OBSERVED': {
-      const sync = await getSync();
-      let mutated = false;
-      const next = sync.accounts.map((a) => {
-        if (a.accountId !== msg.accountId) return a;
-        const updated = recordRegionObservation(a, msg.region);
-        if (updated !== a) mutated = true;
-        return updated;
+      await mutateSync((sync) => {
+        let mutated = false;
+        const next = sync.accounts.map((a) => {
+          if (a.accountId !== msg.accountId) return a;
+          const updated = recordRegionObservation(a, msg.region);
+          if (updated !== a) mutated = true;
+          return updated;
+        });
+        return mutated ? { accounts: next } : null;
       });
-      if (mutated) await setSync({ accounts: next });
       return { ok: true };
     }
 
     case 'SET_ACCOUNT_DEFAULT_REGION': {
-      const sync = await getSync();
-      const next = sync.accounts.map((a) =>
-        a.accountId === msg.accountId
-          ? { ...a, defaultRegion: msg.region }
-          : a,
-      );
-      await setSync({ accounts: next });
+      await mutateSync((sync) => ({
+        accounts: sync.accounts.map((a) =>
+          a.accountId === msg.accountId
+            ? { ...a, defaultRegion: msg.region }
+            : a,
+        ),
+      }));
       return { ok: true };
     }
 
     case 'DISMISS_REGION_SUGGESTION': {
-      const sync = await getSync();
-      const next = sync.accounts.map((a) => {
-        if (a.accountId !== msg.accountId) return a;
-        const dismissed = a.dismissedRegions ?? [];
-        if (dismissed.includes(msg.region)) return a;
-        return { ...a, dismissedRegions: [...dismissed, msg.region] };
-      });
-      await setSync({ accounts: next });
+      await mutateSync((sync) => ({
+        accounts: sync.accounts.map((a) => {
+          if (a.accountId !== msg.accountId) return a;
+          const dismissed = a.dismissedRegions ?? [];
+          if (dismissed.includes(msg.region)) return a;
+          return { ...a, dismissedRegions: [...dismissed, msg.region] };
+        }),
+      }));
       return { ok: true };
     }
 
     case 'ACCOUNT_ROLE_OBSERVED': {
-      const sync = await getSync();
-      let mutated = false;
-      const next = sync.accounts.map((a) => {
-        if (a.accountId !== msg.accountId) return a;
-        const updated = recordRoleObservation(a, msg.roleName);
-        if (updated !== a) mutated = true;
-        return updated;
+      await mutateSync((sync) => {
+        let mutated = false;
+        const next = sync.accounts.map((a) => {
+          if (a.accountId !== msg.accountId) return a;
+          const updated = recordRoleObservation(a, msg.roleName);
+          if (updated !== a) mutated = true;
+          return updated;
+        });
+        return mutated ? { accounts: next } : null;
       });
-      if (mutated) await setSync({ accounts: next });
       return { ok: true };
     }
 
     case 'SET_ACCOUNT_DEFAULT_ROLE': {
-      const sync = await getSync();
-      const next = sync.accounts.map((a) =>
-        a.accountId === msg.accountId
-          ? { ...a, defaultRoleName: msg.roleName }
-          : a,
-      );
-      await setSync({ accounts: next });
+      await mutateSync((sync) => ({
+        accounts: sync.accounts.map((a) =>
+          a.accountId === msg.accountId
+            ? { ...a, defaultRoleName: msg.roleName }
+            : a,
+        ),
+      }));
       return { ok: true };
     }
 
     case 'DISMISS_ROLE_SUGGESTION': {
-      const sync = await getSync();
-      const next = sync.accounts.map((a) => {
-        if (a.accountId !== msg.accountId) return a;
-        const dismissed = a.dismissedRoles ?? [];
-        if (dismissed.includes(msg.roleName)) return a;
-        return { ...a, dismissedRoles: [...dismissed, msg.roleName] };
-      });
-      await setSync({ accounts: next });
+      await mutateSync((sync) => ({
+        accounts: sync.accounts.map((a) => {
+          if (a.accountId !== msg.accountId) return a;
+          const dismissed = a.dismissedRoles ?? [];
+          if (dismissed.includes(msg.roleName)) return a;
+          return { ...a, dismissedRoles: [...dismissed, msg.roleName] };
+        }),
+      }));
+      return { ok: true };
+    }
+
+    case 'RESCAN_OPEN_TABS': {
+      await harvestOpenTabs();
       return { ok: true };
     }
   }

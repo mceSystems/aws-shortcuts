@@ -42,6 +42,23 @@ export async function setSync(patch: Partial<SyncSchema>): Promise<void> {
   await chrome.storage.sync.set(patch);
 }
 
+// Serialized read-modify-write. Prevents racing concurrent observation
+// handlers from clobbering each other's writes when multiple tabs report
+// at once. Each call waits for the previous mutation to finish.
+let mutationChain: Promise<void> = Promise.resolve();
+
+export function mutateSync(
+  fn: (state: SyncSchema) => Partial<SyncSchema> | null | Promise<Partial<SyncSchema> | null>,
+): Promise<void> {
+  const next = mutationChain.then(async () => {
+    const cur = await getSync();
+    const patch = await fn(cur);
+    if (patch) await setSync(patch);
+  });
+  mutationChain = next.catch(() => {});
+  return next;
+}
+
 export async function getLocal(): Promise<LocalSchema> {
   const raw = await chrome.storage.local.get(null);
   return { ...DEFAULT_LOCAL, ...(raw as Partial<LocalSchema>) };

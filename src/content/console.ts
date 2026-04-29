@@ -63,10 +63,33 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
     }
   }, 1500);
 
+  // Allow background to ask us to re-scan on demand (e.g. user clicks refresh
+  // in the popup, or extension boot harvesting existing tabs).
+  chrome.runtime.onMessage.addListener((msg: { type?: string }, _sender, reply) => {
+    if (msg?.type === 'RESCAN_TAB') {
+      // Reset caches so a forced re-scan re-emits even if values match.
+      lastReported = null;
+      lastRole = null;
+      lastRegion = null;
+      reportRegion(regionFromUrl());
+      tryScrape();
+      reply?.({ ok: true });
+      return true;
+    }
+    return false;
+  });
+
   function tryScrape(): void {
-    // Prefer the always-visible color band (top header). Falls back to text
-    // scrape inside the multi-session sidebar when the band isn't found.
-    const color = findColorFromBand() ?? findColorName();
+    const fromBand = findColorFromBand();
+    const fromText = fromBand ? null : findColorName();
+    const color = fromBand ?? fromText;
+    const role = findRoleName();
+    console.log('[aws-shortcut/cs]', accountId, {
+      colorBand: fromBand,
+      colorText: fromText,
+      role,
+      url: location.href,
+    });
     if (color && color !== lastReported) {
       lastReported = color;
       void chrome.runtime.sendMessage({
@@ -75,7 +98,6 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
         colorName: color,
       });
     }
-    const role = findRoleName();
     if (role && role !== lastRole) {
       lastRole = role;
       void chrome.runtime.sendMessage({
