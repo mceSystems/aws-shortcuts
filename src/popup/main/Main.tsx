@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Header } from './Header';
 import { AccountList, AccountsEditButton } from './AccountList';
-import { SuggestionQueue } from './SuggestionQueue';
+import { ServiceSearch } from './ServiceSearch';
 import { useAccounts } from '../hooks/useAccounts';
 import { send } from '@/shared/messages';
+import { getSync, setSync } from '@/shared/storage';
 import styles from './Main.module.css';
 
 type Props = {
@@ -12,9 +13,30 @@ type Props = {
 };
 
 export function Main({ onOpenSettings, onWipe }: Props) {
-  const { accounts, accountOrder, hiddenAccountIds, loaded } = useAccounts();
+  const { accounts, accountOrder, hiddenAccountIds, ssoConfig, prefs, loaded } = useAccounts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const initRef = useState({ done: false })[0];
+
+  // Restore last-selected account once accounts + prefs have loaded.
+  useEffect(() => {
+    if (!loaded || initRef.done) return;
+    initRef.done = true;
+    const last = prefs?.lastSelectedAccountId;
+    if (last && accounts.some((a) => a.accountId === last)) {
+      setSelectedId(last);
+    }
+  }, [loaded, prefs, accounts, initRef]);
+
+  function selectAccount(id: string | null) {
+    setSelectedId(id);
+    void persistLastSelected(id);
+  }
+
+  const selectedAccount = useMemo(
+    () => accounts.find((a) => a.accountId === selectedId) ?? null,
+    [accounts, selectedId],
+  );
 
   return (
     <div className={styles.root}>
@@ -29,7 +51,9 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       />
 
       <div className={styles.body}>
-        {loaded && <SuggestionQueue accounts={accounts} />}
+        <Section label={selectedAccount ? 'Service' : 'Pick an account first'}>
+          <ServiceSearch account={selectedAccount} ssoConfig={ssoConfig} />
+        </Section>
 
         <Section
           label="Account"
@@ -48,16 +72,12 @@ export function Main({ onOpenSettings, onWipe }: Props) {
               accountOrder={accountOrder}
               hiddenAccountIds={hiddenAccountIds}
               selectedId={selectedId}
-              onSelect={(id) => setSelectedId(id === selectedId ? null : id)}
+              onSelect={(id) => selectAccount(id === selectedId ? null : id)}
               editing={editing}
             />
           ) : (
             <div className={styles.skeleton} />
           )}
-        </Section>
-
-        <Section label={selectedId ? 'Service' : 'Pick an account first'}>
-          <div className={styles.placeholder}>Service search · coming next</div>
         </Section>
 
         <Section label="Favorites">
@@ -75,6 +95,13 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       )}
     </div>
   );
+}
+
+async function persistLastSelected(accountId: string | null): Promise<void> {
+  const sync = await getSync();
+  await setSync({
+    prefs: { ...sync.prefs, lastSelectedAccountId: accountId ?? undefined },
+  });
 }
 
 function Section({

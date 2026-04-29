@@ -22,15 +22,3 @@ export const AWS_REGIONS = [
   'af-south-1',
 ] as const;
 
-export function pickRegionSuggestion(
-  observed: { region: string; hits: number; lastSeenAt: number }[] | undefined,
-  dismissed: string[] | undefined,
-): { region: string; hits: number } | undefined {
-  if (!observed || observed.length === 0) return undefined;
-  const skip = new Set(dismissed ?? []);
-  const candidates = observed
-    .filter((o) => !skip.has(o.region))
-    .sort((a, b) => b.lastSeenAt - a.lastSeenAt);
-  if (candidates.length === 0) return undefined;
-  return { region: candidates[0].region, hits: candidates[0].hits };
-}

@@ -55,6 +55,34 @@
   min-width: 0;
 }
 
+.nameInput {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+  letter-spacing: -0.005em;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-xs);
+  background: var(--surface-1);
+  padding: 2px 8px;
+  height: 26px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.nameInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.nameInput::placeholder {
+  color: var(--ink-400);
+  font-weight: 400;
+  font-style: italic;
+}
+
 .roleBtn {
   display: inline-flex;
   align-items: center;

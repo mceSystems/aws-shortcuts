@@ -82,10 +82,9 @@ export async function fetchAccounts(
       email: app.searchMetadata?.AccountEmail,
       appInstanceId: app.id,
       roles,
-      // mergeAccounts will auto-fill for single-role accounts, leave blank
-      // otherwise so the user gets a confirm prompt.
-      defaultRoleName: '',
-      defaultRegion: '',
+      // mergeAccounts auto-fills preferredRoleName for single-role accounts.
+      preferredRoleName: '',
+      preferredRegion: '',
       color: '',
     });
   }

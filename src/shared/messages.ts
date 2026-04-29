@@ -5,14 +5,15 @@ export type Msg =
   | { type: 'SCAN_PORTAL' }
   | { type: 'ACCOUNT_COLOR_OBSERVED'; accountId: string; colorName: string }
   | { type: 'ACCOUNT_REGION_OBSERVED'; accountId: string; region: string }
-  | { type: 'SET_ACCOUNT_DEFAULT_REGION'; accountId: string; region: string }
-  | { type: 'DISMISS_REGION_SUGGESTION'; accountId: string; region: string }
+  | { type: 'SET_ACCOUNT_PREFERRED_REGION'; accountId: string; region: string }
+  | { type: 'TOGGLE_REGION_LOCK'; accountId: string; locked: boolean }
   | { type: 'ACCOUNT_ROLE_OBSERVED'; accountId: string; roleName: string }
-  | { type: 'SET_ACCOUNT_DEFAULT_ROLE'; accountId: string; roleName: string }
-  | { type: 'DISMISS_ROLE_SUGGESTION'; accountId: string; roleName: string }
+  | { type: 'SET_ACCOUNT_PREFERRED_ROLE'; accountId: string; roleName: string }
+  | { type: 'TOGGLE_ROLE_LOCK'; accountId: string; locked: boolean }
   | { type: 'RESCAN_OPEN_TABS' }
   | { type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' }
-  | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] };
+  | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] }
+  | { type: 'SET_ACCOUNT_ALIAS'; accountId: string; alias: string };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };

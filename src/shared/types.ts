@@ -17,21 +17,23 @@ export type RoleObservation = {
 export type Account = {
   accountId: string;
   name: string;
+  /** User-set display alias. Falls back to `name` in UI. */
+  alias?: string;
   email?: string;
   appInstanceId: string;
   roles: Role[];
-  /** Confirmed default role. Empty until single-role auto-set, user-confirmed, or manual pick. */
-  defaultRoleName: string;
-  /** Observed roles from console visits. Drives the role suggestion banner. */
+  /** Preferred role for opens. Auto-updates with last-used unless `roleLocked`. */
+  preferredRoleName: string;
+  /** When true, opens never overwrite preferredRoleName. User-controlled pin. */
+  roleLocked?: boolean;
+  /** Observed roles from console visits. Drives picker ordering. */
   observedRoles?: RoleObservation[];
-  /** Roles the user has actively declined for default-role suggestion. */
-  dismissedRoles?: string[];
-  /** Confirmed default region. Empty until user explicitly confirms or sets manually. */
-  defaultRegion: string;
-  /** Observed regions from console visits. Drives the region suggestion banner. */
+  /** Preferred region for opens. Auto-updates with last-used unless `regionLocked`. */
+  preferredRegion: string;
+  /** When true, opens never overwrite preferredRegion. User-controlled pin. */
+  regionLocked?: boolean;
+  /** Observed regions from console visits. Drives picker ordering. */
   observedRegions?: RegionObservation[];
-  /** Regions the user has actively declined for default-region suggestion. */
-  dismissedRegions?: string[];
   color: string;
 };
 
@@ -75,4 +77,6 @@ export type Prefs = {
   uiMode: 'popup' | 'sidepanel' | 'both';
   multiSessionVerified: boolean;
   catalogLastRefreshAt?: number;
+  /** Last account selected in popup; restored on next popup open. */
+  lastSelectedAccountId?: string;
 };

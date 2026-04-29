@@ -199,7 +199,11 @@ async function handle(msg: Msg): Promise<MsgResponse> {
         let mutated = false;
         const next = sync.accounts.map((a) => {
           if (a.accountId !== msg.accountId) return a;
-          const updated = recordRegionObservation(a, msg.region);
+          let updated = recordRegionObservation(a, msg.region);
+          // Auto-adopt as preferred when none set yet and not locked.
+          if (!updated.preferredRegion && !updated.regionLocked && msg.region) {
+            updated = { ...updated, preferredRegion: msg.region };
+          }
           if (updated !== a) mutated = true;
           return updated;
         });
@@ -208,25 +212,24 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return { ok: true };
     }
 
-    case 'SET_ACCOUNT_DEFAULT_REGION': {
+    case 'SET_ACCOUNT_PREFERRED_REGION': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
           a.accountId === msg.accountId
-            ? { ...a, defaultRegion: msg.region }
+            ? { ...a, preferredRegion: msg.region }
             : a,
         ),
       }));
       return { ok: true };
     }
 
-    case 'DISMISS_REGION_SUGGESTION': {
+    case 'TOGGLE_REGION_LOCK': {
       await mutateSync((sync) => ({
-        accounts: sync.accounts.map((a) => {
-          if (a.accountId !== msg.accountId) return a;
-          const dismissed = a.dismissedRegions ?? [];
-          if (dismissed.includes(msg.region)) return a;
-          return { ...a, dismissedRegions: [...dismissed, msg.region] };
-        }),
+        accounts: sync.accounts.map((a) =>
+          a.accountId === msg.accountId
+            ? { ...a, regionLocked: msg.locked }
+            : a,
+        ),
       }));
       return { ok: true };
     }
@@ -236,7 +239,17 @@ async function handle(msg: Msg): Promise<MsgResponse> {
         let mutated = false;
         const next = sync.accounts.map((a) => {
           if (a.accountId !== msg.accountId) return a;
-          const updated = recordRoleObservation(a, msg.roleName);
+          let updated = recordRoleObservation(a, msg.roleName);
+          // Auto-adopt as preferred when none set yet and not locked. Only if
+          // the role is part of the account's roles list (recordRoleObservation
+          // already enforces this for the observation itself).
+          if (
+            !updated.preferredRoleName &&
+            !updated.roleLocked &&
+            updated.roles.some((r) => r.name === msg.roleName)
+          ) {
+            updated = { ...updated, preferredRoleName: msg.roleName };
+          }
           if (updated !== a) mutated = true;
           return updated;
         });
@@ -245,25 +258,24 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return { ok: true };
     }
 
-    case 'SET_ACCOUNT_DEFAULT_ROLE': {
+    case 'SET_ACCOUNT_PREFERRED_ROLE': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
           a.accountId === msg.accountId
-            ? { ...a, defaultRoleName: msg.roleName }
+            ? { ...a, preferredRoleName: msg.roleName }
             : a,
         ),
       }));
       return { ok: true };
     }
 
-    case 'DISMISS_ROLE_SUGGESTION': {
+    case 'TOGGLE_ROLE_LOCK': {
       await mutateSync((sync) => ({
-        accounts: sync.accounts.map((a) => {
-          if (a.accountId !== msg.accountId) return a;
-          const dismissed = a.dismissedRoles ?? [];
-          if (dismissed.includes(msg.roleName)) return a;
-          return { ...a, dismissedRoles: [...dismissed, msg.roleName] };
-        }),
+        accounts: sync.accounts.map((a) =>
+          a.accountId === msg.accountId
+            ? { ...a, roleLocked: msg.locked }
+            : a,
+        ),
       }));
       return { ok: true };
     }
@@ -280,6 +292,18 @@ async function handle(msg: Msg): Promise<MsgResponse> {
         const hidden = msg.hidden.filter((id) => ids.has(id));
         return { accountOrder: visible, hiddenAccountIds: hidden };
       });
+      return { ok: true };
+    }
+
+    case 'SET_ACCOUNT_ALIAS': {
+      const trimmed = msg.alias.trim();
+      await mutateSync((sync) => ({
+        accounts: sync.accounts.map((a) =>
+          a.accountId === msg.accountId
+            ? { ...a, alias: trimmed || undefined }
+            : a,
+        ),
+      }));
       return { ok: true };
     }
   }
@@ -542,25 +566,36 @@ function mergeAccounts(existing: Account[], incoming: Account[]): Account[] {
       inc.roles.length === 1 ? inc.roles[0]?.name ?? '' : '';
 
     if (prev) {
-      // Preserve user-set default if still valid; clear otherwise.
-      const carriedDefault = prev.defaultRoleName && roleNames.has(prev.defaultRoleName)
-        ? prev.defaultRoleName
+      // Migration: support legacy field names from earlier builds.
+      const prevAny = prev as unknown as {
+        preferredRoleName?: string;
+        defaultRoleName?: string;
+        preferredRegion?: string;
+        defaultRegion?: string;
+        roleLocked?: boolean;
+        regionLocked?: boolean;
+      };
+      const prevPreferredRole = prevAny.preferredRoleName ?? prevAny.defaultRoleName ?? '';
+      const carriedRole = prevPreferredRole && roleNames.has(prevPreferredRole)
+        ? prevPreferredRole
         : autoSingleRole;
       return {
         ...inc,
-        defaultRoleName: carriedDefault,
+        alias: prev.alias,
+        preferredRoleName: carriedRole,
+        roleLocked: prevAny.roleLocked,
         observedRoles: prev.observedRoles?.filter((o) => roleNames.has(o.roleName)),
-        dismissedRoles: prev.dismissedRoles?.filter((r) => roleNames.has(r)),
-        defaultRegion: prev.defaultRegion,
+        preferredRegion: prevAny.preferredRegion ?? prevAny.defaultRegion ?? '',
+        regionLocked: prevAny.regionLocked,
         observedRegions: prev.observedRegions,
-        dismissedRegions: prev.dismissedRegions,
         color: prev.color,
       };
     }
     // Neutral by default; populated by content-script observations.
     return {
       ...inc,
-      defaultRoleName: autoSingleRole,
+      preferredRoleName: autoSingleRole,
+      preferredRegion: '',
       color: '',
     };
   });

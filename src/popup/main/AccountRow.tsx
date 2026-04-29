@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Account } from '@/shared/types';
 import { chipColor } from '@/shared/colors';
+import { send } from '@/shared/messages';
 import { RegionPicker } from './RegionPicker';
 import { RolePicker } from './RolePicker';
 import styles from './AccountRow.module.css';
@@ -14,17 +15,34 @@ type Props = {
 };
 
 export function AccountRow({ account, selected, live, compact, onClick }: Props) {
-  const role = account.defaultRoleName || 'set role';
-  const region = account.defaultRegion || 'set region';
+  const role = account.preferredRoleName || 'set role';
+  const region = account.preferredRegion || 'set region';
   const isNeutral = !account.color;
   const [openPicker, setOpenPicker] = useState<'region' | 'role' | null>(null);
+  const [aliasDraft, setAliasDraft] = useState<string | null>(null);
 
   function handleRowClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest(`.${styles.regionBtn}`)) return;
     if (target.closest(`.${styles.roleBtn}`)) return;
+    if (target.closest(`.${styles.nameInput}`)) return;
     onClick();
   }
+
+  function commitAlias() {
+    if (aliasDraft === null) return;
+    const next = aliasDraft.trim();
+    if (next !== (account.alias ?? '')) {
+      void send({
+        type: 'SET_ACCOUNT_ALIAS',
+        accountId: account.accountId,
+        alias: next,
+      });
+    }
+    setAliasDraft(null);
+  }
+
+  const displayName = account.alias || account.name;
 
   return (
     <div
@@ -48,14 +66,40 @@ export function AccountRow({ account, selected, live, compact, onClick }: Props)
     >
       <span className={styles.stripe} />
       <span className={styles.dot} />
-      <span className={styles.name}>{account.name}</span>
+      {compact ? (
+        <input
+          type="text"
+          className={styles.nameInput}
+          value={aliasDraft ?? displayName}
+          placeholder={account.name}
+          onClick={(e) => e.stopPropagation()}
+          onFocus={() => {
+            if (aliasDraft === null) setAliasDraft(account.alias ?? '');
+          }}
+          onChange={(e) => setAliasDraft(e.target.value)}
+          onBlur={commitAlias}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              (e.target as HTMLInputElement).blur();
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              setAliasDraft(null);
+              (e.target as HTMLInputElement).blur();
+            }
+          }}
+          spellCheck={false}
+        />
+      ) : (
+        <span className={styles.name} title={account.name}>{displayName}</span>
+      )}
       {!compact && (
         <>
           <button
             type="button"
             className={[
               styles.roleBtn,
-              account.defaultRoleName ? '' : styles.roleBtnEmpty,
+              account.preferredRoleName ? '' : styles.roleBtnEmpty,
             ]
               .filter(Boolean)
               .join(' ')}
@@ -72,7 +116,7 @@ export function AccountRow({ account, selected, live, compact, onClick }: Props)
             type="button"
             className={[
               styles.regionBtn,
-              account.defaultRegion ? '' : styles.regionBtnEmpty,
+              account.preferredRegion ? '' : styles.regionBtnEmpty,
             ]
               .filter(Boolean)
               .join(' ')}

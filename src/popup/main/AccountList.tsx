@@ -243,6 +243,7 @@ export function AccountList({
               <AccountRow
                 account={a}
                 selected={selectedId === a.accountId}
+                compact={editing}
                 onClick={() => onSelect(a.accountId)}
               />
             </div>
