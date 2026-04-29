@@ -36,8 +36,7 @@
   gap: var(--space-3);
 }
 
-.sectionLabel::after {
-  content: "";
+.sectionLine {
   flex: 1;
   height: 1px;
   background: var(--ink-200);

@@ -11,7 +11,8 @@ export type Msg =
   | { type: 'SET_ACCOUNT_DEFAULT_ROLE'; accountId: string; roleName: string }
   | { type: 'DISMISS_ROLE_SUGGESTION'; accountId: string; roleName: string }
   | { type: 'RESCAN_OPEN_TABS' }
-  | { type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' };
+  | { type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' }
+  | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };

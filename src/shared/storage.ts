@@ -5,6 +5,10 @@ export type SyncSchema = {
   accounts: Account[];
   favorites: Favorite[];
   prefs: Prefs;
+  /** Visible accountIds in display order. New accounts append. */
+  accountOrder: string[];
+  /** Hidden accountIds in display order (within the hidden section). */
+  hiddenAccountIds: string[];
 };
 
 export type LocalSchema = {
@@ -20,13 +24,22 @@ const DEFAULT_SYNC: SyncSchema = {
   accounts: [],
   favorites: [],
   prefs: DEFAULT_PREFS,
+  accountOrder: [],
+  hiddenAccountIds: [],
 };
 
 const DEFAULT_LOCAL: LocalSchema = {
   recents: [],
 };
 
-const SYNC_KEYS: (keyof SyncSchema)[] = ['ssoConfig', 'accounts', 'favorites', 'prefs'];
+const SYNC_KEYS: (keyof SyncSchema)[] = [
+  'ssoConfig',
+  'accounts',
+  'favorites',
+  'prefs',
+  'accountOrder',
+  'hiddenAccountIds',
+];
 
 export async function getSync(): Promise<SyncSchema> {
   const raw = await chrome.storage.sync.get(SYNC_KEYS);

@@ -4,8 +4,150 @@
   gap: 4px;
 }
 
+.editing {
+  /* Subtle ring around list while editing. */
+  padding: 4px;
+  margin: -4px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--accent) 4%, transparent);
+  outline: 1px dashed color-mix(in oklch, var(--accent) 28%, transparent);
+}
+
 .empty {
   font-size: 12px;
   color: var(--ink-500);
   font-style: italic;
+}
+
+.editBtn {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--ink-400);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+  flex-shrink: 0;
+}
+
+.editBtn:hover {
+  background: var(--ink-100);
+  color: var(--ink-700);
+}
+
+.editBtn[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.editBtn[aria-pressed='true']:hover {
+  filter: brightness(1.05);
+}
+
+.rowWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--dur-fast);
+}
+
+.rowWrap > :global(*:last-child) {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowWrap::before,
+.rowWrap::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast);
+}
+
+.rowWrap::before { top: -3px; }
+.rowWrap::after  { bottom: -3px; }
+
+.dropBefore::before { opacity: 1; }
+.dropAfter::after   { opacity: 1; }
+
+.dragging {
+  opacity: 0.4;
+}
+
+.handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--ink-400);
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.hiddenRow {
+  opacity: 0.55;
+}
+
+.hiddenRow.dragging {
+  opacity: 0.4;
+}
+
+.toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-400);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  margin: 2px 0 2px 4px;
+  transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast);
+}
+
+.toggle:hover {
+  background: var(--ink-100);
+  color: var(--ink-700);
+}
+
+.toggleCount {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-500);
+}
+
+.toggleDrop {
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.tailDrop {
+  min-height: 24px;
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  border: 1px dashed color-mix(in oklch, var(--accent) 30%, transparent);
+  background: color-mix(in oklch, var(--accent) 4%, transparent);
 }

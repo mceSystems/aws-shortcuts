@@ -9,10 +9,11 @@ type Props = {
   account: Account;
   selected: boolean;
   live?: boolean;
+  compact?: boolean;
   onClick: () => void;
 };
 
-export function AccountRow({ account, selected, live, onClick }: Props) {
+export function AccountRow({ account, selected, live, compact, onClick }: Props) {
   const role = account.defaultRoleName || 'set role';
   const region = account.defaultRegion || 'set region';
   const isNeutral = !account.color;
@@ -48,49 +49,53 @@ export function AccountRow({ account, selected, live, onClick }: Props) {
       <span className={styles.stripe} />
       <span className={styles.dot} />
       <span className={styles.name}>{account.name}</span>
-      <button
-        type="button"
-        className={[
-          styles.roleBtn,
-          account.defaultRoleName ? '' : styles.roleBtnEmpty,
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        title={role}
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpenPicker((v) => (v === 'role' ? null : 'role'));
-        }}
-      >
-        {role}
-        <span className={styles.caret}>▾</span>
-      </button>
-      <button
-        type="button"
-        className={[
-          styles.regionBtn,
-          account.defaultRegion ? '' : styles.regionBtnEmpty,
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpenPicker((v) => (v === 'region' ? null : 'region'));
-        }}
-      >
-        {region}
-        <span className={styles.caret}>▾</span>
-      </button>
-      <span
-        className={styles.live}
-        aria-label={live ? 'session live' : ''}
-        data-live={live ? 'true' : 'false'}
-      />
-      {openPicker === 'role' && (
-        <RolePicker account={account} onClose={() => setOpenPicker(null)} />
-      )}
-      {openPicker === 'region' && (
-        <RegionPicker account={account} onClose={() => setOpenPicker(null)} />
+      {!compact && (
+        <>
+          <button
+            type="button"
+            className={[
+              styles.roleBtn,
+              account.defaultRoleName ? '' : styles.roleBtnEmpty,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            title={role}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenPicker((v) => (v === 'role' ? null : 'role'));
+            }}
+          >
+            {role}
+            <span className={styles.caret}>▾</span>
+          </button>
+          <button
+            type="button"
+            className={[
+              styles.regionBtn,
+              account.defaultRegion ? '' : styles.regionBtnEmpty,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenPicker((v) => (v === 'region' ? null : 'region'));
+            }}
+          >
+            {region}
+            <span className={styles.caret}>▾</span>
+          </button>
+          <span
+            className={styles.live}
+            aria-label={live ? 'session live' : ''}
+            data-live={live ? 'true' : 'false'}
+          />
+          {openPicker === 'role' && (
+            <RolePicker account={account} onClose={() => setOpenPicker(null)} />
+          )}
+          {openPicker === 'region' && (
+            <RegionPicker account={account} onClose={() => setOpenPicker(null)} />
+          )}
+        </>
       )}
     </div>
   );

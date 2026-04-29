@@ -2,24 +2,44 @@ import { useEffect, useState } from 'react';
 import { getSync } from '@/shared/storage';
 import type { Account } from '@/shared/types';
 
-export function useAccounts(): { accounts: Account[]; loaded: boolean } {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loaded, setLoaded] = useState(false);
+type State = {
+  accounts: Account[];
+  accountOrder: string[];
+  hiddenAccountIds: string[];
+  loaded: boolean;
+};
+
+export function useAccounts(): State {
+  const [state, setState] = useState<State>({
+    accounts: [],
+    accountOrder: [],
+    hiddenAccountIds: [],
+    loaded: false,
+  });
 
   useEffect(() => {
     let cancelled = false;
     void getSync().then((sync) => {
       if (cancelled) return;
-      setAccounts(sync.accounts);
-      setLoaded(true);
+      setState({
+        accounts: sync.accounts,
+        accountOrder: sync.accountOrder,
+        hiddenAccountIds: sync.hiddenAccountIds,
+        loaded: true,
+      });
     });
     const handler = (
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
-      if (area === 'sync' && changes.accounts) {
-        setAccounts((changes.accounts.newValue as Account[]) ?? []);
-      }
+      if (area !== 'sync') return;
+      setState((prev) => ({
+        ...prev,
+        accounts: (changes.accounts?.newValue as Account[]) ?? prev.accounts,
+        accountOrder: (changes.accountOrder?.newValue as string[]) ?? prev.accountOrder,
+        hiddenAccountIds:
+          (changes.hiddenAccountIds?.newValue as string[]) ?? prev.hiddenAccountIds,
+      }));
     };
     chrome.storage.onChanged.addListener(handler);
     return () => {
@@ -28,5 +48,5 @@ export function useAccounts(): { accounts: Account[]; loaded: boolean } {
     };
   }, []);
 
-  return { accounts, loaded };
+  return state;
 }

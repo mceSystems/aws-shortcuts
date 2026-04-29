@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Header } from './Header';
-import { AccountList } from './AccountList';
+import { AccountList, AccountsEditButton } from './AccountList';
 import { SuggestionQueue } from './SuggestionQueue';
 import { useAccounts } from '../hooks/useAccounts';
 import { send } from '@/shared/messages';
@@ -12,8 +12,9 @@ type Props = {
 };
 
 export function Main({ onOpenSettings, onWipe }: Props) {
-  const { accounts, loaded } = useAccounts();
+  const { accounts, accountOrder, hiddenAccountIds, loaded } = useAccounts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
 
   return (
     <div className={styles.root}>
@@ -30,12 +31,25 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       <div className={styles.body}>
         {loaded && <SuggestionQueue accounts={accounts} />}
 
-        <Section label="Account">
+        <Section
+          label="Account"
+          action={
+            loaded && accounts.length > 0 ? (
+              <AccountsEditButton
+                editing={editing}
+                onToggle={() => setEditing((v) => !v)}
+              />
+            ) : null
+          }
+        >
           {loaded ? (
             <AccountList
               accounts={accounts}
+              accountOrder={accountOrder}
+              hiddenAccountIds={hiddenAccountIds}
               selectedId={selectedId}
               onSelect={(id) => setSelectedId(id === selectedId ? null : id)}
+              editing={editing}
             />
           ) : (
             <div className={styles.skeleton} />
@@ -63,10 +77,22 @@ export function Main({ onOpenSettings, onWipe }: Props) {
   );
 }
 
-function Section({ label, children }: { label: string; children: ReactNode }) {
+function Section({
+  label,
+  action,
+  children,
+}: {
+  label: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <section className={styles.section}>
-      <div className={styles.sectionLabel}>{label}</div>
+      <div className={styles.sectionLabel}>
+        <span>{label}</span>
+        <span className={styles.sectionLine} />
+        {action}
+      </div>
       {children}
     </section>
   );

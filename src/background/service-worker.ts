@@ -272,6 +272,16 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       await harvestOpenTabs();
       return { ok: true };
     }
+
+    case 'REORDER_ACCOUNTS': {
+      await mutateSync((sync) => {
+        const ids = new Set(sync.accounts.map((a) => a.accountId));
+        const visible = msg.visible.filter((id) => ids.has(id));
+        const hidden = msg.hidden.filter((id) => ids.has(id));
+        return { accountOrder: visible, hiddenAccountIds: hidden };
+      });
+      return { ok: true };
+    }
   }
 }
 
@@ -296,11 +306,34 @@ async function runScanPortal(): Promise<MsgResponse> {
       `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
     const accounts = await fetchAccounts(apiHost, session.bearerToken!);
     merged = mergeAccounts(sync.accounts, accounts);
-    return { accounts: merged };
+    const { accountOrder, hiddenAccountIds } = reconcileOrder(
+      merged,
+      sync.accountOrder,
+      sync.hiddenAccountIds,
+    );
+    return { accounts: merged, accountOrder, hiddenAccountIds };
   });
   if (scanError) return { ok: false, error: scanError };
   void harvestOpenTabs();
   return { ok: true, accounts: merged };
+}
+
+function reconcileOrder(
+  accounts: Account[],
+  prevOrder: string[],
+  prevHidden: string[],
+): { accountOrder: string[]; hiddenAccountIds: string[] } {
+  const incomingIds = new Set(accounts.map((a) => a.accountId));
+  const visibleKept = prevOrder.filter((id) => incomingIds.has(id));
+  const hiddenKept = prevHidden.filter((id) => incomingIds.has(id));
+  const tracked = new Set([...visibleKept, ...hiddenKept]);
+  const fresh = accounts
+    .map((a) => a.accountId)
+    .filter((id) => !tracked.has(id));
+  return {
+    accountOrder: [...visibleKept, ...fresh],
+    hiddenAccountIds: hiddenKept,
+  };
 }
 
 // Capture a fresh bearer + run the scan, without breaking the user's flow.
