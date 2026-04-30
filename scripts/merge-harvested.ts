@@ -39,6 +39,7 @@ type Service = {
   id: string;
   name: string;
   consolePath: string;
+  popular?: boolean;
   aliases?: string[];
   features?: Feature[];
 };
@@ -55,6 +56,8 @@ type Overrides = {
   consolePathOverrides?: Record<string, string>;
   nameOverrides?: Record<string, string>;
   exclude?: string[];
+  /** Curated "popular" service ids — bumped in default order + slight match bonus. */
+  popular?: string[];
 };
 
 function readJson<T>(p: string): T {
@@ -118,6 +121,7 @@ function main(): void {
   const aliasMap = overrides.aliases ?? {};
   const pathOverrides = overrides.consolePathOverrides ?? {};
   const nameOverrides = overrides.nameOverrides ?? {};
+  const popularSet = new Set(overrides.popular ?? []);
 
   const out: Service[] = [];
   const ids = new Set<string>([...currentById.keys(), ...harvestedById.keys()]);
@@ -150,6 +154,7 @@ function main(): void {
       name,
       consolePath,
     };
+    if (popularSet.has(id)) entry.popular = true;
     if (aliases?.length) entry.aliases = aliases;
     if (features?.length) entry.features = features;
     out.push(entry);

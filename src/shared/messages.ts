@@ -27,6 +27,10 @@ export type Msg =
       roleName: string;
       region: string;
       consolePath: string;
+      /** Service id from catalog (e.g. "ec2") — bumps openCounts. */
+      serviceId?: string;
+      /** Feature path if a deep link, omitted for service home. */
+      featurePath?: string;
     }
   | { type: 'REFRESH_CATALOG' }
   | { type: 'HARVEST_SERVICES'; debug?: boolean }

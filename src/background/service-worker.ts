@@ -12,6 +12,7 @@ import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
 import { cancelHarvest, harvestFeatures, harvestServices } from './harvester';
+import { bumpOpenCount } from '@/shared/openCounts';
 
 installCatalogRefresh();
 
@@ -453,7 +454,12 @@ async function resolveLaunchUrl(input: {
   roleName: string;
   region: string;
   consolePath: string;
+  serviceId?: string;
+  featurePath?: string;
 }): Promise<MsgResponse> {
+  if (input.serviceId) {
+    void bumpOpenCount(input.serviceId, input.featurePath);
+  }
   const sync = await getSync();
   const portalHost = sync.ssoConfig?.portalHost;
   if (!portalHost) {

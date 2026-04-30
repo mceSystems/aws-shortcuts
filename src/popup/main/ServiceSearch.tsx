@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
-import { type CatalogHit, searchCatalog } from '@/shared/serviceCatalog';
+import { type CatalogHit, rankCatalog } from '@/shared/serviceCatalog';
 import { subscribeCatalog } from '@/shared/catalogStore';
+import { OPEN_COUNTS_STORAGE_KEY } from '@/shared/openCounts';
 import { send } from '@/shared/messages';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
 import { ServiceIcon } from './ServiceIcon';
@@ -21,10 +22,30 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [catalogTick, setCatalogTick] = useState(0);
+  const [openCounts, setOpenCounts] = useState<Record<string, number>>({});
 
   useEffect(() => subscribeCatalog(() => setCatalogTick((t) => t + 1)), []);
 
-  const hits = useMemo(() => searchCatalog(query), [query, catalogTick]);
+  // Load open counts; refresh when SW writes after a launch.
+  useEffect(() => {
+    void chrome.storage.local.get(OPEN_COUNTS_STORAGE_KEY).then((got) => {
+      setOpenCounts((got[OPEN_COUNTS_STORAGE_KEY] as Record<string, number>) ?? {});
+    });
+    const onChange = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: chrome.storage.AreaName,
+    ) => {
+      if (area !== 'local' || !changes[OPEN_COUNTS_STORAGE_KEY]) return;
+      setOpenCounts((changes[OPEN_COUNTS_STORAGE_KEY].newValue as Record<string, number>) ?? {});
+    };
+    chrome.storage.onChanged.addListener(onChange);
+    return () => chrome.storage.onChanged.removeListener(onChange);
+  }, []);
+
+  const hits = useMemo(
+    () => rankCatalog(query, { openCounts }),
+    [query, catalogTick, openCounts],
+  );
 
   useEffect(() => {
     setCursor(0);
@@ -50,13 +71,16 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
   async function open(service: ServiceCatalogEntry, featurePath?: string) {
     if (!account || missingRole || missingRegion || missingPortal) return;
     // SW resolves the URL: direct multi-session subdomain if a live session
-    // exists for (account, role), portal-shortcut redirect otherwise.
+    // exists for (account, role), portal-shortcut redirect otherwise. Pass
+    // serviceId + featurePath so SW can bump openCounts.
     const res = await send({
       type: 'RESOLVE_LAUNCH_URL',
       accountId: account.accountId,
       roleName: role,
       region,
       consolePath: featurePath ?? service.consolePath,
+      serviceId: service.id,
+      featurePath: featurePath,
     });
     if (!res.ok || !res.url) return;
     void chrome.tabs.create({ url: res.url });
@@ -175,6 +199,9 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
                   {hit.feature.name}
                 </span>
               )}
+              {hit.popular && (
+                <span className={styles.badgePopular} title="Popular service">★</span>
+              )}
               {hasFeaturesPicker && (
                 <span className={styles.chevron} aria-hidden>›</span>
               )}
@@ -242,7 +269,7 @@ function FeaturePicker({
           onMouseEnter={() => setCursor(0)}
           onClick={() => onPick(service.consolePath)}
         >
-          <span className={styles.swatchPlain}>↗</span>
+          <span className={styles.featureBullet} aria-hidden>›</span>
           <span className={styles.name}>{service.name} home</span>
         </li>
         {features.map((f, i) => (
@@ -254,7 +281,7 @@ function FeaturePicker({
             onMouseEnter={() => setCursor(i + 1)}
             onClick={() => onPick(f.path)}
           >
-            <span className={styles.swatchPlain}>›</span>
+            <span className={styles.featureBullet} aria-hidden>›</span>
             <span className={styles.name}>{f.name}</span>
           </li>
         ))}

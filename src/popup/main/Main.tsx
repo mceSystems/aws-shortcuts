@@ -51,9 +51,11 @@ export function Main({ onOpenSettings, onWipe }: Props) {
       />
 
       <div className={styles.body}>
-        <Section label={selectedAccount ? 'Service' : 'Pick an account first'}>
-          <ServiceSearch account={selectedAccount} ssoConfig={ssoConfig} />
-        </Section>
+        {!editing && (
+          <Section label={selectedAccount ? 'Service' : 'Pick an account first'}>
+            <ServiceSearch account={selectedAccount} ssoConfig={ssoConfig} />
+          </Section>
+        )}
 
         <Section
           label="Account"
@@ -65,6 +67,9 @@ export function Main({ onOpenSettings, onWipe }: Props) {
               />
             ) : null
           }
+          /* When editing, expand the account section so the long list fits
+           * (with its own scroll) and the service search is out of the way. */
+          grow={editing}
         >
           {loaded ? (
             <AccountList
@@ -80,9 +85,11 @@ export function Main({ onOpenSettings, onWipe }: Props) {
           )}
         </Section>
 
-        <Section label="Favorites">
-          <div className={styles.placeholder}>No favorites yet</div>
-        </Section>
+        {!editing && (
+          <Section label="Favorites">
+            <div className={styles.placeholder}>No favorites yet</div>
+          </Section>
+        )}
       </div>
 
       {onWipe && (
@@ -108,13 +115,15 @@ function Section({
   label,
   action,
   children,
+  grow,
 }: {
   label: string;
   action?: ReactNode;
   children: ReactNode;
+  grow?: boolean;
 }) {
   return (
-    <section className={styles.section}>
+    <section className={[styles.section, grow ? styles.sectionGrow : ''].filter(Boolean).join(' ')}>
       <div className={styles.sectionLabel}>
         <span>{label}</span>
         <span className={styles.sectionLine} />

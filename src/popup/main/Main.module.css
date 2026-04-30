@@ -7,12 +7,15 @@
 
 .body {
   flex: 1;
-  overflow-y: auto;
+  /* Body does NOT scroll — each section manages its own scroll so the
+   * accounts list stays pinned while the service search scrolls in place. */
+  overflow: hidden;
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   scrollbar-width: thin;
+  min-height: 0;
 }
 
 .body::-webkit-scrollbar { width: 6px; }
@@ -22,7 +25,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  min-height: 0;
 }
+
+.sectionGrow {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sectionGrow::-webkit-scrollbar { width: 6px; }
+.sectionGrow::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 999px; }
 
 .sectionLabel {
   font-size: 11px;

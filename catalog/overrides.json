@@ -39,5 +39,13 @@
   },
   "consolePathOverrides": {},
   "nameOverrides": {},
-  "exclude": []
+  "exclude": [],
+  "popular": [
+    "ec2", "s3", "iam", "cloudwatch", "lambda", "rds", "dynamodb", "vpc",
+    "route53", "cloudfront", "sqs", "sns", "ses", "eventbridge",
+    "stepfunctions", "ecs", "eks", "ecr", "kms", "secretsmanager",
+    "systemsmanager", "cloudtrail", "config", "costexplorer", "billing",
+    "organizations", "sso", "apigateway", "glue", "athena", "bedrock",
+    "sagemaker", "opensearch", "appsync", "cloudformation"
+  ]
 }

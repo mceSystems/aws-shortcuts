@@ -687,6 +687,7 @@
       "id": "bedrock",
       "name": "Amazon Bedrock",
       "consolePath": "bedrock/home",
+      "popular": true,
       "aliases": [
         "AI",
         "LLM",
@@ -5978,6 +5979,7 @@
       "id": "sagemaker",
       "name": "Amazon SageMaker AI",
       "consolePath": "sagemaker/home",
+      "popular": true,
       "aliases": [
         "ML",
         "machine learning",
@@ -6138,6 +6140,7 @@
       "id": "ses",
       "name": "Amazon Simple Email Service",
       "consolePath": "ses/home",
+      "popular": true,
       "aliases": [
         "Simple Email Service",
         "email",
@@ -7711,6 +7714,7 @@
       "id": "apigateway",
       "name": "API Gateway",
       "consolePath": "apigateway/home",
+      "popular": true,
       "aliases": [
         "REST API",
         "HTTP API",
@@ -8257,6 +8261,7 @@
       "id": "athena",
       "name": "Athena",
       "consolePath": "athena/home",
+      "popular": true,
       "aliases": [
         "SQL",
         "query",
@@ -8337,6 +8342,7 @@
       "id": "rds",
       "name": "Aurora and RDS",
       "consolePath": "rds/home",
+      "popular": true,
       "aliases": [
         "Relational Database Service",
         "database",
@@ -9266,6 +9272,7 @@
       "id": "systemsmanager",
       "name": "AWS AppConfig",
       "consolePath": "systems-manager/home",
+      "popular": true,
       "aliases": [
         "SSM",
         "ops",
@@ -9598,6 +9605,7 @@
       "id": "appsync",
       "name": "AWS AppSync",
       "consolePath": "appsync/home",
+      "popular": true,
       "aliases": [
         "GraphQL",
         "managed graphql"
@@ -10788,6 +10796,7 @@
       "id": "config",
       "name": "AWS Config",
       "consolePath": "config/home",
+      "popular": true,
       "aliases": [
         "compliance",
         "configuration recorder"
@@ -12224,6 +12233,7 @@
       "id": "glue",
       "name": "AWS Glue",
       "consolePath": "glue/home",
+      "popular": true,
       "aliases": [
         "ETL",
         "data catalog",
@@ -12991,6 +13001,7 @@
       "id": "organizations",
       "name": "AWS Organizations",
       "consolePath": "organizations/v2/home",
+      "popular": true,
       "aliases": [
         "AWS Organizations",
         "OU",
@@ -14724,6 +14735,7 @@
       "id": "cloudformation",
       "name": "CloudFormation",
       "consolePath": "cloudformation/home",
+      "popular": true,
       "aliases": [
         "IaC",
         "infrastructure as code",
@@ -14745,6 +14757,7 @@
       "id": "cloudfront",
       "name": "CloudFront",
       "consolePath": "cloudfront/v4/home",
+      "popular": true,
       "aliases": [
         "CDN",
         "edge",
@@ -14876,6 +14889,7 @@
       "id": "cloudtrail",
       "name": "CloudTrail",
       "consolePath": "cloudtrail/home",
+      "popular": true,
       "aliases": [
         "audit",
         "api activity",
@@ -14943,6 +14957,7 @@
       "id": "cloudwatch",
       "name": "CloudWatch",
       "consolePath": "cloudwatch/home",
+      "popular": true,
       "aliases": [
         "monitoring",
         "metrics",
@@ -15177,6 +15192,7 @@
       "id": "costexplorer",
       "name": "Cost Explorer",
       "consolePath": "cost-management/home#/cost-explorer",
+      "popular": true,
       "aliases": [
         "cost analysis",
         "spend",
@@ -15393,6 +15409,7 @@
       "id": "dynamodb",
       "name": "DynamoDB",
       "consolePath": "dynamodbv2/home",
+      "popular": true,
       "aliases": [
         "nosql",
         "key value",
@@ -15476,6 +15493,7 @@
       "id": "ec2",
       "name": "EC2",
       "consolePath": "ec2/home",
+      "popular": true,
       "aliases": [
         "Elastic Compute Cloud",
         "compute",
@@ -15707,6 +15725,7 @@
       "id": "ecr",
       "name": "Elastic Container Registry",
       "consolePath": "ecr/home",
+      "popular": true,
       "aliases": [
         "Elastic Container Registry",
         "container registry",
@@ -15727,6 +15746,7 @@
       "id": "ecs",
       "name": "Elastic Container Service",
       "consolePath": "ecs/v2/home",
+      "popular": true,
       "aliases": [
         "Elastic Container Service",
         "containers",
@@ -15787,6 +15807,7 @@
       "id": "eks",
       "name": "Elastic Kubernetes Service",
       "consolePath": "eks/home",
+      "popular": true,
       "aliases": [
         "Elastic Kubernetes Service",
         "kubernetes",
@@ -15969,6 +15990,7 @@
       "id": "eventbridge",
       "name": "EventBridge",
       "consolePath": "events/home",
+      "popular": true,
       "aliases": [
         "events",
         "event bus",
@@ -16095,6 +16117,7 @@
       "id": "iam",
       "name": "IAM",
       "consolePath": "iam/home",
+      "popular": true,
       "aliases": [
         "Identity and Access Management",
         "permissions",
@@ -16183,6 +16206,7 @@
       "id": "sso",
       "name": "IAM Identity Center",
       "consolePath": "singlesignon/home",
+      "popular": true,
       "aliases": [
         "SSO",
         "single sign-on",
@@ -17329,6 +17353,7 @@
       "id": "kms",
       "name": "Key Management Service",
       "consolePath": "kms/home",
+      "popular": true,
       "aliases": [
         "Key Management Service",
         "encryption",
@@ -17420,6 +17445,7 @@
       "id": "lambda",
       "name": "Lambda",
       "consolePath": "lambda/home",
+      "popular": true,
       "aliases": [
         "serverless",
         "functions"
@@ -17497,6 +17523,7 @@
       "id": "billing",
       "name": "Manage Regions",
       "consolePath": "billing/home#/account?AWS-Regions",
+      "popular": true,
       "aliases": [
         "invoices",
         "payment",
@@ -17896,6 +17923,7 @@
       "id": "opensearch",
       "name": "OpenSearch",
       "consolePath": "aos/home",
+      "popular": true,
       "aliases": [
         "elasticsearch",
         "search",
@@ -18034,6 +18062,7 @@
       "id": "route53",
       "name": "Route 53",
       "consolePath": "route53/v2/home",
+      "popular": true,
       "aliases": [
         "DNS",
         "domains"
@@ -18092,6 +18121,7 @@
       "id": "s3",
       "name": "S3",
       "consolePath": "s3/home",
+      "popular": true,
       "aliases": [
         "Simple Storage Service",
         "object storage",
@@ -18185,6 +18215,7 @@
       "id": "secretsmanager",
       "name": "Secrets Manager",
       "consolePath": "secretsmanager/home",
+      "popular": true,
       "aliases": [
         "secrets",
         "credentials"
@@ -18309,6 +18340,7 @@
       "id": "sns",
       "name": "Simple Notification Service",
       "consolePath": "sns/v3/home",
+      "popular": true,
       "aliases": [
         "Simple Notification Service",
         "topic",
@@ -18346,6 +18378,7 @@
       "id": "sqs",
       "name": "Simple Queue Service",
       "consolePath": "sqs/v3/home",
+      "popular": true,
       "aliases": [
         "Simple Queue Service",
         "queue",
@@ -18356,6 +18389,7 @@
       "id": "stepfunctions",
       "name": "Step Functions",
       "consolePath": "states/home",
+      "popular": true,
       "aliases": [
         "workflow",
         "state machine",
@@ -18443,6 +18477,7 @@
       "id": "vpc",
       "name": "VPC",
       "consolePath": "vpc/home",
+      "popular": true,
       "aliases": [
         "Virtual Private Cloud",
         "network",

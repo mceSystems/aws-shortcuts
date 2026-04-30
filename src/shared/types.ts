@@ -66,6 +66,10 @@ export type ServiceCatalogEntry = {
   id: string;
   name: string;
   consolePath: string;
+  /** Curated "popular" flag. Bumps service in empty-query default order +
+   * small score bonus for fuzzy matches. Set via merge tool from
+   * catalog/overrides.json:popular. */
+  popular?: boolean;
   /** Full names + synonyms used for search (e.g. "Simple Email Service" for ses). */
   aliases?: string[];
   features?: ServiceFeature[];
