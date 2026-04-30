@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AWS Shortcut · Side Panel Onboarding Mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, color-mix(in oklch, var(--c-iris) 14%, transparent), transparent 60%),
+        radial-gradient(900px 500px at 110% 110%, color-mix(in oklch, var(--c-mint) 12%, transparent), transparent 60%),
+        var(--surface-0);
+      min-height: 100vh;
+      color: var(--ink-900);
+    }
+
+    .frame {
+      display: flex;
+      gap: var(--space-5);
+      padding: var(--space-6);
+      align-items: flex-start;
+      flex-wrap: wrap;
+      max-width: 1700px;
+      margin: 0 auto;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .step-label {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-500);
+      padding-left: 6px;
+    }
+
+    /* Side panel — locked at the typical 380px Chrome side-panel width. */
+    .panel {
+      width: 380px;
+      height: 700px;
+      background: var(--surface-1);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* shared scene container */
+    .scene {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding: var(--space-5) var(--space-4);
+      overflow-y: auto;
+    }
+
+    /* step dots */
+    .dots {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      align-self: center;
+    }
+    .dots .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ink-200);
+    }
+    .dots .dot.active {
+      background: var(--accent);
+      width: 18px;
+      border-radius: 999px;
+    }
+
+    .title-block { display: flex; flex-direction: column; gap: 6px; }
+    .title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink-900);
+    }
+    .lede {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink-500);
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      padding: 10px 12px;
+      background: var(--ink-100);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--ink-900);
+    }
+    .check-num {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--ink-100);
+      background: var(--surface-1);
+      flex: 0 0 auto;
+    }
+    .spacer { flex: 1; }
+    .btn {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn.ghost {
+      background: transparent;
+      color: var(--ink-700);
+      border-color: var(--ink-200);
+    }
+
+    /* multi-session illustration */
+    .illust {
+      background: var(--surface-0);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .illust-bar {
+      height: 18px;
+      border-radius: 8px;
+      background: var(--ink-100);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 8px;
+      font-size: 10px;
+      color: var(--ink-500);
+    }
+    .illust-bar .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ink-200);
+    }
+    .illust-console {
+      background: #232e3c;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .illust-console-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.65);
+    }
+    .illust-console-bar .aws {
+      color: #ff9900;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .illust-console-bar .spacer { flex: 1; }
+    .illust-console-bar .pulse {
+      background: #ff9900;
+      color: #000;
+      padding: 2px 6px;
+      border-radius: 4px;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,153,0,0.6); }
+      50%      { box-shadow: 0 0 0 6px rgba(255,153,0,0); }
+    }
+    .illust-console-body {
+      height: 80px;
+      background: #1a242f;
+      border-radius: 4px;
+    }
+
+    /* connect step form */
+    .form-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-500);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .input {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--ink-200);
+      background: var(--surface-1);
+      font: inherit;
+      font-size: 13px;
+      color: var(--ink-900);
+      outline: none;
+    }
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .help {
+      font-size: 11px;
+      color: var(--ink-500);
+      line-height: 1.5;
+    }
+
+    /* scan progress */
+    .scan-state {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      align-items: center;
+      padding: var(--space-5) 0;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--ink-100);
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .scan-status {
+      font-size: 13px;
+      color: var(--ink-700);
+    }
+    .scan-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0;
+      list-style: none;
+      margin: 0;
+    }
+    .scan-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--ink-100);
+      font-size: 12px;
+      color: var(--ink-700);
+    }
+    .scan-list .ok { color: var(--success); }
+    .scan-list .pending { color: var(--ink-400); }
+
+    .legend {
+      width: 320px;
+      padding: var(--space-5);
+      background: var(--surface-1);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-1);
+    }
+    .legend h2 {
+      margin: 0 0 var(--space-3);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .legend p, .legend ul {
+      margin: 0 0 var(--space-3);
+      font-size: 12px;
+      color: var(--ink-700);
+      line-height: 1.5;
+    }
+    .legend ul { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+
+    <!-- ─────────────────── STEP 1: Multi-session ─────────────────── -->
+    <div class="col">
+      <span class="step-label">Step 1 — Multi-session</span>
+      <aside class="panel">
+        <div class="scene">
+          <div class="dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+
+          <div class="title-block">
+            <h1 class="title">Enable multi-session</h1>
+            <p class="lede">
+              AWS lets you keep up to 5 accounts open at once. AWS Shortcut
+              relies on this so switching accounts won't sign you out of the
+              others.
+            </p>
+          </div>
+
+          <div class="illust">
+            <div class="illust-bar">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span style="margin-left:6px">console.aws.amazon.com</span>
+            </div>
+            <div class="illust-console">
+              <div class="illust-console-bar">
+                <span class="aws">aws</span>
+                <span class="spacer"></span>
+                <span>Provide feedback</span>
+                <span class="pulse">Multi-session ▾</span>
+                <span>EN ▾</span>
+              </div>
+              <div class="illust-console-body"></div>
+            </div>
+          </div>
+
+          <ol class="checklist">
+            <li><span class="check-num">1</span>Open <strong>console.aws.amazon.com</strong>.</li>
+            <li><span class="check-num">2</span>Top-right → click <strong>Multi-session</strong>.</li>
+            <li><span class="check-num">3</span>Choose <strong>Turn on multi-session</strong>.</li>
+          </ol>
+        </div>
+
+        <div class="actions">
+          <span class="spacer"></span>
+          <button class="btn ghost">Open console ↗</button>
+          <button class="btn primary">I enabled it ▸</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ─────────────────── STEP 2: Connect SSO portal ─────────────────── -->
+    <div class="col">
+      <span class="step-label">Step 2 — Connect</span>
+      <aside class="panel">
+        <div class="scene">
+          <div class="dots">
+            <span class="dot"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+          </div>
+
+          <div class="title-block">
+            <h1 class="title">Connect your SSO portal</h1>
+            <p class="lede">
+              Paste your AWS access portal URL. AWS Shortcut uses it to read
+              your account list and to launch the console with the right role.
+            </p>
+          </div>
+
+          <div class="form-block">
+            <span class="form-label">Access portal URL</span>
+            <input
+              class="input"
+              type="text"
+              value="https://my-org.awsapps.com/start"
+              spellcheck="false"
+            />
+            <span class="help">
+              Looks like <code>https://&lt;your-org&gt;.awsapps.com/start</code>.
+              Find it in any AWS account-switcher email or your SSO admin.
+            </span>
+          </div>
+
+          <ol class="checklist">
+            <li><span class="check-num">1</span>Sign in to the portal in a browser tab.</li>
+            <li><span class="check-num">2</span>Make sure you can see your account list there.</li>
+            <li><span class="check-num">3</span>Come back here and continue.</li>
+          </ol>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost">‹ Back</button>
+          <span class="spacer"></span>
+          <button class="btn primary">Continue ▸</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ─────────────────── STEP 3: Scan accounts ─────────────────── -->
+    <div class="col">
+      <span class="step-label">Step 3 — Scan</span>
+      <aside class="panel">
+        <div class="scene">
+          <div class="dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot active"></span>
+          </div>
+
+          <div class="title-block">
+            <h1 class="title">Scanning accounts…</h1>
+            <p class="lede">
+              Reading your portal to discover accounts, roles, and regions.
+              Takes a few seconds.
+            </p>
+          </div>
+
+          <div class="scan-state">
+            <span class="spinner"></span>
+            <span class="scan-status">Reading portal · 7 of 12 accounts</span>
+          </div>
+
+          <ul class="scan-list">
+            <li><span class="ok">✓</span> Authenticated to portal</li>
+            <li><span class="ok">✓</span> Read account list (12 accounts)</li>
+            <li><span class="ok">✓</span> Read roles for Prod</li>
+            <li><span class="ok">✓</span> Read roles for Staging</li>
+            <li><span class="pending">○</span> Read roles for Dev</li>
+            <li><span class="pending">○</span> Read roles for Sandbox</li>
+          </ul>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost">‹ Back</button>
+          <span class="spacer"></span>
+          <button class="btn primary" disabled style="opacity:0.5">Working…</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ─────────────────── notes ─────────────────── -->
+    <aside class="legend">
+      <h2>Onboarding mock — notes</h2>
+      <p>
+        Three steps reuse the existing popup flow at side-panel dimensions
+        (380×700). Sticky bottom action bar swaps Cancel/Back/Continue per step.
+      </p>
+      <ul>
+        <li>Step 1 stays unchanged — still drives the user to flip the
+          multi-session toggle in the AWS console.</li>
+        <li>Step 2 is the SSO portal URL form. Auto-fills any existing
+          stored URL.</li>
+        <li>Step 3 streams scan progress from the SW (already implemented in
+          the popup version).</li>
+        <li>Once Step 3 finishes the panel swaps to the Main UI without a
+          page reload — same component tree, just different React state.</li>
+        <li>If the user closes the side panel mid-onboarding, opening it
+          again resumes at the right step (driven by stored prefs).</li>
+        <li>Settings page can also surface a "Reset onboarding" button for
+          users who want to redo it.</li>
+      </ul>
+    </aside>
+
+  </div>
+</body>
+</html>

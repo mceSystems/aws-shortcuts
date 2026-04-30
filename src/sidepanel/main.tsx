@@ -1,15 +1,16 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/tokens.css';
-import './sidepanel.module.css';
+import { initCatalogStore } from '@/shared/catalogStore';
+import { App } from '@/popup/App';
+
+void initCatalogStore();
 
 const root = document.getElementById('root');
 if (root) {
   createRoot(root).render(
     <StrictMode>
-      <div style={{ padding: 16, color: 'var(--ink-500)' }}>
-        AWS Shortcut · side panel placeholder
-      </div>
+      <App />
     </StrictMode>,
   );
 }

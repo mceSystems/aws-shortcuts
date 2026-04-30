@@ -45,7 +45,9 @@ export default defineManifest({
     'https://raw.githubusercontent.com/*',
   ],
   action: {
-    default_popup: 'src/popup/index.html',
+    // Toolbar click is handled by the SW (chrome.sidePanel.open). The popup
+    // HTML is still bundled (kept around as a fallback / future palette
+    // surface) but is not auto-attached to the action.
     default_title: 'AWS Shortcut',
   },
   side_panel: {

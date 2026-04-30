@@ -1,6 +1,8 @@
 .app {
-  width: 420px;
-  height: 600px;
+  /* Width/height come from the entrypoint shell. Popup is fixed 420×600
+   * via its body styles; side panel fills its container. */
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--surface-1);

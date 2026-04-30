@@ -53,11 +53,17 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('[aws-shortcut] installed');
   void refreshOriginRule();
   void harvestOpenTabs();
+  void chrome.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: true })
+    .catch((err) => console.warn('[aws-shortcut] sidePanel setPanelBehavior failed:', err));
 });
 
 chrome.runtime.onStartup.addListener(() => {
   void refreshOriginRule();
   void harvestOpenTabs();
+  void chrome.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: true })
+    .catch(() => {});
 });
 
 // ───── console session lifecycle ───────────────────────────────────
