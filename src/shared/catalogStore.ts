@@ -40,8 +40,12 @@ export function initCatalogStore(): Promise<void> {
     try {
       const got = await chrome.storage.local.get(STORAGE_KEY);
       const stored = got[STORAGE_KEY] as Catalog | undefined;
-      if (stored && validateCatalog(stored)) {
+      if (stored && validateCatalog(stored) && shouldPreferStored(stored)) {
         adopt(stored);
+      } else if (stored) {
+        // Stored remote catalog is older than bundled — drop it so the next
+        // chrome.storage.onChanged write doesn't downgrade us either.
+        await chrome.storage.local.remove(STORAGE_KEY);
       }
     } catch {
       // ignore — keep bundled snapshot
@@ -49,10 +53,18 @@ export function initCatalogStore(): Promise<void> {
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local' || !changes[STORAGE_KEY]) return;
       const next = changes[STORAGE_KEY].newValue as Catalog | undefined;
-      if (next && validateCatalog(next)) adopt(next);
+      if (next && validateCatalog(next) && shouldPreferStored(next)) adopt(next);
     });
   })();
   return initPromise;
+}
+
+/** Stored catalog wins only if it's newer or has more entries than bundled. */
+function shouldPreferStored(stored: Catalog): boolean {
+  const b = bundled as Catalog;
+  if (stored.services.length > b.services.length) return true;
+  if (stored.services.length < b.services.length) return false;
+  return stored.version >= b.version;
 }
 
 function adopt(c: Catalog): void {

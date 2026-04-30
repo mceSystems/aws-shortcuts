@@ -5,9 +5,11 @@ type Props = {
   onSettings?: () => void;
   onRefresh?: () => void;
   onPalette?: () => void;
+  onOpenPortal?: () => void;
+  portalUrl?: string;
 };
 
-export function Header({ onSettings, onRefresh, onPalette }: Props) {
+export function Header({ onSettings, onRefresh, onPalette, onOpenPortal, portalUrl }: Props) {
   return (
     <header className={styles.header}>
       <span className={styles.brand}>
@@ -15,6 +17,16 @@ export function Header({ onSettings, onRefresh, onPalette }: Props) {
         <span className={styles.title}>AWS Shortcut</span>
       </span>
       <span className={styles.spacer} />
+      {portalUrl && (
+        <button
+          type="button"
+          className={styles.iconBtn}
+          onClick={onOpenPortal}
+          title={`Open SSO portal (${portalUrl})`}
+        >
+          ↗
+        </button>
+      )}
       <button
         type="button"
         className={styles.iconBtn}

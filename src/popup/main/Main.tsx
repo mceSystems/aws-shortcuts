@@ -48,6 +48,12 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         onPalette={() => {
           // cmd+k overlay coming next
         }}
+        portalUrl={ssoConfig?.startUrl}
+        onOpenPortal={() => {
+          if (ssoConfig?.startUrl) {
+            void chrome.tabs.create({ url: ssoConfig.startUrl });
+          }
+        }}
       />
 
       <div className={styles.body}>
@@ -67,9 +73,9 @@ export function Main({ onOpenSettings, onWipe }: Props) {
               />
             ) : null
           }
-          /* When editing, expand the account section so the long list fits
-           * (with its own scroll) and the service search is out of the way. */
-          grow={editing}
+          /* Account section always grows + scrolls so all accounts are
+           * reachable, while header + service search stay pinned above. */
+          grow
         >
           {loaded ? (
             <AccountList

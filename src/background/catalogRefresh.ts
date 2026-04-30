@@ -80,6 +80,14 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
         await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
         return { ok: true, updated: false, version: cur.version, services: cur.services.length, fetchedAt, source: url };
       }
+      // Don't downgrade — if remote has fewer services AND an older version
+      // string, keep what we have. Avoids the dev-time hazard where the
+      // public repo lags the locally-merged catalog.
+      if (cur && next.services.length < cur.services.length && next.version < cur.version) {
+        console.warn(`[catalog] ${trigger} remote (${next.version}, ${next.services.length}) is older than stored (${cur.version}, ${cur.services.length}); skipping`);
+        await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
+        return { ok: true, updated: false, version: cur.version, services: cur.services.length, fetchedAt, source: url };
+      }
       await chrome.storage.local.set({
         [CATALOG_STORAGE_KEY]: next,
         [CATALOG_FETCHED_AT_KEY]: fetchedAt,
