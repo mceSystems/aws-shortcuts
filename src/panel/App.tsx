@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Onboarding } from './onboarding/Onboarding';
 import { Main } from './main/Main';
+import { SettingsView } from './settings/SettingsView';
 import { getSync } from '@/shared/storage';
 import type { SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
 
-type Phase = 'onboarding' | 'ready';
+type Phase = 'onboarding' | 'ready' | 'settings';
 
 const CACHE_KEY = 'aws-shortcut:bootstrap';
 
@@ -124,10 +125,18 @@ export function App() {
     );
   }
 
+  if (phase === 'settings') {
+    return (
+      <div className={styles.app}>
+        <SettingsView onBack={() => setPhase('ready')} />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.app}>
       <Main
-        onOpenSettings={() => chrome.runtime.openOptionsPage()}
+        onOpenSettings={() => setPhase('settings')}
         onWipe={wipeAll}
       />
     </div>

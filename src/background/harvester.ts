@@ -43,19 +43,12 @@ async function bootstrapSession(): Promise<ConsoleSessionInfo> {
     region: account.preferredRegion,
     consolePath: 'console/home',
   });
-  const tab = await chrome.tabs.create({ url: launchUrl, active: false });
+  // Side-panel-only mode: open the bootstrap tab focused, do NOT close it.
+  // User keeps full control over their tabs; the harvest tab opens
+  // separately on the multi-session subdomain.
+  const tab = await chrome.tabs.create({ url: launchUrl, active: true });
   if (!tab.id) throw new Error('failed to open SSO launch tab');
-  try {
-    return await waitForSession(tab.id, 30_000);
-  } finally {
-    // Close the bootstrap tab — its session is now in store + we'll open
-    // a fresh harvest tab with the multi-session subdomain.
-    try {
-      await chrome.tabs.remove(tab.id);
-    } catch {
-      // ignore
-    }
-  }
+  return await waitForSession(tab.id, 30_000);
 }
 
 function waitForSession(tabId: number, timeoutMs: number): Promise<ConsoleSessionInfo> {
@@ -109,8 +102,10 @@ function emit(progress: HarvestProgress): void {
 
 type WaitedTab = { tabId: number; created: boolean };
 
-async function openHarvestTab(url: string, active = false): Promise<WaitedTab> {
-  const tab = await chrome.tabs.create({ url, active });
+async function openHarvestTab(url: string, _active = true): Promise<WaitedTab> {
+  // Always focused per side-panel-only policy. Caller controls when (or
+  // whether) to close, but harvester never closes by itself anymore.
+  const tab = await chrome.tabs.create({ url, active: true });
   if (!tab.id) throw new Error('tab not created');
   await waitForTabReady(tab.id);
   return { tabId: tab.id, created: true };
@@ -139,13 +134,8 @@ function waitForTabReady(tabId: number, timeoutMs = 30_000, settleMs = 800): Pro
   });
 }
 
-async function closeTab(tabId: number): Promise<void> {
-  try {
-    await chrome.tabs.remove(tabId);
-  } catch {
-    // ignore
-  }
-}
+// Tab-close helper kept for reference / future. Side-panel mode no longer
+// invokes it: harvester leaves tabs open and the user closes them.
 
 // ───── service harvest ───────────────────────────────────────────────
 
@@ -199,7 +189,8 @@ async function runHarvestServices(opts: HarvestServicesOptions): Promise<Harvest
     emit({ type: 'HARVEST_PROGRESS', phase: 'services', done: 1, total: 1 });
     return payload.services;
   } finally {
-    if (!opts.debug) await closeTab(tabId);
+    // Side-panel-only policy: never auto-close tabs we opened.
+    void tabId;
   }
 }
 
@@ -509,7 +500,8 @@ async function runHarvestFeatures(
       featuresCount,
     });
   } finally {
-    await closeTab(tab.tabId);
+    // Side-panel-only policy: never auto-close tabs we opened.
+    void tab.tabId;
   }
   return { features, skipped };
 }

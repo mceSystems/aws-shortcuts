@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '../components/Button';
 import { StepDots } from '../components/StepDots';
 import { getSync, setSync } from '@/shared/storage';
+import { findTabByUrlPrefix, openOrFocusTab } from '@/shared/tabs';
 import styles from './Onboarding.module.css';
 import illust from './MultiSessionIllust.module.css';
 
@@ -16,7 +17,19 @@ export function MultiSessionStep({ onContinue }: Props) {
   const [opened, setOpened] = useState(false);
 
   async function openConsole() {
-    await chrome.tabs.create({ url: CONSOLE_URL, active: false });
+    // Reuse any existing console tab (matches console.aws.amazon.com OR
+    // multi-session subdomains like 1234-abc.us-west-2.console.aws.amazon.com).
+    const existing =
+      (await findTabByUrlPrefix('https://console.aws.amazon.com/')) ||
+      (await findTabByUrlPrefix('https://*.console.aws.amazon.com/'));
+    if (existing?.id != null) {
+      await chrome.tabs.update(existing.id, { active: true });
+      if (existing.windowId != null) {
+        await chrome.windows.update(existing.windowId, { focused: true });
+      }
+    } else {
+      await openOrFocusTab(CONSOLE_URL);
+    }
     setOpened(true);
   }
 

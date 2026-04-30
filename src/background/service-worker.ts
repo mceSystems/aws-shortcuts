@@ -657,36 +657,21 @@ async function runCaptureAndScan(): Promise<MsgResponse> {
     'branch=', branch,
   );
 
-  let openedTabId: number | undefined;
+  // Side-panel-only policy: focus tabs (no hidden bg open), and never
+  // auto-close a tab we created. The user keeps control of their tabs.
   if (existing && !userIsOnPortal) {
     try {
       await chrome.tabs.reload(existing.id!);
     } catch {
-      // Reload failed (tab vanished?); fall back to opening a new bg tab.
-      const tab = await chrome.tabs.create({ url: startUrl, active: false });
-      openedTabId = tab.id;
+      // Reload failed (tab vanished?); open a fresh portal tab.
+      await chrome.tabs.create({ url: startUrl, active: true });
     }
-  } else {
-    const tab = await chrome.tabs.create({ url: startUrl, active: false });
-    openedTabId = tab.id;
+  } else if (!existing) {
+    await chrome.tabs.create({ url: startUrl, active: true });
   }
 
-  try {
-    await waitForBearer(beforeCapturedAt);
-    return await runScanPortal();
-  } finally {
-    console.log('[aws-shortcut/bg-tab] finally openedTabId=', openedTabId ?? 'none');
-    if (openedTabId !== undefined) {
-      try {
-        await chrome.tabs.remove(openedTabId);
-        console.log('[aws-shortcut/bg-tab] removed tab', openedTabId);
-      } catch (e) {
-        console.warn('[aws-shortcut/bg-tab] tabs.remove failed', e);
-      }
-    } else {
-      console.log('[aws-shortcut/bg-tab] no openedTabId — branch was reload, skipping close');
-    }
-  }
+  await waitForBearer(beforeCapturedAt);
+  return await runScanPortal();
 }
 
 async function findPortalTab(

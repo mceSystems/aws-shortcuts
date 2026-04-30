@@ -59,9 +59,11 @@
 
 .statGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 0 0 20px;
+  /* Auto-fits to whatever space is available — 3 cols on the wide options
+   * page, 2 (or 1) inside the side-panel SettingsView. */
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
 }
 
 .stat {
@@ -70,6 +72,8 @@
   border-radius: var(--radius-md);
   background: var(--surface-0);
   border: 1px solid var(--ink-200);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .statLabel {
@@ -88,7 +92,13 @@
   color: var(--ink-900);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
+  /* Long values ("2026.04.30 BUNDLED", "never (using bundled snapshot)")
+   * must stay inside the stat tile at narrow widths. */
+  overflow: hidden;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .bundledTag {

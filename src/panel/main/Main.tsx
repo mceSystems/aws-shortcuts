@@ -5,6 +5,7 @@ import { ServiceSearch } from './ServiceSearch';
 import { useAccounts } from '../hooks/useAccounts';
 import { send } from '@/shared/messages';
 import { getSync, setSync } from '@/shared/storage';
+import { openOrFocusTab } from '@/shared/tabs';
 import styles from './Main.module.css';
 
 type Props = {
@@ -51,7 +52,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         portalUrl={ssoConfig?.startUrl}
         onOpenPortal={() => {
           if (ssoConfig?.startUrl) {
-            void chrome.tabs.create({ url: ssoConfig.startUrl });
+            void openOrFocusTab(ssoConfig.startUrl, { reuseUrlPrefix: ssoConfig.startUrl });
           }
         }}
       />

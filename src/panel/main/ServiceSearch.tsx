@@ -21,6 +21,7 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     featureIdx: number | null;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const [catalogTick, setCatalogTick] = useState(0);
   const [openCounts, setOpenCounts] = useState<Record<string, number>>({});
 
@@ -51,24 +52,32 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     setCursor(0);
   }, [query]);
 
+  // Keep the highlighted row visible inside the scrollable list. Manual
+  // scroll math avoids scrollIntoView's focus side-effects (some browsers
+  // pull focus to the scrolled container, which would steal it from the
+  // search input and break Enter handling).
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const active = list.children[cursor] as HTMLElement | undefined;
+    if (!active) return;
+    const top = active.offsetTop;
+    const bottom = top + active.offsetHeight;
+    if (top < list.scrollTop) {
+      list.scrollTop = top;
+    } else if (bottom > list.scrollTop + list.clientHeight) {
+      list.scrollTop = bottom - list.clientHeight;
+    }
+  }, [cursor]);
+
   useEffect(() => {
     setPickedFeature(null);
     setQuery('');
   }, [account?.accountId]);
 
   useEffect(() => {
-    // Side panel + popup both want the cursor in the search box on every
-    // open. Two passes (sync + RAF) cover the case where the panel isn't
-    // yet activated when the first focus runs.
     inputRef.current?.focus();
-    requestAnimationFrame(() => inputRef.current?.focus());
   }, []);
-
-  // Re-focus when the account selection changes (input is reset above; the
-  // user almost always wants to type a service immediately).
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [account?.accountId]);
 
   const role = account?.preferredRoleName ?? '';
   const region = account?.preferredRegion ?? '';
@@ -163,7 +172,6 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
         </span>
         <input
           ref={inputRef}
-          autoFocus
           className={styles.input}
           type="text"
           placeholder={
@@ -180,7 +188,7 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
 
       {blocker && <div className={styles.blocker}>{blocker}</div>}
 
-      <ul className={styles.results}>
+      <ul ref={listRef} className={styles.results}>
         {hits.length === 0 && (
           <li className={styles.empty}>No matches for “{query}”.</li>
         )}
