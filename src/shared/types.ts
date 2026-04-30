@@ -60,11 +60,15 @@ export type Recent = {
   hits: number;
 };
 
+export type ServiceFeature = { name: string; path: string };
+
 export type ServiceCatalogEntry = {
   id: string;
   name: string;
   consolePath: string;
-  features?: { name: string; path: string }[];
+  /** Full names + synonyms used for search (e.g. "Simple Email Service" for ses). */
+  aliases?: string[];
+  features?: ServiceFeature[];
 };
 
 export type Catalog = {

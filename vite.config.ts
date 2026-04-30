@@ -35,5 +35,14 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     hmr: { port: 5174 },
+    // CRXJS/HMR CORS fix: extension origin must be allow-listed so the
+    // dev-built service worker can fetch /@vite/env and /@crx/client-worker.
+    // Vite 5's default CORS config doesn't echo chrome-extension:// origins.
+    cors: {
+      origin: [/chrome-extension:\/\//],
+    },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
 });

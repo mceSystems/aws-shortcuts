@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
-import { searchServices } from '@/shared/serviceCatalog';
+import { type CatalogHit, searchCatalog } from '@/shared/serviceCatalog';
 import { subscribeCatalog } from '@/shared/catalogStore';
 import { send } from '@/shared/messages';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
@@ -24,7 +24,7 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
 
   useEffect(() => subscribeCatalog(() => setCatalogTick((t) => t + 1)), []);
 
-  const hits = useMemo(() => searchServices(query), [query, catalogTick]);
+  const hits = useMemo(() => searchCatalog(query), [query, catalogTick]);
 
   useEffect(() => {
     setCursor(0);
@@ -62,6 +62,19 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     void chrome.tabs.create({ url: res.url });
   }
 
+  function activate(hit: CatalogHit): void {
+    if (missingAccount) return;
+    if (hit.kind === 'feature') {
+      open(hit.service, hit.feature.path);
+      return;
+    }
+    if (hit.service.features && hit.service.features.length > 0) {
+      setPickedFeature({ serviceId: hit.service.id, featureIdx: null });
+      return;
+    }
+    open(hit.service);
+  }
+
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -72,12 +85,7 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const hit = hits[cursor];
-      if (!hit) return;
-      if (hit.service.features && hit.service.features.length > 0) {
-        setPickedFeature({ serviceId: hit.service.id, featureIdx: null });
-        return;
-      }
-      open(hit.service);
+      if (hit) activate(hit);
     } else if (e.key === 'Escape') {
       e.preventDefault();
       if (pickedFeature) setPickedFeature(null);
@@ -139,35 +147,40 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
 
       <ul className={styles.results}>
         {hits.length === 0 && (
-          <li className={styles.empty}>No services match “{query}”.</li>
+          <li className={styles.empty}>No matches for “{query}”.</li>
         )}
-        {hits.map((hit, i) => (
-          <li
-            key={hit.service.id}
-            className={[styles.result, i === cursor ? styles.active : '']
-              .filter(Boolean)
-              .join(' ')}
-            onMouseEnter={() => setCursor(i)}
-            onClick={() => {
-              if (missingAccount) return;
-              if (hit.service.features && hit.service.features.length > 0) {
-                setPickedFeature({ serviceId: hit.service.id, featureIdx: null });
-              } else {
-                open(hit.service);
-              }
-            }}
-          >
-            <ServiceIcon
-              id={hit.service.id}
-              name={hit.service.name}
-              fallbackBg={accountColor}
-            />
-            <span className={styles.name}>{hit.service.name}</span>
-            {hit.service.features && hit.service.features.length > 0 && (
-              <span className={styles.chevron} aria-hidden>›</span>
-            )}
-          </li>
-        ))}
+        {hits.map((hit, i) => {
+          const key = hit.kind === 'service' ? hit.service.id : `${hit.service.id}::${hit.feature.path}`;
+          const hasFeaturesPicker = hit.kind === 'service' && (hit.service.features?.length ?? 0) > 0;
+          return (
+            <li
+              key={key}
+              className={[styles.result, i === cursor ? styles.active : '']
+                .filter(Boolean)
+                .join(' ')}
+              onMouseEnter={() => setCursor(i)}
+              onClick={() => activate(hit)}
+            >
+              <ServiceIcon
+                id={hit.service.id}
+                name={hit.service.name}
+                fallbackBg={accountColor}
+              />
+              {hit.kind === 'service' ? (
+                <span className={styles.name}>{hit.service.name}</span>
+              ) : (
+                <span className={styles.name}>
+                  <span className={styles.crumbParent}>{hit.service.name}</span>
+                  <span className={styles.crumbSep}>›</span>
+                  {hit.feature.name}
+                </span>
+              )}
+              {hasFeaturesPicker && (
+                <span className={styles.chevron} aria-hidden>›</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       {missingAccount && (

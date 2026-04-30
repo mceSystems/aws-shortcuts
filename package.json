@@ -11,6 +11,7 @@
     "icons:fetch": "tsx scripts/fetch-icons.ts",
     "icons:build": "tsx scripts/build-icons.ts",
     "icons:check": "tsx scripts/build-icons.ts --check",
+    "catalog:merge": "tsx scripts/merge-harvested.ts",
     "predev": "npm run icons:build -- --allow-missing",
     "prebuild": "npm run icons:build -- --allow-missing"
   },

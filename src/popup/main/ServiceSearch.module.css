@@ -115,6 +115,16 @@
   flex-shrink: 0;
 }
 
+.crumbParent {
+  color: var(--ink-500);
+  font-weight: 500;
+}
+
+.crumbSep {
+  color: var(--ink-400);
+  margin: 0 6px;
+}
+
 .empty {
   padding: 8px 10px;
   font-size: 12px;

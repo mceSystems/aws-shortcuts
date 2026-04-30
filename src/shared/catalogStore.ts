@@ -78,3 +78,21 @@ export function validateCatalog(value: unknown): value is Catalog {
 
 export const CATALOG_STORAGE_KEY = STORAGE_KEY;
 export const CATALOG_FETCHED_AT_KEY = FETCHED_AT_KEY;
+
+export type CatalogStatus = {
+  version: string;
+  services: number;
+  fetchedAt: number | null;
+  bundled: boolean;
+};
+
+export async function readCatalogStatus(): Promise<CatalogStatus> {
+  const got = await chrome.storage.local.get([STORAGE_KEY, FETCHED_AT_KEY]);
+  const stored = got[STORAGE_KEY] as Catalog | undefined;
+  const fetchedAt = (got[FETCHED_AT_KEY] as number | undefined) ?? null;
+  if (stored && validateCatalog(stored)) {
+    return { version: stored.version, services: stored.services.length, fetchedAt, bundled: false };
+  }
+  const b = bundled as Catalog;
+  return { version: b.version, services: b.services.length, fetchedAt: null, bundled: true };
+}

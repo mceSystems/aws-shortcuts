@@ -10,7 +10,8 @@ import {
 import { awsColorToHex } from '@/shared/colors';
 import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { fetchAccounts } from './portal-api';
-import { installCatalogRefresh } from './catalogRefresh';
+import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
+import { cancelHarvest, harvestFeatures, harvestServices } from './harvester';
 
 installCatalogRefresh();
 
@@ -389,6 +390,54 @@ async function handle(msg: Msg): Promise<MsgResponse> {
 
     case 'RESOLVE_LAUNCH_URL': {
       return resolveLaunchUrl(msg);
+    }
+
+    case 'REFRESH_CATALOG': {
+      const result = await refreshCatalog('manual');
+      if (!result.ok) return { ok: false, error: result.error };
+      return {
+        ok: true,
+        catalog: {
+          updated: result.updated,
+          version: result.version,
+          services: result.services,
+          fetchedAt: result.fetchedAt,
+          source: result.source,
+        },
+      };
+    }
+
+    case 'HARVEST_SERVICES': {
+      try {
+        const services = await harvestServices({ debug: msg.debug === true });
+        await chrome.storage.local.set({ harvestedServices: services });
+        return { ok: true, harvest: { services } };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      }
+    }
+
+    case 'HARVEST_FEATURES': {
+      try {
+        const got = await chrome.storage.local.get('harvestedServices');
+        const stored = (got as { harvestedServices?: { id: string; consolePath: string }[] }).harvestedServices ?? [];
+        const target = msg.serviceIds && msg.serviceIds.length
+          ? stored.filter((s) => msg.serviceIds!.includes(s.id))
+          : stored;
+        if (!target.length) {
+          return { ok: false, error: 'no services to harvest features for — run service harvest first' };
+        }
+        const out = await harvestFeatures(target.map((s) => ({ id: s.id, consolePath: s.consolePath })));
+        await chrome.storage.local.set({ harvestedFeatures: out.features });
+        return { ok: true, harvest: { features: out.features, skipped: out.skipped } };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      }
+    }
+
+    case 'HARVEST_CANCEL': {
+      cancelHarvest();
+      return { ok: true };
     }
   }
 }

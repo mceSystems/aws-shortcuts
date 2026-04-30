@@ -50,37 +50,50 @@ async function ensureAlarm(): Promise<void> {
   chrome.alarms.create(ALARM_NAME, { periodInMinutes: PERIOD_MIN });
 }
 
-export async function refreshCatalog(trigger: string): Promise<void> {
+export type RefreshResult =
+  | { ok: true; updated: boolean; version: string; services: number; fetchedAt: number; source: string }
+  | { ok: false; error: string };
+
+export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
+  const errors: string[] = [];
   for (const url of URLS) {
     try {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) {
-        console.warn(`[catalog] ${trigger} HTTP ${res.status} from ${url}`);
+        const msg = `HTTP ${res.status} from ${url}`;
+        console.warn(`[catalog] ${trigger} ${msg}`);
+        errors.push(msg);
         continue;
       }
       const json = (await res.json()) as unknown;
       if (!validateCatalog(json)) {
-        console.warn(`[catalog] ${trigger} invalid shape from ${url}`);
+        const msg = `invalid shape from ${url}`;
+        console.warn(`[catalog] ${trigger} ${msg}`);
+        errors.push(msg);
         continue;
       }
       const next = json as Catalog;
       const cur = await readStoredCatalog();
+      const fetchedAt = Date.now();
       if (cur && cur.version === next.version) {
         console.log(`[catalog] ${trigger} version unchanged (${cur.version})`);
-        await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: Date.now() });
-        return;
+        await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
+        return { ok: true, updated: false, version: cur.version, services: cur.services.length, fetchedAt, source: url };
       }
       await chrome.storage.local.set({
         [CATALOG_STORAGE_KEY]: next,
-        [CATALOG_FETCHED_AT_KEY]: Date.now(),
+        [CATALOG_FETCHED_AT_KEY]: fetchedAt,
       });
       console.log(`[catalog] ${trigger} updated → ${next.version} (${next.services.length} services)`);
-      return;
+      return { ok: true, updated: true, version: next.version, services: next.services.length, fetchedAt, source: url };
     } catch (err) {
-      console.warn(`[catalog] ${trigger} fetch failed for ${url}:`, err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[catalog] ${trigger} fetch failed for ${url}:`, msg);
+      errors.push(`${url}: ${msg}`);
     }
   }
   console.warn(`[catalog] ${trigger} all sources failed; keeping prior catalog`);
+  return { ok: false, error: errors.join('; ') || 'all sources failed' };
 }
 
 async function readStoredCatalog(): Promise<Catalog | null> {
