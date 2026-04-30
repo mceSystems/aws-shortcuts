@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      '@catalog': resolve(__dirname, 'catalog'),
       // Alias React → Preact/compat for ~140KB bundle savings.
       // API-compatible with React 18, including createRoot + JSX runtime.
       react: 'preact/compat',

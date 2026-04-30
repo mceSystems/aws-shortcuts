@@ -17,9 +17,10 @@
     "types": ["chrome", "vite/client"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@catalog/*": ["catalog/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "catalog"],
   "exclude": ["src/manifest.ts"]
 }

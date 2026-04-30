@@ -39,6 +39,10 @@ export default defineManifest({
     'https://portal.sso.sa-east-1.amazonaws.com/*',
     'https://*.console.aws.amazon.com/*',
     'https://*.signin.aws.amazon.com/*',
+    // Catalog refresh from public GitHub repo (jsDelivr CDN primary,
+    // raw.githubusercontent.com fallback).
+    'https://cdn.jsdelivr.net/*',
+    'https://raw.githubusercontent.com/*',
   ],
   action: {
     default_popup: 'src/popup/index.html',

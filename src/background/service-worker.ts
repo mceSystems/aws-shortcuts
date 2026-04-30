@@ -10,6 +10,9 @@ import {
 import { awsColorToHex } from '@/shared/colors';
 import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { fetchAccounts } from './portal-api';
+import { installCatalogRefresh } from './catalogRefresh';
+
+installCatalogRefresh();
 
 // ───── bearer capture ──────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 // Pre-build pipeline: vendor icons → optimized icons in src/assets/icons/.
 // Reads scripts/icon-map.json (id → filename), validates against
-// src/data/services.json, walks vendor/aws-icons-source/ recursively to
+// catalog/services.json, walks vendor/aws-icons-source/ recursively to
 // resolve filenames at any depth, writes per-id files + index.ts.
 //
 // Source files may be .svg (optimized via svgo) or .png/.jpg/.webp (copied
@@ -27,12 +27,13 @@ const ALLOW_MISSING = args.has('--allow-missing');
 
 const SOURCE_DIR = resolveFlag('--source') ?? process.env.ICONS_SOURCE_DIR ?? join(ROOT, 'vendor/aws-icons-source');
 const OUT_DIR = join(ROOT, 'src/assets/icons');
-const SERVICES_PATH = join(ROOT, 'src/data/services.json');
+const SERVICES_PATH = join(ROOT, 'catalog/services.json');
 const MAP_PATH = join(ROOT, 'scripts/icon-map.json');
 const LOCK_PATH = join(ROOT, '.cache/icons.lock');
 
 type IconMap = Record<string, string>;
 type Service = { id: string };
+type Catalog = { schemaVersion: number; version: string; services: Service[] };
 
 function resolveFlag(name: string): string | undefined {
   const idx = process.argv.indexOf(name);
@@ -132,7 +133,8 @@ function idVar(id: string): string {
 }
 
 function main(): void {
-  const services = readJson<Service[]>(SERVICES_PATH);
+  const catalog = readJson<Catalog>(SERVICES_PATH);
+  const services = catalog.services;
   const map = readJson<IconMap>(MAP_PATH);
   // Strip the $schema doc field if present.
   delete (map as Record<string, string>)['$schema'];

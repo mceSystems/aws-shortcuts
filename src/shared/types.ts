@@ -67,6 +67,12 @@ export type ServiceCatalogEntry = {
   features?: { name: string; path: string }[];
 };
 
+export type Catalog = {
+  schemaVersion: number;
+  version: string;
+  services: ServiceCatalogEntry[];
+};
+
 export type SsoConfig = {
   startUrl: string;
   portalHost: string;

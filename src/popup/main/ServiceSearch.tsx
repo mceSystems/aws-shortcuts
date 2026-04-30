@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
 import { searchServices } from '@/shared/serviceCatalog';
+import { subscribeCatalog } from '@/shared/catalogStore';
 import { send } from '@/shared/messages';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
 import { ServiceIcon } from './ServiceIcon';
@@ -19,8 +20,11 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     featureIdx: number | null;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [catalogTick, setCatalogTick] = useState(0);
 
-  const hits = useMemo(() => searchServices(query), [query]);
+  useEffect(() => subscribeCatalog(() => setCatalogTick((t) => t + 1)), []);
+
+  const hits = useMemo(() => searchServices(query), [query, catalogTick]);
 
   useEffect(() => {
     setCursor(0);

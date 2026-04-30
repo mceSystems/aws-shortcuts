@@ -1,5 +1,5 @@
 {
-  "$schema": "Maps service id (from src/data/services.json) to source icon filename inside vendor/aws-icons-source/. Filename must match a file at any depth in the source tree. Currently uses awslabs/aws-icons-for-plantuml dist/ PNGs (run scripts/fetch-icons.sh to populate).",
+  "$schema": "Maps service id (from catalog/services.json) to source icon filename inside vendor/aws-icons-source/. Filename must match a file at any depth in the source tree. Currently uses awslabs/aws-icons-for-plantuml dist/ PNGs (run npm run icons:fetch to populate).",
   "ec2":             "EC2.png",
   "s3":              "SimpleStorageService.png",
   "iam":             "IdentityandAccessManagement.png",
