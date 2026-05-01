@@ -176,6 +176,23 @@
   border-radius: var(--radius-sm);
 }
 
+.blocker[data-flash='true'] {
+  animation: blockerFlash 480ms var(--ease-out, ease-out);
+}
+
+@keyframes blockerFlash {
+  0%   { background: color-mix(in oklch, var(--warning) 8%, transparent); transform: translateX(0); }
+  15%  { background: color-mix(in oklch, var(--warning) 28%, transparent); transform: translateX(-4px); }
+  35%  { transform: translateX(4px); }
+  55%  { transform: translateX(-3px); }
+  75%  { transform: translateX(2px); }
+  100% { background: color-mix(in oklch, var(--warning) 8%, transparent); transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blocker[data-flash='true'] { animation: none; }
+}
+
 .crumb {
   display: flex;
   align-items: center;
