@@ -19,8 +19,8 @@
 //   npm run catalog:merge -- --dry         # show diff, no write
 //   npm run catalog:merge -- --strict      # drop non-harvested services
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,6 +29,10 @@ const ROOT = resolve(__dirname, '..');
 const HARVEST_PATH = join(ROOT, 'catalog/harvested.raw.json');
 const SERVICES_PATH = join(ROOT, 'catalog/services.json');
 const OVERRIDES_PATH = join(ROOT, 'catalog/overrides.json');
+const ICON_MAP_PATH = join(ROOT, 'scripts/icon-map.json');
+const ICON_VENDOR_DIR = join(ROOT, 'vendor/aws-icons-source/dist');
+const ICONS_VERSION = process.env.ICONS_VERSION ?? '18.0';
+const ICON_CDN_BASE = `https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v${ICONS_VERSION}/dist`;
 
 const args = new Set(process.argv.slice(2));
 const DRY = args.has('--dry');
@@ -42,6 +46,7 @@ type Service = {
   popular?: boolean;
   aliases?: string[];
   features?: Feature[];
+  iconUrl?: string;
 };
 type Catalog = { schemaVersion: number; version: string; services: Service[] };
 
@@ -62,6 +67,96 @@ type Overrides = {
 
 function readJson<T>(p: string): T {
   return JSON.parse(readFileSync(p, 'utf8')) as T;
+}
+
+const ICON_EXTS = new Set(['.svg', '.png', '.jpg', '.jpeg', '.webp']);
+
+function extOf(name: string): string {
+  const i = name.lastIndexOf('.');
+  return i >= 0 ? name.slice(i).toLowerCase() : '';
+}
+
+/** Walk vendor icons dir. Returns filename → relative path within dist/. */
+function walkIcons(dir: string): Map<string, string> {
+  const out = new Map<string, string>();
+  if (!existsSync(dir)) return out;
+  const stack: string[] = [dir];
+  while (stack.length) {
+    const cur = stack.pop()!;
+    for (const entry of readdirSync(cur, { withFileTypes: true })) {
+      const full = join(cur, entry.name);
+      if (entry.isDirectory()) stack.push(full);
+      else if (entry.isFile() && ICON_EXTS.has(extOf(entry.name))) {
+        if (out.has(entry.name)) continue; // first match wins, like build-icons.ts
+        out.set(entry.name, relative(dir, full));
+      }
+    }
+  }
+  return out;
+}
+
+/** Generate filename guesses for a service. Many AWS icon filenames
+ *  follow `<ServiceName>.png` with spaces / "Amazon "/"AWS " stripped, so
+ *  derive a few common variants from the service's id and display name.
+ *  Caller looks each up in the filenameToRel walker map. */
+function guessIconFilenames(id: string, name: string): string[] {
+  const cleanName = name
+    .replace(/^(Amazon|AWS)\s+/i, '')
+    .replace(/[^A-Za-z0-9]/g, '');
+  const fullName = name.replace(/[^A-Za-z0-9]/g, '');
+  const idCap = id.replace(/^./, (c) => c.toUpperCase());
+  const idUpper = id.toUpperCase();
+  const firstWord = name.split(/\s+/)[0]?.replace(/[^A-Za-z0-9]/g, '');
+  const guesses = new Set<string>();
+  for (const stem of [cleanName, fullName, idCap, idUpper, firstWord]) {
+    if (!stem) continue;
+    guesses.add(`${stem}.png`);
+    guesses.add(`${stem}.svg`);
+  }
+  return [...guesses];
+}
+
+function buildIconUrlMap(services: { id: string; name: string }[]): {
+  urls: Map<string, string>;
+  matched: number;
+  unmatched: string[];
+} {
+  const filenameToRel = walkIcons(ICON_VENDOR_DIR);
+  if (filenameToRel.size === 0) {
+    console.warn('[merge] vendor icons not found — run `npm run icons:fetch`');
+    return { urls: new Map(), matched: 0, unmatched: services.map((s) => s.id) };
+  }
+
+  // Manual map wins. Start from icon-map.json so curated names like
+  // "SimpleStorageService.png" for s3 take precedence over heuristic guesses.
+  const manual: Record<string, string> = existsSync(ICON_MAP_PATH)
+    ? readJson<Record<string, string>>(ICON_MAP_PATH)
+    : {};
+  delete (manual as Record<string, unknown>)['$schema'];
+
+  const urls = new Map<string, string>();
+  const unmatched: string[] = [];
+
+  for (const svc of services) {
+    let filename = manual[svc.id];
+    if (!filename || !filenameToRel.has(filename)) {
+      // Fall back to heuristic guesses derived from id + display name.
+      for (const g of guessIconFilenames(svc.id, svc.name)) {
+        if (filenameToRel.has(g)) {
+          filename = g;
+          break;
+        }
+      }
+    }
+    const rel = filename ? filenameToRel.get(filename) : undefined;
+    if (!rel) {
+      unmatched.push(`${svc.id} (${svc.name})`);
+      continue;
+    }
+    urls.set(svc.id, `${ICON_CDN_BASE}/${rel.split('\\').join('/')}`);
+  }
+
+  return { urls, matched: urls.size, unmatched };
 }
 
 function todayVersion(): string {
@@ -160,6 +255,14 @@ function main(): void {
     out.push(entry);
   }
 
+  // Resolve icon URLs after the service list is final so we can iterate
+  // across the full population (manual map + heuristic guess from name).
+  const iconResult = buildIconUrlMap(out.map((s) => ({ id: s.id, name: s.name })));
+  for (const s of out) {
+    const url = iconResult.urls.get(s.id);
+    if (url) s.iconUrl = url;
+  }
+
   const sorted = sortServices(out);
   const next: Catalog = {
     schemaVersion: 2,
@@ -187,6 +290,11 @@ function main(): void {
   console.log(`[merge] removed (${removed.length}): ${removed.join(', ')}`);
   console.log(`[merge] consolePath changes: ${pathChanged}`);
   console.log(`[merge] features changes: ${featuresChanged}`);
+  console.log(`[merge] icons matched: ${iconResult.matched}/${sorted.length}`);
+  if (iconResult.unmatched.length) {
+    console.log(`[merge] icons unmatched (${iconResult.unmatched.length}):`);
+    for (const m of iconResult.unmatched) console.log(`  - ${m}`);
+  }
   console.log(`[merge] new version: ${next.version}`);
 
   if (DRY) {

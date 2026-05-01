@@ -16,6 +16,7 @@
 
 import type { Catalog } from '@/shared/types';
 import { CATALOG_FETCHED_AT_KEY, CATALOG_STORAGE_KEY, validateCatalog } from '@/shared/catalogStore';
+import { refreshIcons } from './iconRefresh';
 
 const REPO = 'netanel-mce/aws-shortcut';
 const BRANCH = 'main';
@@ -51,8 +52,14 @@ async function ensureAlarm(): Promise<void> {
 }
 
 export type RefreshResult =
-  | { ok: true; updated: boolean; version: string; services: number; fetchedAt: number; source: string }
+  | { ok: true; updated: boolean; version: string; services: number; features: number; fetchedAt: number; source: string }
   | { ok: false; error: string };
+
+function countFeatures(c: Catalog): number {
+  let n = 0;
+  for (const s of c.services) n += s.features?.length ?? 0;
+  return n;
+}
 
 export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
   const errors: string[] = [];
@@ -78,7 +85,8 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
       if (cur && cur.version === next.version) {
         console.log(`[catalog] ${trigger} version unchanged (${cur.version})`);
         await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
-        return { ok: true, updated: false, version: cur.version, services: cur.services.length, fetchedAt, source: url };
+        kickIconRefresh(trigger);
+        return { ok: true, updated: false, version: cur.version, services: cur.services.length, features: countFeatures(cur), fetchedAt, source: url };
       }
       // Don't downgrade — if remote has fewer services AND an older version
       // string, keep what we have. Avoids the dev-time hazard where the
@@ -86,14 +94,16 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
       if (cur && next.services.length < cur.services.length && next.version < cur.version) {
         console.warn(`[catalog] ${trigger} remote (${next.version}, ${next.services.length}) is older than stored (${cur.version}, ${cur.services.length}); skipping`);
         await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
-        return { ok: true, updated: false, version: cur.version, services: cur.services.length, fetchedAt, source: url };
+        kickIconRefresh(trigger);
+        return { ok: true, updated: false, version: cur.version, services: cur.services.length, features: countFeatures(cur), fetchedAt, source: url };
       }
       await chrome.storage.local.set({
         [CATALOG_STORAGE_KEY]: next,
         [CATALOG_FETCHED_AT_KEY]: fetchedAt,
       });
-      console.log(`[catalog] ${trigger} updated → ${next.version} (${next.services.length} services)`);
-      return { ok: true, updated: true, version: next.version, services: next.services.length, fetchedAt, source: url };
+      console.log(`[catalog] ${trigger} updated → ${next.version} (${next.services.length} services, ${countFeatures(next)} features)`);
+      kickIconRefresh(trigger);
+      return { ok: true, updated: true, version: next.version, services: next.services.length, features: countFeatures(next), fetchedAt, source: url };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[catalog] ${trigger} fetch failed for ${url}:`, msg);
@@ -102,6 +112,16 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
   }
   console.warn(`[catalog] ${trigger} all sources failed; keeping prior catalog`);
   return { ok: false, error: errors.join('; ') || 'all sources failed' };
+}
+
+/** Fire-and-forget icon refresh after catalog write. Failures are logged
+ *  but never fail the catalog refresh — stale icons are tolerable, a
+ *  missing catalog is not. The icon worker dedupes against the cache, so
+ *  calling this on every successful catalog refresh is cheap. */
+function kickIconRefresh(trigger: string): void {
+  void refreshIcons(`after-${trigger}`).catch((err) =>
+    console.warn(`[catalog] icon refresh failed:`, err),
+  );
 }
 
 async function readStoredCatalog(): Promise<Catalog | null> {

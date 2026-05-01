@@ -51,6 +51,7 @@ export type MsgResponse =
         updated: boolean;
         version: string;
         services: number;
+        features: number;
         fetchedAt: number;
         source: string;
       };

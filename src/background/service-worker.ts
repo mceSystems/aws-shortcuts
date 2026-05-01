@@ -408,6 +408,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
           updated: result.updated,
           version: result.version,
           services: result.services,
+          features: result.features,
           fetchedAt: result.fetchedAt,
           source: result.source,
         },

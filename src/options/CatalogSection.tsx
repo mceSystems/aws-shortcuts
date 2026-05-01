@@ -6,7 +6,7 @@ import styles from './options.module.css';
 type RefreshState =
   | { kind: 'idle' }
   | { kind: 'pending' }
-  | { kind: 'ok'; updated: boolean; version: string; services: number; source: string }
+  | { kind: 'ok'; updated: boolean; version: string; services: number; features: number; source: string }
   | { kind: 'error'; error: string };
 
 export function CatalogSection() {
@@ -44,6 +44,7 @@ export function CatalogSection() {
       updated: res.catalog.updated,
       version: res.catalog.version,
       services: res.catalog.services,
+      features: res.catalog.features,
       source: res.catalog.source,
     });
   }
@@ -71,6 +72,10 @@ export function CatalogSection() {
           <dd className={styles.statValue}>{status?.services ?? '—'}</dd>
         </div>
         <div className={styles.stat}>
+          <dt className={styles.statLabel}>Features</dt>
+          <dd className={styles.statValue}>{status?.features ?? '—'}</dd>
+        </div>
+        <div className={styles.stat}>
           <dt className={styles.statLabel}>Last fetched</dt>
           <dd className={styles.statValue}>{formatFetchedAt(status?.fetchedAt ?? null)}</dd>
         </div>
@@ -88,7 +93,7 @@ export function CatalogSection() {
         {refresh.kind === 'ok' && (
           <span className={styles.successMsg}>
             {refresh.updated
-              ? `Updated to ${refresh.version} (${refresh.services} services)`
+              ? `Updated to ${refresh.version} (${refresh.services} services, ${refresh.features} features)`
               : `Already on ${refresh.version} — no changes`}
           </span>
         )}

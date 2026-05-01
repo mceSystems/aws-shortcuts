@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { ICONS } from '@/assets/icons';
+import { getCachedIconUrl, subscribeIconCache } from '@/shared/iconCache';
 import styles from './ServiceIcon.module.css';
 
 type Props = {
@@ -9,7 +11,12 @@ type Props = {
 };
 
 export function ServiceIcon({ id, name, fallbackBg, size = 22 }: Props) {
-  const url = ICONS[id];
+  // Resolve once per render but re-render whenever the runtime icon cache
+  // changes (e.g. SW just finished fetching a freshly-added service icon).
+  const [, setTick] = useState(0);
+  useEffect(() => subscribeIconCache(() => setTick((n) => n + 1)), []);
+
+  const url = getCachedIconUrl(id) ?? ICONS[id];
   if (url) {
     return (
       <span className={styles.iconBox} style={{ width: size, height: size }}>

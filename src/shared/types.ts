@@ -73,6 +73,10 @@ export type ServiceCatalogEntry = {
   /** Full names + synonyms used for search (e.g. "Simple Email Service" for ses). */
   aliases?: string[];
   features?: ServiceFeature[];
+  /** Public URL for the service icon. Emitted by merge-harvested.ts from
+   * scripts/icon-map.json. SW fetches these on catalog refresh and caches
+   * each as a data URL in chrome.storage.local (see iconCache.ts). */
+  iconUrl?: string;
 };
 
 export type Catalog = {

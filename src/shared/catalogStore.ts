@@ -94,17 +94,36 @@ export const CATALOG_FETCHED_AT_KEY = FETCHED_AT_KEY;
 export type CatalogStatus = {
   version: string;
   services: number;
+  features: number;
   fetchedAt: number | null;
   bundled: boolean;
 };
+
+function countFeatures(c: Catalog): number {
+  let n = 0;
+  for (const s of c.services) n += s.features?.length ?? 0;
+  return n;
+}
 
 export async function readCatalogStatus(): Promise<CatalogStatus> {
   const got = await chrome.storage.local.get([STORAGE_KEY, FETCHED_AT_KEY]);
   const stored = got[STORAGE_KEY] as Catalog | undefined;
   const fetchedAt = (got[FETCHED_AT_KEY] as number | undefined) ?? null;
   if (stored && validateCatalog(stored)) {
-    return { version: stored.version, services: stored.services.length, fetchedAt, bundled: false };
+    return {
+      version: stored.version,
+      services: stored.services.length,
+      features: countFeatures(stored),
+      fetchedAt,
+      bundled: false,
+    };
   }
   const b = bundled as Catalog;
-  return { version: b.version, services: b.services.length, fetchedAt: null, bundled: true };
+  return {
+    version: b.version,
+    services: b.services.length,
+    features: countFeatures(b),
+    fetchedAt: null,
+    bundled: true,
+  };
 }
