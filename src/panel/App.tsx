@@ -80,7 +80,10 @@ export function App() {
     writeCached(next);
     setSsoConfig(next.ssoConfig);
     setBoot(next);
-    setPhase(isReady(next) ? 'ready' : 'onboarding');
+    // Don't auto-bounce the user out of the settings view they explicitly
+    // navigated into. Storage updates (e.g. account observations triggered
+    // by a harvest tab) shouldn't yank them back to the main panel.
+    setPhase((cur) => (cur === 'settings' ? 'settings' : isReady(next) ? 'ready' : 'onboarding'));
   }
 
   async function wipeAll() {

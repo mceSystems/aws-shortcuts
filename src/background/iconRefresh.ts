@@ -7,6 +7,7 @@
 import type { Catalog } from '@/shared/types';
 import { CATALOG_STORAGE_KEY, validateCatalog } from '@/shared/catalogStore';
 import { ICON_CACHE_KEY, type IconCache } from '@/shared/iconCache';
+import bundled from '@catalog/services.json';
 
 const CONCURRENCY = 8;
 
@@ -21,11 +22,12 @@ export type IconRefreshResult = {
 export async function refreshIcons(trigger: string): Promise<IconRefreshResult> {
   const got = await chrome.storage.local.get([CATALOG_STORAGE_KEY, ICON_CACHE_KEY]);
   const stored = got[CATALOG_STORAGE_KEY];
-  if (!stored || !validateCatalog(stored)) {
-    console.warn(`[icons] ${trigger} no catalog in storage; skipping`);
-    return { fetched: 0, reused: 0, failed: 0, total: 0, bytes: 0 };
-  }
-  const catalog = stored as Catalog;
+  // Fall back to the bundled catalog when storage hasn't been populated
+  // yet (offline first install, or before the first successful CDN
+  // refresh). Bundled already carries iconUrls thanks to merge-harvested,
+  // so icons can populate as soon as network is available.
+  const catalog: Catalog =
+    stored && validateCatalog(stored) ? (stored as Catalog) : (bundled as Catalog);
   const cache: IconCache = (got[ICON_CACHE_KEY] as IconCache | undefined) ?? {};
 
   type Job = { id: string; url: string };

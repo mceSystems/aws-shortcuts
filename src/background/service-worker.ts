@@ -11,6 +11,7 @@ import { awsColorToHex } from '@/shared/colors';
 import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
+import { refreshIcons } from './iconRefresh';
 import { cancelHarvest, harvestFeatures, harvestServices } from './harvester';
 import { bumpOpenCount } from '@/shared/openCounts';
 
@@ -413,6 +414,15 @@ async function handle(msg: Msg): Promise<MsgResponse> {
           source: result.source,
         },
       };
+    }
+
+    case 'REFRESH_ICONS': {
+      try {
+        const result = await refreshIcons('manual');
+        return { ok: true, icons: result };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : String(err) };
+      }
     }
 
     case 'HARVEST_SERVICES': {

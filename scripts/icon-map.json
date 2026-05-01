@@ -83,5 +83,13 @@
   "servicequotas":        "ServiceCatalog.png",
   "securityagent":        "SecurityHub.png",
   "securityir":           "SecurityHub.png",
-  "endusermessaging":     "SimpleNotificationService.png"
+  "endusermessaging":     "SimpleNotificationService.png",
+  "connecthealth":        "Connect.png",
+  "novaact":              "Bedrock.png",
+  "aidevops":             "DevOpsGuru.png",
+  "biodiscovery":         "Bedrock.png",
+  "sustainability":       "BillingConductor.png",
+  "transform":            "ApplicationMigrationService.png",
+  "odb":                  "AuroraOracleInstance.png",
+  "rtbfabric":            "AppFabric.png"
 }

@@ -34,10 +34,15 @@ export function installCatalogRefresh(): void {
   chrome.runtime.onInstalled.addListener(() => {
     void ensureAlarm();
     void refreshCatalog('onInstalled');
+    // Independent icon kick: covers offline first install where catalog
+    // refresh fails entirely. Reads bundled catalog iconUrls and fetches
+    // whatever it can. No-op for cache entries already populated.
+    kickIconRefresh('onInstalled-direct');
   });
   chrome.runtime.onStartup.addListener(() => {
     void ensureAlarm();
     void refreshCatalog('onStartup');
+    kickIconRefresh('onStartup-direct');
   });
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name !== ALARM_NAME) return;
@@ -84,7 +89,14 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
       const fetchedAt = Date.now();
       if (cur && cur.version === next.version) {
         console.log(`[catalog] ${trigger} version unchanged (${cur.version})`);
-        await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
+        // Always write catalog to storage even when version matches: on
+        // first install `cur` is null and we still need the catalog
+        // available so iconRefresh can read it. Idempotent for same-version
+        // re-writes.
+        await chrome.storage.local.set({
+          [CATALOG_STORAGE_KEY]: next,
+          [CATALOG_FETCHED_AT_KEY]: fetchedAt,
+        });
         kickIconRefresh(trigger);
         return { ok: true, updated: false, version: cur.version, services: cur.services.length, features: countFeatures(cur), fetchedAt, source: url };
       }

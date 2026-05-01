@@ -993,7 +993,8 @@
     {
       "id": "biodiscovery",
       "name": "Amazon Bio Discovery",
-      "consolePath": "biodiscovery/home"
+      "consolePath": "biodiscovery/home",
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
     },
     {
       "id": "braket",
@@ -2176,7 +2177,8 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ]
+      ],
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Connect.png"
     },
     {
       "id": "firehose",
@@ -4907,7 +4909,8 @@
     {
       "id": "novaact",
       "name": "Amazon Nova Act",
-      "consolePath": "nova-act/home"
+      "consolePath": "nova-act/home",
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
     },
     {
       "id": "aos",
@@ -11436,7 +11439,8 @@
           "name": "Feedback",
           "path": "feedback"
         }
-      ]
+      ],
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/DevOpsGuru.png"
     },
     {
       "id": "drs",
@@ -14536,7 +14540,8 @@
           "name": "Skip to Main Content",
           "path": "sustainability/home#c"
         }
-      ]
+      ],
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/BillingConductor.png"
     },
     {
       "id": "tnb",
@@ -14677,7 +14682,8 @@
     {
       "id": "transform",
       "name": "AWS Transform",
-      "consolePath": "transform/home"
+      "consolePath": "transform/home",
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/ApplicationMigrationService.png"
     },
     {
       "id": "notifications",
@@ -18125,7 +18131,8 @@
     {
       "id": "odb",
       "name": "Oracle Database@AWS",
-      "consolePath": "odb/home"
+      "consolePath": "odb/home",
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/AuroraOracleInstance.png"
     },
     {
       "id": "pcs",
@@ -18313,7 +18320,8 @@
           "name": "Responder gateways",
           "path": "rtbfabric/responder"
         }
-      ]
+      ],
+      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/AppFabric.png"
     },
     {
       "id": "s3",

@@ -33,6 +33,7 @@ export type Msg =
       featurePath?: string;
     }
   | { type: 'REFRESH_CATALOG' }
+  | { type: 'REFRESH_ICONS' }
   | { type: 'HARVEST_SERVICES'; debug?: boolean }
   | { type: 'HARVEST_FEATURES'; serviceIds?: string[] }
   | { type: 'HARVEST_CANCEL' };
@@ -54,6 +55,13 @@ export type MsgResponse =
         features: number;
         fetchedAt: number;
         source: string;
+      };
+      icons?: {
+        fetched: number;
+        reused: number;
+        failed: number;
+        total: number;
+        bytes: number;
       };
       harvest?: {
         services?: HarvestedService[];
