@@ -4,6 +4,7 @@ import { send } from '@/shared/messages';
 import { FavoritesView } from './FavoritesView';
 import { OpenList } from './OpenList';
 import { RecentList } from './RecentList';
+import type { PendingFavorite } from './SaveFavoriteBanner';
 import { useFavorites } from './useFavorites';
 import { useOpenTabs } from './useOpenTabs';
 import { useRecents } from './useRecents';
@@ -13,9 +14,10 @@ type Pill = 'favorites' | 'tabs';
 
 type Props = {
   accounts: Account[];
+  onRequestSaveFavorite?: (pending: PendingFavorite) => void;
 };
 
-export function TabsSection({ accounts }: Props) {
+export function TabsSection({ accounts, onRequestSaveFavorite }: Props) {
   const [pill, setPill] = useState<Pill>('favorites');
   const { openTabs } = useOpenTabs();
   const { recents } = useRecents();
@@ -50,11 +52,15 @@ export function TabsSection({ accounts }: Props) {
 
       <div className={styles.body}>
         {pill === 'favorites' ? (
-          <FavoritesView favorites={favorites} accounts={accounts} />
+          <FavoritesView favorites={favorites} accounts={accounts} openTabs={openTabs} />
         ) : (
           <>
             <div className={styles.subLabel}>Open</div>
-            <OpenList openTabs={openTabs} accounts={accounts} />
+            <OpenList
+              openTabs={openTabs}
+              accounts={accounts}
+              onRequestSaveFavorite={onRequestSaveFavorite}
+            />
             <div className={styles.subLabelRow}>
               <span className={styles.subLabel}>Recently closed</span>
               {recents.length > 0 && (
@@ -70,7 +76,12 @@ export function TabsSection({ accounts }: Props) {
                 </button>
               )}
             </div>
-            <RecentList recents={recents} openTabs={openTabs} accounts={accounts} />
+            <RecentList
+              recents={recents}
+              openTabs={openTabs}
+              accounts={accounts}
+              onRequestSaveFavorite={onRequestSaveFavorite}
+            />
           </>
         )}
       </div>

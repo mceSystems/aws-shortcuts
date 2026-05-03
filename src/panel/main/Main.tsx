@@ -138,7 +138,12 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         },
         tabs: {
           label: 'Tabs',
-          render: () => <TabsSection accounts={accounts} />,
+          render: () => (
+            <TabsSection
+              accounts={accounts}
+              onRequestSaveFavorite={setPendingFavorite}
+            />
+          ),
         },
       }),
       [

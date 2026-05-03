@@ -105,6 +105,29 @@
   color: var(--ink-700);
 }
 
+.rowSaveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-300, var(--ink-400));
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+
+.rowSaveBtn:hover,
+.rowSaveBtn:focus-visible {
+  opacity: 1;
+  background: var(--ink-100);
+  color: var(--accent);
+}
+
 .list {
   display: flex;
   flex-direction: column;

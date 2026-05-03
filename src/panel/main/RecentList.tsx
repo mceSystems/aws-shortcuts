@@ -3,15 +3,18 @@ import type { OpenTabInfo } from '@/shared/sessionStorage';
 import { send } from '@/shared/messages';
 import { openOrFocusTab } from '@/shared/tabs';
 import { TabRow } from './TabRow';
+import { buildRowPendingFavorite } from './buildRowPendingFavorite';
+import type { PendingFavorite } from './SaveFavoriteBanner';
 import styles from './TabsSection.module.css';
 
 type Props = {
   recents: Recent[];
   openTabs: OpenTabInfo[];
   accounts: Account[];
+  onRequestSaveFavorite?: (pending: PendingFavorite) => void;
 };
 
-export function RecentList({ recents, openTabs, accounts }: Props) {
+export function RecentList({ recents, openTabs, accounts, onRequestSaveFavorite }: Props) {
   const openKeys = new Set(openTabs.map((t) => t.dedupeKey).filter(Boolean));
   const filtered = recents.filter((r) => !openKeys.has(r.dedupeKey));
 
@@ -32,7 +35,19 @@ export function RecentList({ recents, openTabs, accounts }: Props) {
           region={r.region}
           title={r.title}
           onClick={() => relaunch(r)}
-          trailing={<RelaunchIcon />}
+          trailing={
+            <>
+              {onRequestSaveFavorite && (
+                <SaveButton
+                  onClick={() => {
+                    const pending = buildRowPendingFavorite(r, accounts);
+                    if (pending) onRequestSaveFavorite(pending);
+                  }}
+                />
+              )}
+              <RelaunchIcon />
+            </>
+          }
         />
       ))}
     </div>
@@ -53,6 +68,35 @@ async function relaunch(r: Recent): Promise<void> {
     return;
   }
   await openOrFocusTab(res.url);
+}
+
+function SaveButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className={styles.rowSaveBtn}
+      title="Save as favorite"
+      aria-label="Save as favorite"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M12 2 15 8.5 22 9.3l-5.2 4.8L18.2 21 12 17.5 5.8 21l1.4-6.9L2 9.3 9 8.5z" />
+      </svg>
+    </button>
+  );
 }
 
 function RelaunchIcon() {

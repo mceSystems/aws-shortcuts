@@ -1,4 +1,6 @@
 import type { Account, Favorite } from '@/shared/types';
+import type { OpenTabInfo } from '@/shared/sessionStorage';
+import { sanitizeConsolePathForFavorite } from '@/shared/consoleUrl';
 import { send } from '@/shared/messages';
 import { openOrFocusTab } from '@/shared/tabs';
 import { TabRow } from './TabRow';
@@ -7,9 +9,10 @@ import styles from './TabsSection.module.css';
 type Props = {
   favorites: Favorite[];
   accounts: Account[];
+  openTabs: OpenTabInfo[];
 };
 
-export function FavoritesView({ favorites, accounts }: Props) {
+export function FavoritesView({ favorites, accounts, openTabs }: Props) {
   if (favorites.length === 0) {
     return <div className={styles.empty}>No favorites yet</div>;
   }
@@ -26,7 +29,7 @@ export function FavoritesView({ favorites, accounts }: Props) {
           roleName={f.roleName}
           region={f.region}
           label={f.label}
-          onClick={() => launchFavorite(f)}
+          onClick={() => launchFavorite(f, openTabs)}
           trailing={<LaunchIcon />}
         />
       ))}
@@ -34,7 +37,21 @@ export function FavoritesView({ favorites, accounts }: Props) {
   );
 }
 
-async function launchFavorite(f: Favorite): Promise<void> {
+async function launchFavorite(f: Favorite, openTabs: OpenTabInfo[]): Promise<void> {
+  // Already open in this account/role/region with the exact same path?
+  // Focus the last-observed tab instead of spawning a duplicate.
+  const match = findExactOpenMatch(f, openTabs);
+  if (match) {
+    try {
+      await chrome.tabs.update(match.tabId, { active: true });
+      if (match.windowId !== -1) {
+        await chrome.windows.update(match.windowId, { focused: true });
+      }
+      return;
+    } catch (e) {
+      console.warn('[aws-shortcut/panel] focus existing tab failed; falling through', e);
+    }
+  }
   const res = await send({
     type: 'RESOLVE_LAUNCH_URL',
     accountId: f.accountId,
@@ -49,6 +66,18 @@ async function launchFavorite(f: Favorite): Promise<void> {
     return;
   }
   await openOrFocusTab(res.url);
+}
+
+function findExactOpenMatch(f: Favorite, openTabs: OpenTabInfo[]): OpenTabInfo | undefined {
+  let best: OpenTabInfo | undefined;
+  for (const t of openTabs) {
+    if (t.accountId !== f.accountId) continue;
+    if (t.roleName !== f.roleName) continue;
+    if (t.region !== f.region) continue;
+    if (sanitizeConsolePathForFavorite(t.consolePath) !== f.consolePath) continue;
+    if (!best || t.observedAt > best.observedAt) best = t;
+  }
+  return best;
 }
 
 function LaunchIcon() {

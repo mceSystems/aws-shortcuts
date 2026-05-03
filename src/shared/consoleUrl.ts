@@ -145,6 +145,77 @@ export function featureDedupeKey(consolePath: string): string {
   return path + hash.slice(0, sepIdx + 1);
 }
 
+/** Auth/session/tracking params we strip when storing a favorite. AWS
+ *  console seeds these on portal redirect; they're meaningless on next
+ *  launch and clutter the saved URL. Everything else is preserved. */
+const AUTH_PARAM_RE =
+  /^(nc2|icmpid|hashArgs|orgId|signin_token|x-amz-sso-token|token|code|state|response_type|client_id|client_secret|redirect_uri|session|identity|trk|sc_channel|sc_campaign|sc_publisher|sc_geo|sc_country|sc_outcome)$/i;
+
+function stripAuthParams(qs: string): string {
+  if (!qs) return qs;
+  const params = new URLSearchParams(qs);
+  const keep: [string, string][] = [];
+  for (const [k, v] of params) {
+    if (AUTH_PARAM_RE.test(k)) continue;
+    keep.push([k, v]);
+  }
+  if (keep.length === params.size) return qs;
+  const out = new URLSearchParams();
+  for (const [k, v] of keep) out.append(k, v);
+  return out.toString();
+}
+
+/** Sanitize a consolePath for storage in a favorite. Keeps all routing,
+ *  resource bindings, and view params; drops only known auth/session/
+ *  tracking params from both the top-level query AND any hash query. */
+export function sanitizeConsolePathForFavorite(consolePath: string): string {
+  const hashIdx = consolePath.indexOf('#');
+  const beforeHash = hashIdx === -1 ? consolePath : consolePath.slice(0, hashIdx);
+  const hash = hashIdx === -1 ? '' : consolePath.slice(hashIdx);
+
+  // Top-level query.
+  const qIdx = beforeHash.indexOf('?');
+  const path = qIdx === -1 ? beforeHash : beforeHash.slice(0, qIdx);
+  const topQs = qIdx === -1 ? '' : beforeHash.slice(qIdx + 1);
+  const cleanTop = stripAuthParams(topQs);
+
+  // Hash query — AWS uses two patterns: `#Anchor:k=v&k=v` and `#/route?k=v&k=v`.
+  let cleanHash = hash;
+  if (hash) {
+    const hashColon = hash.indexOf(':');
+    const hashQues = hash.indexOf('?');
+    let sepIdx = -1;
+    let sepChar = '';
+    if (hashColon === -1 && hashQues === -1) {
+      cleanHash = hash;
+    } else {
+      if (hashColon === -1) {
+        sepIdx = hashQues;
+        sepChar = '?';
+      } else if (hashQues === -1) {
+        sepIdx = hashColon;
+        sepChar = ':';
+      } else if (hashColon < hashQues) {
+        sepIdx = hashColon;
+        sepChar = ':';
+      } else {
+        sepIdx = hashQues;
+        sepChar = '?';
+      }
+      const head = hash.slice(0, sepIdx + 1);
+      const tail = hash.slice(sepIdx + 1);
+      const cleanTail = stripAuthParams(tail);
+      cleanHash = cleanTail ? head + cleanTail : hash.slice(0, sepIdx);
+      // If the separator was `:` and tail was wiped clean, keep the `:`
+      // so AWS recognizes the anchor form (it expects `#Anchor:` even
+      // when there are no kvs).
+      if (sepChar === ':' && !cleanTail) cleanHash = hash.slice(0, sepIdx + 1);
+    }
+  }
+
+  return path + (cleanTop ? '?' + cleanTop : '') + cleanHash;
+}
+
 /** Full dedupe key scoped to a launch context. Feature-level — same
  *  resource id collapses, but different account/role/region remains
  *  distinct. */
