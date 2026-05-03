@@ -8,12 +8,15 @@ import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
 import { ServiceIcon } from './ServiceIcon';
 import styles from './ServiceSearch.module.css';
 
+import type { PendingFavorite } from './SaveFavoriteBanner';
+
 type Props = {
   account: Account | null;
   ssoConfig?: SsoConfig;
+  onRequestSaveFavorite?: (pending: PendingFavorite) => void;
 };
 
-export function ServiceSearch({ account, ssoConfig }: Props) {
+export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite }: Props) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const [featureCursor, setFeatureCursor] = useState(0);
@@ -181,6 +184,41 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     open(hit.service);
   }
 
+  function buildPending(
+    service: ServiceCatalogEntry,
+    featurePath?: string,
+    featureName?: string,
+  ): PendingFavorite | null {
+    if (!account || missingRole || missingRegion) return null;
+    const consolePath = featurePath ?? service.consolePath;
+    const accountLabel = account.alias || account.name;
+    const labelParts = [accountLabel, service.name];
+    if (featureName) labelParts.push(featureName);
+    return {
+      defaultLabel: labelParts.join(' · '),
+      accountId: account.accountId,
+      roleName: role,
+      region,
+      serviceId: service.id,
+      featurePath,
+      consolePath,
+    };
+  }
+
+  function requestSave(hit: CatalogHit): void {
+    if (!onRequestSaveFavorite) return;
+    const featurePath = hit.kind === 'feature' ? hit.feature.path : undefined;
+    const featureName = hit.kind === 'feature' ? hit.feature.name : undefined;
+    const pending = buildPending(hit.service, featurePath, featureName);
+    if (pending) onRequestSaveFavorite(pending);
+  }
+
+  function requestSaveFeature(featurePath?: string, featureName?: string): void {
+    if (!onRequestSaveFavorite || !pickerService) return;
+    const pending = buildPending(pickerService, featurePath, featureName);
+    if (pending) onRequestSaveFavorite(pending);
+  }
+
   useEffect(() => {
     setFeatureCursor(0);
   }, [pickedFeature?.serviceId]);
@@ -207,6 +245,8 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     hits,
     activate,
     open,
+    requestSave,
+    requestSaveFeature,
   });
   stateRef.current = {
     pickedFeature,
@@ -217,6 +257,8 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
     hits,
     activate,
     open,
+    requestSave,
+    requestSaveFeature,
   };
 
   // Single window-level keyboard handler. Capture phase so nav keys
@@ -248,8 +290,17 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
           setFeatureCursor(s.pickerFeatures.length);
         } else if (e.key === 'Enter') {
           e.preventDefault();
-          if (s.featureCursor === 0) s.open(s.pickerService, undefined);
-          else s.open(s.pickerService, s.pickerFeatures[s.featureCursor - 1].path);
+          if (e.shiftKey) {
+            if (s.featureCursor === 0) {
+              s.requestSaveFeature(undefined, undefined);
+            } else {
+              const f = s.pickerFeatures[s.featureCursor - 1];
+              s.requestSaveFeature(f.path, f.name);
+            }
+          } else {
+            if (s.featureCursor === 0) s.open(s.pickerService, undefined);
+            else s.open(s.pickerService, s.pickerFeatures[s.featureCursor - 1].path);
+          }
         } else if (e.key === 'Escape' || e.key === 'ArrowLeft') {
           // ArrowLeft is safe in picker — no input rendered, no caret to fight.
           e.preventDefault();
@@ -305,7 +356,12 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
       } else if (e.key === 'Enter') {
         e.preventDefault();
         const hit = s.hits[s.cursor];
-        if (hit) s.activate(hit);
+        if (!hit) return;
+        if (e.shiftKey) {
+          s.requestSave(hit);
+        } else {
+          s.activate(hit);
+        }
       } else if (e.key === 'Escape') {
         if (inField) {
           setQuery('');
@@ -337,6 +393,11 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
         }}
         onPick={(path) => open(pickerService, path)}
         onCancel={() => setPickedFeature(null)}
+        onRequestSave={
+          onRequestSaveFavorite && !missingRole && !missingRegion
+            ? (path, name) => requestSaveFeature(path, name)
+            : undefined
+        }
       />
     );
   }
@@ -418,8 +479,19 @@ export function ServiceSearch({ account, ssoConfig }: Props) {
                   {hit.feature.name}
                 </span>
               )}
-              {hit.popular && (
-                <span className={styles.badgePopular} title="Popular service">★</span>
+              {onRequestSaveFavorite && account && !missingRole && !missingRegion && (
+                <button
+                  type="button"
+                  className={styles.saveBtn}
+                  title="Save as favorite (Shift+Enter)"
+                  aria-label="Save as favorite"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    requestSave(hit);
+                  }}
+                >
+                  <SaveStarIcon />
+                </button>
               )}
               {hasFeaturesPicker && (
                 <span className={styles.chevron} aria-hidden>›</span>
@@ -444,6 +516,7 @@ function FeaturePicker({
   onHover,
   onPick,
   onCancel,
+  onRequestSave,
 }: {
   account: Account;
   service: ServiceCatalogEntry;
@@ -452,6 +525,7 @@ function FeaturePicker({
   onHover: (i: number) => void;
   onPick: (path: string) => void;
   onCancel: () => void;
+  onRequestSave?: (featurePath?: string, featureName?: string) => void;
 }) {
   const features = service.features ?? [];
 
@@ -473,6 +547,20 @@ function FeaturePicker({
         >
           <span className={styles.featureBullet} aria-hidden>›</span>
           <span className={styles.name}>{service.name} home</span>
+          {onRequestSave && (
+            <button
+              type="button"
+              className={styles.saveBtn}
+              title="Save as favorite (Shift+Enter)"
+              aria-label="Save as favorite"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRequestSave(undefined, undefined);
+              }}
+            >
+              <SaveStarIcon />
+            </button>
+          )}
         </li>
         {features.map((f, i) => (
           <li
@@ -485,6 +573,20 @@ function FeaturePicker({
           >
             <span className={styles.featureBullet} aria-hidden>›</span>
             <span className={styles.name}>{f.name}</span>
+            {onRequestSave && (
+              <button
+                type="button"
+                className={styles.saveBtn}
+                title="Save as favorite (Shift+Enter)"
+                aria-label="Save as favorite"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRequestSave(f.path, f.name);
+                }}
+              >
+                <SaveStarIcon />
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -519,6 +621,24 @@ function SearchIcon() {
     >
       <circle cx="11" cy="11" r="7" />
       <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function SaveStarIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M12 2 15 8.5 22 9.3l-5.2 4.8L18.2 21 12 17.5 5.8 21l1.4-6.9L2 9.3 9 8.5z" />
     </svg>
   );
 }

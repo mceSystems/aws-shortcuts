@@ -42,10 +42,12 @@ export type Favorite = {
   accountId: string;
   roleName: string;
   region: string;
-  service: string;
-  feature?: string;
-  label?: string;
-  destinationUrl?: string;
+  serviceId: string;
+  featurePath?: string;
+  /** Path + query (no `region=`) + hash. Round-trips through RESOLVE_LAUNCH_URL. */
+  consolePath: string;
+  label: string;
+  createdAt: number;
 };
 
 export type Recent = {

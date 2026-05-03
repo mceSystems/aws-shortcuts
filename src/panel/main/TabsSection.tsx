@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import type { Account } from '@/shared/types';
 import { send } from '@/shared/messages';
+import { FavoritesView } from './FavoritesView';
 import { OpenList } from './OpenList';
 import { RecentList } from './RecentList';
+import { useFavorites } from './useFavorites';
 import { useOpenTabs } from './useOpenTabs';
 import { useRecents } from './useRecents';
 import styles from './TabsSection.module.css';
@@ -17,6 +19,7 @@ export function TabsSection({ accounts }: Props) {
   const [pill, setPill] = useState<Pill>('favorites');
   const { openTabs } = useOpenTabs();
   const { recents } = useRecents();
+  const { favorites } = useFavorites();
 
   return (
     <section className={styles.section}>
@@ -30,6 +33,7 @@ export function TabsSection({ accounts }: Props) {
         >
           <StarIcon />
           <span>Favorites</span>
+          {favorites.length > 0 && <span className={styles.count}>{favorites.length}</span>}
         </button>
         <button
           type="button"
@@ -46,7 +50,7 @@ export function TabsSection({ accounts }: Props) {
 
       <div className={styles.body}>
         {pill === 'favorites' ? (
-          <div className={styles.empty}>No favorites yet</div>
+          <FavoritesView favorites={favorites} accounts={accounts} />
         ) : (
           <>
             <div className={styles.subLabel}>Open</div>

@@ -107,13 +107,52 @@ export function dedupeKeyFromConsolePath(consolePath: string): string {
   return path + anchorAndSep + firstKv;
 }
 
-/** Full dedupe key scoped to a launch context. Same resource under
- *  a different account/role/region is a different bucket. */
+/** Feature-level key. Drops the resource id and trailing route segments
+ *  so EC2 i-aaa and EC2 i-bbb collapse to the same bucket.
+ *
+ *  Patterns:
+ *    A. Hash route form `#/segment/...` → keep `#/segment` only.
+ *    B. Anchor form `#Anchor:key=val` or `#Anchor?…` → keep `#Anchor:` (or `#Anchor?`).
+ *  This aligns with the catalog's `feature.path` shape. */
+export function featureDedupeKey(consolePath: string): string {
+  const hashIdx = consolePath.indexOf('#');
+  const beforeHash = hashIdx === -1 ? consolePath : consolePath.slice(0, hashIdx);
+  const hash = hashIdx === -1 ? '' : consolePath.slice(hashIdx);
+  const qIdx = beforeHash.indexOf('?');
+  const path = qIdx === -1 ? beforeHash : beforeHash.slice(0, qIdx);
+
+  if (!hash) return path;
+
+  if (hash.startsWith('#/')) {
+    const rest = hash.slice(2);
+    const slashIdx = rest.indexOf('/');
+    const ques = rest.indexOf('?');
+    let endIdx = -1;
+    if (slashIdx === -1) endIdx = ques;
+    else if (ques === -1) endIdx = slashIdx;
+    else endIdx = Math.min(slashIdx, ques);
+    if (endIdx === -1) return path + hash;
+    return path + '#/' + rest.slice(0, endIdx);
+  }
+
+  const colon = hash.indexOf(':');
+  const ques = hash.indexOf('?');
+  let sepIdx = -1;
+  if (colon === -1) sepIdx = ques;
+  else if (ques === -1) sepIdx = colon;
+  else sepIdx = Math.min(colon, ques);
+  if (sepIdx === -1) return path + hash;
+  return path + hash.slice(0, sepIdx + 1);
+}
+
+/** Full dedupe key scoped to a launch context. Feature-level — same
+ *  resource id collapses, but different account/role/region remains
+ *  distinct. */
 export function fullDedupeKey(input: {
   accountId: string;
   roleName: string;
   region: string;
   consolePath: string;
 }): string {
-  return `${input.accountId}|${input.roleName}|${input.region}|${dedupeKeyFromConsolePath(input.consolePath)}`;
+  return `${input.accountId}|${input.roleName}|${input.region}|${featureDedupeKey(input.consolePath)}`;
 }

@@ -146,6 +146,34 @@
   margin-left: 4px;
 }
 
+.saveBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-300, var(--ink-200));
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast), background var(--dur-fast), color var(--dur-fast);
+}
+
+.result:hover .saveBtn,
+.result.active .saveBtn,
+.saveBtn:focus-visible {
+  opacity: 1;
+}
+
+.saveBtn:hover {
+  background: var(--ink-100);
+  color: var(--accent);
+}
+
 .badgeOpens {
   flex-shrink: 0;
   display: inline-flex;

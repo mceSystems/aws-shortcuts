@@ -1,4 +1,4 @@
-import type { Account } from './types';
+import type { Account, Favorite } from './types';
 
 export type Msg =
   | { type: 'GET_BEARER' }
@@ -33,7 +33,15 @@ export type Msg =
       featurePath?: string;
     }
   | { type: 'REFRESH_CATALOG' }
-  | { type: 'CLEAR_RECENTS' };
+  | { type: 'CLEAR_RECENTS' }
+  | { type: 'SAVE_FAVORITE'; fav: Favorite }
+  | {
+      type: 'UPDATE_FAVORITE';
+      id: string;
+      patch: Partial<Pick<Favorite, 'label' | 'accountId' | 'roleName' | 'region' | 'consolePath'>>;
+    }
+  | { type: 'DELETE_FAVORITE'; id: string }
+  | { type: 'REORDER_FAVORITES'; ids: string[] };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };

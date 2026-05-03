@@ -12,6 +12,7 @@ import { Header } from './Header';
 import { AccountList, AccountsEditButton } from './AccountList';
 import { ServiceSearch } from './ServiceSearch';
 import { TabsSection } from './TabsSection';
+import { SaveFavoriteBanner, type PendingFavorite } from './SaveFavoriteBanner';
 import { useAccounts } from '../hooks/useAccounts';
 import { send } from '@/shared/messages';
 import { getSync, setSync } from '@/shared/storage';
@@ -47,6 +48,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
   const initRef = useState({ done: false })[0];
 
   const [layout, setLayout] = useState<LayoutState>(loadLayout);
+  const [pendingFavorite, setPendingFavorite] = useState<PendingFavorite | null>(null);
   const persistDebounce = useRef<number | null>(null);
   const persistLayout = useCallback((next: LayoutState) => {
     if (persistDebounce.current !== null) clearTimeout(persistDebounce.current);
@@ -126,7 +128,13 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         },
         service: {
           label: selectedAccount ? 'Features Explorer' : 'Pick an account first',
-          render: () => <ServiceSearch account={selectedAccount} ssoConfig={ssoConfig} />,
+          render: () => (
+            <ServiceSearch
+              account={selectedAccount}
+              ssoConfig={ssoConfig}
+              onRequestSaveFavorite={setPendingFavorite}
+            />
+          ),
         },
         tabs: {
           label: 'Tabs',
@@ -167,6 +175,13 @@ export function Main({ onOpenSettings, onWipe }: Props) {
           }
         }}
       />
+
+      {pendingFavorite && (
+        <SaveFavoriteBanner
+          pending={pendingFavorite}
+          onClose={() => setPendingFavorite(null)}
+        />
+      )}
 
       <div className={styles.body}>
         {visibleOrder.map((id) => {

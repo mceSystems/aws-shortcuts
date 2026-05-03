@@ -1,0 +1,76 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  margin: 0 var(--space-4) 0;
+  border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklch, var(--accent) 6%, var(--surface-1));
+  box-shadow: var(--elev-1);
+}
+
+.icon {
+  color: var(--accent);
+  font-size: 14px;
+  line-height: 1;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-xs);
+  background: var(--surface-1);
+  padding: 4px 8px;
+  height: 26px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-900);
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.btnPrimary {
+  height: 26px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  filter: brightness(1.05);
+}
+
+.btnGhost {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--ink-400);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.btnGhost:hover {
+  color: var(--ink-700);
+  background: var(--ink-100);
+}

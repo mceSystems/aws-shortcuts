@@ -1,5 +1,5 @@
 import type { Msg, MsgResponse } from '@/shared/messages';
-import type { Account, Recent } from '@/shared/types';
+import type { Account, Favorite, Recent } from '@/shared/types';
 import { getSync, mutateLocal, mutateSync } from '@/shared/storage';
 import {
   getSessionState,
@@ -561,6 +561,58 @@ async function handle(msg: Msg): Promise<MsgResponse> {
 
     case 'CLEAR_RECENTS': {
       await mutateLocal(() => ({ recents: [] }));
+      return { ok: true };
+    }
+
+    case 'SAVE_FAVORITE': {
+      await mutateSync((sync) => {
+        // Replace if id matches (idempotent re-save).
+        const idx = sync.favorites.findIndex((f) => f.id === msg.fav.id);
+        const next: Favorite[] =
+          idx === -1
+            ? [...sync.favorites, msg.fav]
+            : sync.favorites.map((f, i) => (i === idx ? msg.fav : f));
+        return { favorites: next };
+      });
+      return { ok: true };
+    }
+
+    case 'UPDATE_FAVORITE': {
+      await mutateSync((sync) => {
+        let mutated = false;
+        const next = sync.favorites.map((f) => {
+          if (f.id !== msg.id) return f;
+          mutated = true;
+          return { ...f, ...msg.patch };
+        });
+        return mutated ? { favorites: next } : null;
+      });
+      return { ok: true };
+    }
+
+    case 'DELETE_FAVORITE': {
+      await mutateSync((sync) => {
+        if (!sync.favorites.some((f) => f.id === msg.id)) return null;
+        return { favorites: sync.favorites.filter((f) => f.id !== msg.id) };
+      });
+      return { ok: true };
+    }
+
+    case 'REORDER_FAVORITES': {
+      await mutateSync((sync) => {
+        const byId = new Map(sync.favorites.map((f) => [f.id, f]));
+        const reordered: Favorite[] = [];
+        for (const id of msg.ids) {
+          const f = byId.get(id);
+          if (f) {
+            reordered.push(f);
+            byId.delete(id);
+          }
+        }
+        // Append any missing entries (defensive — shouldn't happen).
+        for (const f of byId.values()) reordered.push(f);
+        return { favorites: reordered };
+      });
       return { ok: true };
     }
 
