@@ -1,4 +1,3 @@
-import { Logo } from '../components/Logo';
 import styles from './Header.module.css';
 
 type Props = {
@@ -11,11 +10,6 @@ type Props = {
 export function Header({ onSettings, onRefresh, onOpenPortal, portalUrl }: Props) {
   return (
     <header className={styles.header}>
-      <span className={styles.brand}>
-        <Logo size={22} />
-        <span className={styles.title}>AWS Shortcut</span>
-      </span>
-      <span className={styles.spacer} />
       {portalUrl && (
         <button
           type="button"
