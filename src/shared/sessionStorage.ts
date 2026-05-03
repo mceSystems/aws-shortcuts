@@ -52,3 +52,48 @@ export function mutateConsoleSessions(
   sessionMutateChain = next.catch(() => {});
   return next;
 }
+
+// ───── live open-tab tracker ───────────────────────────────────────
+// Per-tab snapshot of open AWS console tabs. Distinct from
+// currentSessions (which is keyed by accountId + sessionSubdomain) —
+// the UI needs URL+title per tab to render the Open list.
+
+export type OpenTabInfo = {
+  tabId: number;
+  windowId: number;
+  url: string;
+  title: string;
+  accountId: string;
+  sessionSubdomain: string;
+  region: string;
+  serviceId: string;
+  consolePath: string;
+  /** Joined from currentSessions when known; '' until SESSION_OBSERVED arrives. */
+  roleName: string;
+  observedAt: number;
+};
+
+export const OPEN_TABS_KEY = 'openTabs';
+
+export async function getOpenTabs(): Promise<OpenTabInfo[]> {
+  const raw = await chrome.storage.session.get(OPEN_TABS_KEY);
+  return ((raw as { openTabs?: OpenTabInfo[] }).openTabs) ?? [];
+}
+
+export async function setOpenTabs(next: OpenTabInfo[]): Promise<void> {
+  await chrome.storage.session.set({ [OPEN_TABS_KEY]: next });
+}
+
+let openTabsMutateChain: Promise<void> = Promise.resolve();
+
+export function mutateOpenTabs(
+  fn: (cur: OpenTabInfo[]) => OpenTabInfo[],
+): Promise<void> {
+  const next = openTabsMutateChain.then(async () => {
+    const cur = await getOpenTabs();
+    const updated = fn(cur);
+    if (updated !== cur) await setOpenTabs(updated);
+  });
+  openTabsMutateChain = next.catch(() => {});
+  return next;
+}

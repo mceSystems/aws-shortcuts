@@ -6,9 +6,11 @@ import {
   setBearer,
   getConsoleSessions,
   mutateConsoleSessions,
+  mutateOpenTabs,
 } from '@/shared/sessionStorage';
 import { awsColorToHex } from '@/shared/colors';
 import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
+import { MULTI_SESSION_HOST_RE, parseConsoleUrl } from '@/shared/consoleUrl';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
 import { bumpOpenCount } from '@/shared/openCounts';
@@ -79,7 +81,71 @@ chrome.tabs.onRemoved.addListener((tabId) => {
       .filter((s) => s.tabIds.length > 0);
     return mutated ? next : cur;
   });
+  void mutateOpenTabs((cur) => {
+    if (!cur.some((t) => t.tabId === tabId)) return cur;
+    return cur.filter((t) => t.tabId !== tabId);
+  });
 });
+
+// Track URL + title for every open multi-session console tab. Drives the
+// Open list in the side panel.
+chrome.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
+  void upsertOpenTab(tab);
+});
+
+async function upsertOpenTab(tab: chrome.tabs.Tab): Promise<void> {
+  if (!tab?.id || !tab.url) return;
+  const parsed = parseConsoleUrl(tab.url);
+  if (!parsed?.isMultiSession || !parsed.accountId || !parsed.sessionSubdomain) {
+    // Tab navigated away from a multi-session URL — drop any stale entry.
+    await mutateOpenTabs((cur) => {
+      if (!cur.some((t) => t.tabId === tab.id)) return cur;
+      return cur.filter((t) => t.tabId !== tab.id);
+    });
+    return;
+  }
+  const sessions = await getConsoleSessions();
+  const session = sessions.find(
+    (s) => s.accountId === parsed.accountId && s.sessionSubdomain === parsed.sessionSubdomain,
+  );
+  await mutateOpenTabs((cur) => {
+    const idx = cur.findIndex((t) => t.tabId === tab.id);
+    const entry = {
+      tabId: tab.id!,
+      windowId: tab.windowId ?? -1,
+      url: tab.url!,
+      title: tab.title ?? '',
+      accountId: parsed.accountId!,
+      sessionSubdomain: parsed.sessionSubdomain!,
+      region: parsed.region,
+      serviceId: parsed.serviceId,
+      consolePath: parsed.consolePath,
+      roleName: session?.roleName ?? '',
+      observedAt: Date.now(),
+    };
+    if (idx === -1) return [...cur, entry];
+    const existing = cur[idx];
+    // Preserve role if we already had one and the session lookup didn't find anything.
+    const merged = { ...entry, roleName: entry.roleName || existing.roleName };
+    if (sameOpenTab(existing, merged)) return cur;
+    const next = [...cur];
+    next[idx] = merged;
+    return next;
+  });
+}
+
+function sameOpenTab(
+  a: { url: string; title: string; consolePath: string; region: string; roleName: string },
+  b: { url: string; title: string; consolePath: string; region: string; roleName: string },
+): boolean {
+  return (
+    a.url === b.url &&
+    a.title === b.title &&
+    a.consolePath === b.consolePath &&
+    a.region === b.region &&
+    a.roleName === b.roleName
+  );
+}
 
 // Reactive expiry: if a tab navigates from a multi-session subdomain to the
 // signin/portal hosts, the session is dead — drop it from the store.
@@ -101,6 +167,9 @@ async function harvestOpenTabs(): Promise<void> {
       url: ['https://*.console.aws.amazon.com/*'],
     });
     console.log('[aws-shortcut] harvest: matched', tabs.length, 'console tabs');
+    // Seed the openTabs store immediately from the URL so the panel has rows
+    // before the content script reports back.
+    await Promise.all(tabs.map((t) => upsertOpenTab(t)));
     const consoleScript = chrome.runtime
       .getManifest()
       .content_scripts?.find((cs) =>
@@ -356,6 +425,23 @@ async function handle(msg: Msg): Promise<MsgResponse> {
 
     case 'SESSION_OBSERVED': {
       const tabId = chromeTabIdFromCurrentMessage();
+      // Stamp role on any openTabs entry sharing this (account, subdomain).
+      await mutateOpenTabs((cur) => {
+        let mutated = false;
+        const next = cur.map((t) => {
+          if (
+            t.accountId === msg.accountId &&
+            t.sessionSubdomain === msg.sessionSubdomain &&
+            msg.roleName &&
+            t.roleName !== msg.roleName
+          ) {
+            mutated = true;
+            return { ...t, roleName: msg.roleName };
+          }
+          return t;
+        });
+        return mutated ? next : cur;
+      });
       await mutateConsoleSessions((cur) => {
         const idx = cur.findIndex(
           (s) =>
@@ -662,9 +748,6 @@ async function findPortalTab(
     return undefined;
   }
 }
-
-const MULTI_SESSION_HOST_RE =
-  /^([0-9]{12})-([a-z0-9]+)\.([a-z0-9-]+)\.console\.aws\.amazon\.com$/;
 
 // Probe open tabs for a multi-session console tab matching `accountId`. Used
 // as a real-time fallback when our session store hasn't been populated yet.

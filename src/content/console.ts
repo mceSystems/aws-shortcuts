@@ -33,13 +33,37 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
   let lastRegion: string | null = null;
   let lastRole: string | null = null;
   let lastSessionRoleReported: string | null = null;
+  let contextDead = false;
+  let observer: MutationObserver | null = null;
+
+  // Old content scripts keep running after the extension is reloaded; their
+  // chrome.runtime context is dead. Catch the throw, mark dead, stop work.
+  function safeSend(msg: object): void {
+    if (contextDead) return;
+    if (!chrome.runtime?.id) {
+      handleContextDeath();
+      return;
+    }
+    try {
+      chrome.runtime.sendMessage(msg, () => {
+        void chrome.runtime.lastError;
+      });
+    } catch {
+      handleContextDeath();
+    }
+  }
+
+  function handleContextDeath(): void {
+    contextDead = true;
+    observer?.disconnect();
+  }
 
   function reportSession(roleName: string): void {
     // Only emit when we have a role — otherwise SW can't key the session.
     if (!roleName) return;
     if (lastSessionRoleReported === roleName) return;
     lastSessionRoleReported = roleName;
-    void chrome.runtime.sendMessage({
+    safeSend({
       type: 'SESSION_OBSERVED',
       accountId,
       sessionSubdomain,
@@ -51,7 +75,7 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
   function reportRegion(region: string): void {
     if (!region || region === lastRegion) return;
     lastRegion = region;
-    void chrome.runtime.sendMessage({
+    safeSend({
       type: 'ACCOUNT_REGION_OBSERVED',
       accountId,
       region,
@@ -109,7 +133,7 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
     });
     if (color && color !== lastReported) {
       lastReported = color;
-      void chrome.runtime.sendMessage({
+      safeSend({
         type: 'ACCOUNT_COLOR_OBSERVED',
         accountId,
         colorName: color,
@@ -117,7 +141,7 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
     }
     if (role && role !== lastRole) {
       lastRole = role;
-      void chrome.runtime.sendMessage({
+      safeSend({
         type: 'ACCOUNT_ROLE_OBSERVED',
         accountId,
         roleName: role,
@@ -263,9 +287,15 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
 
   // Initial pass + observe DOM changes (sidebar opens on click, band loads
   // late in some flows). MutationObserver is cheap; no timeout — runs as
-  // long as the tab lives.
+  // long as the tab lives. Disconnects if extension context dies.
   tryScrape();
-  const observer = new MutationObserver(() => tryScrape());
+  observer = new MutationObserver(() => {
+    if (contextDead) {
+      observer?.disconnect();
+      return;
+    }
+    tryScrape();
+  });
   observer.observe(document.body, { childList: true, subtree: true });
 })();
 

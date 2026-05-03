@@ -968,16 +968,20 @@
           "path": "bedrock-agentcore/harnesses/playground"
         },
         {
-          "name": "Agent sandbox",
+          "name": "Runtime playground",
           "path": "bedrock-agentcore/playground"
         },
         {
           "name": "Observability",
-          "path": "cloudwatch/home#gen-ai-observability/agent-core?region=us-west-2"
+          "path": "cloudwatch/home#gen-ai-observability/agent-core?region=us-east-1"
         },
         {
           "name": "Evaluations",
           "path": "bedrock-agentcore/evaluations"
+        },
+        {
+          "name": "Optimizations",
+          "path": "bedrock-agentcore/optimizations"
         },
         {
           "name": "Amazon Bedrock",
@@ -4583,7 +4587,33 @@
     {
       "id": "managedblockchain",
       "name": "Amazon Managed Blockchain",
-      "consolePath": "managedblockchain/home"
+      "consolePath": "managedblockchain/home",
+      "features": [
+        {
+          "name": "Amazon Managed Blockchain",
+          "path": "managedblockchain/home#/firstRun"
+        },
+        {
+          "name": "Networks",
+          "path": "managedblockchain/home#/networks"
+        },
+        {
+          "name": "Invitations",
+          "path": "managedblockchain/home#/invitations"
+        },
+        {
+          "name": "Token accessors",
+          "path": "managedblockchain/home#/token-based-access"
+        },
+        {
+          "name": "RPC editor",
+          "path": "managedblockchain/home#/rpc-editor"
+        },
+        {
+          "name": "Query editor",
+          "path": "managedblockchainv2/query/query-editor"
+        }
+      ]
     },
     {
       "id": "memorydb",
@@ -4871,7 +4901,21 @@
     {
       "id": "novaact",
       "name": "Amazon Nova Act",
-      "consolePath": "nova-act/home"
+      "consolePath": "nova-act/home",
+      "features": [
+        {
+          "name": "Amazon Nova Act",
+          "path": "nova-act/home#/"
+        },
+        {
+          "name": "Dashboard",
+          "path": "nova-act/home#/dashboard"
+        },
+        {
+          "name": "Workflow definitions",
+          "path": "nova-act/home#/workflow-definitions"
+        }
+      ]
     },
     {
       "id": "aos",
@@ -4879,204 +4923,108 @@
       "consolePath": "aos/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "aos/home#c"
+          "name": "Amazon OpenSearch Service",
+          "path": "aos/home#/opensearch"
         },
         {
-          "name": "Recently visited",
-          "path": "console/services#recentlyVisited"
+          "name": "Get started",
+          "path": "aos/home#/opensearch/getting-started"
         },
         {
-          "name": "Favourites",
-          "path": "console/services#favorites"
+          "name": "Connected data sources",
+          "path": "aos/home#/opensearch/data-sources"
         },
         {
-          "name": "All applications",
-          "path": "console/applications#allApplications"
+          "name": "OpenSearch UI (Dashboards)",
+          "path": "aos/applications/home#/opensearch/applications"
         },
         {
-          "name": "All services",
-          "path": "console/services#allServices"
+          "name": "Import history",
+          "path": "aos/home#/opensearch/import-history"
         },
         {
-          "name": "Analytics",
-          "path": "console/services#analytics"
+          "name": "Dashboard",
+          "path": "aos/home#/opensearch/dashboard"
         },
         {
-          "name": "Application Integration",
-          "path": "console/services#appservices"
+          "name": "Domains",
+          "path": "aos/home#/opensearch/domains"
         },
         {
-          "name": "Blockchain",
-          "path": "console/services#blockchain"
+          "name": "Reserved Instance leases",
+          "path": "aos/home#/opensearch/reserved-instances"
         },
         {
-          "name": "Business Applications",
-          "path": "console/services#applications"
+          "name": "Packages",
+          "path": "aos/home#/opensearch/custom-packages"
         },
         {
-          "name": "Cloud Financial Management",
-          "path": "console/services#cost_management"
+          "name": "VPC endpoints",
+          "path": "aos/home#/opensearch/vpc-endpoints"
         },
         {
-          "name": "Compute",
-          "path": "console/services#compute"
+          "name": "Dashboard",
+          "path": "aos/home#/opensearch/get-started-serverless"
         },
         {
-          "name": "Containers",
-          "path": "console/services#containers"
+          "name": "Collections",
+          "path": "aos/home#/opensearch/collections"
         },
         {
-          "name": "Customer Enablement",
-          "path": "console/services#customer_enablement"
+          "name": "Collection groups",
+          "path": "aos/home#/opensearch/collection-groups"
         },
         {
-          "name": "Database",
-          "path": "console/services#database"
+          "name": "Security",
+          "path": "aos/home#/opensearch/security"
         },
         {
-          "name": "Developer Tools",
-          "path": "console/services#developer_tools"
+          "name": "Authentication",
+          "path": "aos/home#/opensearch/security/authentication"
         },
         {
-          "name": "End User Computing",
-          "path": "console/services#desktop"
+          "name": "Data access policies",
+          "path": "aos/home#/opensearch/security/access-policies"
         },
         {
-          "name": "Front-end Web & Mobile",
-          "path": "console/services#mobileservices"
+          "name": "Encryption policies",
+          "path": "aos/home#/opensearch/security/encryption-policies"
         },
         {
-          "name": "Game Development",
-          "path": "console/services#gamedev"
+          "name": "Network policies",
+          "path": "aos/home#/opensearch/security/network-policies"
         },
         {
-          "name": "Internet of Things",
-          "path": "console/services#internet_of_things"
+          "name": "Data lifecycle policies",
+          "path": "aos/home#/opensearch/data-lifecycle-policies"
         },
         {
-          "name": "Machine Learning",
-          "path": "console/services#ai"
+          "name": "VPC endpoints",
+          "path": "aos/home#/opensearch/vpcEndpoint"
         },
         {
-          "name": "Management & Governance",
-          "path": "console/services#management_tools"
+          "name": "Dashboard",
+          "path": "aos/osis/home#/osis/ingestion-dashboard"
         },
         {
-          "name": "Media Services",
-          "path": "console/services#media"
+          "name": "Pipelines",
+          "path": "aos/osis/home#/osis/ingestion-pipelines"
         },
         {
-          "name": "Migration & Transfer",
-          "path": "console/services#migration"
+          "name": "VPC endpoints",
+          "path": "aos/osis/home#/osis/ingestion-vpc-endpoints"
         },
         {
-          "name": "Networking & Content Delivery",
-          "path": "console/services#networking"
+          "name": "Vector ingestion",
+          "path": "aos/osis/home#/osis/vector-ingestion"
         },
         {
-          "name": "Quantum Technologies",
-          "path": "console/services#delta"
+          "name": "Integrations",
+          "path": "aos/home#/opensearch/integrations"
         },
         {
-          "name": "Satellite",
-          "path": "console/services#satellite"
-        },
-        {
-          "name": "Security, Identity, & Compliance",
-          "path": "console/services#security_and_identity"
-        },
-        {
-          "name": "Storage",
-          "path": "console/services#storage"
-        },
-        {
-          "name": "Amazon LexBuild Voice and Text Chatbots",
-          "path": "lexv2/home"
-        },
-        {
-          "name": "Amazon KeyspacesServerless Cassandra-compatible database",
-          "path": "keyspaces/v2/home"
-        },
-        {
-          "name": "Support Centre",
-          "path": "support/home"
-        },
-        {
-          "name": "N. Virginiaus-east-1",
-          "path": "aos/home"
-        },
-        {
-          "name": "Manage Regions",
-          "path": "billing/home#/account?AWS-Regions"
-        },
-        {
-          "name": "Manage local zones",
-          "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
-        },
-        {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
-        },
-        {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
-        },
-        {
-          "name": "Lambda",
-          "path": "lambda/home"
-        },
-        {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
-        },
-        {
-          "name": "S3",
-          "path": "s3/home"
-        },
-        {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
-        },
-        {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
-        },
-        {
-          "name": "API Gateway",
-          "path": "apigateway/home"
-        },
-        {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
-        },
-        {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
-        },
-        {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
-        },
-        {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
-        },
-        {
-          "name": "EC2",
-          "path": "ec2/home"
-        },
-        {
-          "name": "Route 53",
-          "path": "route53/v2/home"
-        },
-        {
-          "name": "IAM",
-          "path": "iam/home"
-        },
-        {
-          "name": "Aurora and RDS",
-          "path": "rds/home"
+          "name": "Notifications",
+          "path": "aos/home#/opensearch/notifications"
         }
       ]
     },
@@ -6118,6 +6066,10 @@
         {
           "name": "Labeling workforces",
           "path": "sagemaker/groundtruth#/labeling-workforces"
+        },
+        {
+          "name": "Plus",
+          "path": "sagemaker/groundtruth#/plus"
         },
         {
           "name": "Human review workflows",
@@ -10385,72 +10337,56 @@
       ],
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "config/home#c"
+          "name": "AWS Config",
+          "path": "config/home#/home"
         },
         {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
+          "name": "Dashboard",
+          "path": "config/home#/dashboard"
         },
         {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
+          "name": "Conformance packs",
+          "path": "config/home#/conformance-packs"
         },
         {
-          "name": "Lambda",
-          "path": "lambda/home"
+          "name": "Rules",
+          "path": "config/home#/rules"
         },
         {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
+          "name": "Resources",
+          "path": "config/home#/resources"
         },
         {
-          "name": "S3",
-          "path": "s3/home"
+          "name": "Aggregators",
+          "path": "config/home#/aggregators"
         },
         {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
+          "name": "Compliance Dashboard",
+          "path": "config/home#/aggregators/complianceDashboard"
         },
         {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
+          "name": "Conformance packs",
+          "path": "config/home#/aggregators/conformancePacks"
         },
         {
-          "name": "API Gateway",
-          "path": "apigateway/home"
+          "name": "Rules",
+          "path": "config/home#/aggregators/rules"
         },
         {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
+          "name": "Inventory Dashboard",
+          "path": "config/home#/aggregators/inventoryDashboard"
         },
         {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
+          "name": "Resources",
+          "path": "config/home#/aggregators/resources"
         },
         {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
+          "name": "Authorizations",
+          "path": "config/home#/aggregators/authorizations"
         },
         {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
-        },
-        {
-          "name": "EC2",
-          "path": "ec2/home"
-        },
-        {
-          "name": "Route 53",
-          "path": "route53/v2/home"
-        },
-        {
-          "name": "IAM",
-          "path": "iam/home"
-        },
-        {
-          "name": "Aurora and RDS",
-          "path": "rds/home"
+          "name": "Advanced queries",
+          "path": "config/home#/queries"
         }
       ]
     },
@@ -10944,40 +10880,236 @@
       "consolePath": "drs/home",
       "features": [
         {
-          "name": "AWS Elastic Disaster Recovery",
-          "path": "drs/home#/welcome"
+          "name": "Skip to Main Content",
+          "path": "drs/home#c"
         },
         {
-          "name": "Source servers",
-          "path": "drs/home#/sourceServers"
+          "name": "Recently visited",
+          "path": "console/services#recentlyVisited"
         },
         {
-          "name": "Recovery instances",
-          "path": "drs/home#/recoveryInstances"
+          "name": "Favorites",
+          "path": "console/services#favorites"
         },
         {
-          "name": "Source networks",
-          "path": "drs/home#/sourceNetworks"
+          "name": "All applications",
+          "path": "console/applications#allApplications"
         },
         {
-          "name": "Recovery job history",
-          "path": "drs/home#/launchHistory"
+          "name": "All services",
+          "path": "console/services#allServices"
         },
         {
-          "name": "Default replication",
-          "path": "drs/home#/defaultReplicationSettings"
+          "name": "Analytics",
+          "path": "console/services#analytics"
         },
         {
-          "name": "Default launch",
-          "path": "drs/home#/defaultLaunchSettings"
+          "name": "Application Integration",
+          "path": "console/services#appservices"
         },
         {
-          "name": "Trusted accounts",
-          "path": "drs/home#/trustedAccountsSettings"
+          "name": "Blockchain",
+          "path": "console/services#blockchain"
         },
         {
-          "name": "Default post-launch actions",
-          "path": "drs/home#/defaultPostLaunchActionsSettings"
+          "name": "Business Applications",
+          "path": "console/services#applications"
+        },
+        {
+          "name": "Cloud Financial Management",
+          "path": "console/services#cost_management"
+        },
+        {
+          "name": "Compute",
+          "path": "console/services#compute"
+        },
+        {
+          "name": "Containers",
+          "path": "console/services#containers"
+        },
+        {
+          "name": "Customer Enablement",
+          "path": "console/services#customer_enablement"
+        },
+        {
+          "name": "Database",
+          "path": "console/services#database"
+        },
+        {
+          "name": "Developer Tools",
+          "path": "console/services#developer_tools"
+        },
+        {
+          "name": "End User Computing",
+          "path": "console/services#desktop"
+        },
+        {
+          "name": "Front-end Web & Mobile",
+          "path": "console/services#mobileservices"
+        },
+        {
+          "name": "Game Development",
+          "path": "console/services#gamedev"
+        },
+        {
+          "name": "Internet of Things",
+          "path": "console/services#internet_of_things"
+        },
+        {
+          "name": "Machine Learning",
+          "path": "console/services#ai"
+        },
+        {
+          "name": "Management & Governance",
+          "path": "console/services#management_tools"
+        },
+        {
+          "name": "Media Services",
+          "path": "console/services#media"
+        },
+        {
+          "name": "Migration & Transfer",
+          "path": "console/services#migration"
+        },
+        {
+          "name": "Networking & Content Delivery",
+          "path": "console/services#networking"
+        },
+        {
+          "name": "Quantum Technologies",
+          "path": "console/services#delta"
+        },
+        {
+          "name": "Satellite",
+          "path": "console/services#satellite"
+        },
+        {
+          "name": "Security, Identity, & Compliance",
+          "path": "console/services#security_and_identity"
+        },
+        {
+          "name": "Storage",
+          "path": "console/services#storage"
+        },
+        {
+          "name": "AWS Deadline CloudSimplified render management",
+          "path": "deadlinecloud/home"
+        },
+        {
+          "name": "AWS ConfigTrack Resource Inventory and Changes",
+          "path": "config/home"
+        },
+        {
+          "name": "AWS Cloud MapBuild a dynamic map of your cloud",
+          "path": "cloudmap/home"
+        },
+        {
+          "name": "AWS Billing ConductorSimplifying your billing practice",
+          "path": "billingconductor/home"
+        },
+        {
+          "name": "AWS ArtifactSecurity compliance reports and agreements",
+          "path": "artifact/v2/home"
+        },
+        {
+          "name": "Support Center",
+          "path": "support/home"
+        },
+        {
+          "name": "See all user settings",
+          "path": "settings/home"
+        },
+        {
+          "name": "N. Virginiaus-east-1",
+          "path": "drs/home#/home"
+        },
+        {
+          "name": "Manage Regions",
+          "path": "billing/home#/account?AWS-Regions"
+        },
+        {
+          "name": "Manage Local Zones",
+          "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
+        },
+        {
+          "name": "Account",
+          "path": "billing/home#/account"
+        },
+        {
+          "name": "Organization",
+          "path": "organizations/v2/home"
+        },
+        {
+          "name": "Service Quotas",
+          "path": "servicequotas/home"
+        },
+        {
+          "name": "Billing and Cost Management",
+          "path": "costmanagement/home#/"
+        },
+        {
+          "name": "CloudWatch",
+          "path": "cloudwatch/home"
+        },
+        {
+          "name": "CloudFront",
+          "path": "cloudfront/v4/home"
+        },
+        {
+          "name": "Lambda",
+          "path": "lambda/home"
+        },
+        {
+          "name": "DynamoDB",
+          "path": "dynamodbv2/home"
+        },
+        {
+          "name": "S3",
+          "path": "s3/home"
+        },
+        {
+          "name": "Systems Manager",
+          "path": "systems-manager/home"
+        },
+        {
+          "name": "CloudFormation",
+          "path": "cloudformation/home"
+        },
+        {
+          "name": "API Gateway",
+          "path": "apigateway/home"
+        },
+        {
+          "name": "Cognito",
+          "path": "cognito/v2/home"
+        },
+        {
+          "name": "Simple Queue Service",
+          "path": "sqs/v3/home"
+        },
+        {
+          "name": "Secrets Manager",
+          "path": "secretsmanager/home"
+        },
+        {
+          "name": "Elastic Container Service",
+          "path": "ecs/v2/home"
+        },
+        {
+          "name": "EC2",
+          "path": "ec2/home"
+        },
+        {
+          "name": "Route 53",
+          "path": "route53/v2/home"
+        },
+        {
+          "name": "IAM",
+          "path": "iam/home"
+        },
+        {
+          "name": "Aurora and RDS",
+          "path": "rds/home"
         }
       ]
     },
@@ -12099,7 +12231,29 @@
     {
       "id": "iotfleetwise",
       "name": "AWS IoT FleetWise",
-      "consolePath": "iotfleetwise/home"
+      "consolePath": "iotfleetwise/home",
+      "features": [
+        {
+          "name": "AWS IoT FleetWise",
+          "path": "iotfleetwise/home#/"
+        },
+        {
+          "name": "Signal catalog",
+          "path": "iotfleetwise/home#/signalCatalog"
+        },
+        {
+          "name": "Vehicle models",
+          "path": "iotfleetwise/home#/models"
+        },
+        {
+          "name": "Vehicles",
+          "path": "iotfleetwise/home#/vehicles"
+        },
+        {
+          "name": "Campaigns",
+          "path": "iotfleetwise/home#/campaigns"
+        }
+      ]
     },
     {
       "id": "lakeformation",
@@ -12107,72 +12261,80 @@
       "consolePath": "lakeformation/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "lakeformation/home#c"
+          "name": "AWS Lake Formation",
+          "path": "lakeformation/home#firstRun"
         },
         {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
+          "name": "Dashboard",
+          "path": "lakeformation/home#dashboard"
         },
         {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
+          "name": "Catalogs",
+          "path": "lakeformation/home#catalogs"
         },
         {
-          "name": "Lambda",
-          "path": "lambda/home"
+          "name": "Databases",
+          "path": "lakeformation/home#databases"
         },
         {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
+          "name": "Tables and Materialized Views",
+          "path": "lakeformation/home#tables"
         },
         {
-          "name": "S3",
-          "path": "s3/home"
+          "name": "Views",
+          "path": "lakeformation/home#views"
         },
         {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
+          "name": "Data filters",
+          "path": "lakeformation/home#data-filters"
         },
         {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
+          "name": "Data sharing",
+          "path": "lakeformation/home#data-sharing"
         },
         {
-          "name": "API Gateway",
-          "path": "apigateway/home"
+          "name": "Crawlers",
+          "path": "glue/home#/v2/data-catalog/crawlers"
         },
         {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
+          "name": "Data permissions",
+          "path": "lakeformation/home#permissions-list"
         },
         {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
+          "name": "LF-Tags and permissions",
+          "path": "lakeformation/home#policy-tags"
         },
         {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
+          "name": "Hybrid access mode",
+          "path": "lakeformation/home#hybrid-access"
         },
         {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
+          "name": "Data locations",
+          "path": "lakeformation/home#location-permissions"
         },
         {
-          "name": "EC2",
-          "path": "ec2/home"
+          "name": "Administrative roles and tasks",
+          "path": "lakeformation/home#administrative-roles-and-tasks"
         },
         {
-          "name": "Route 53",
-          "path": "route53/v2/home"
+          "name": "Data lake locations",
+          "path": "lakeformation/home#register-list"
         },
         {
-          "name": "IAM",
-          "path": "iam/home"
+          "name": "Application integration settings",
+          "path": "lakeformation/home#application-integration-settings"
         },
         {
-          "name": "Aurora and RDS",
-          "path": "rds/home"
+          "name": "IAM Identity Center integration",
+          "path": "lakeformation/home#identity-center-integration"
+        },
+        {
+          "name": "Data Catalog settings",
+          "path": "lakeformation/home#default-permission-settings"
+        },
+        {
+          "name": "Blueprints",
+          "path": "lakeformation/home#workflows"
         }
       ]
     },
@@ -12277,10 +12439,6 @@
           "path": "m2/home#/environments"
         },
         {
-          "name": "Tools",
-          "path": "m2/home#/tools"
-        },
-        {
           "name": "File transfer",
           "path": "m2/home#/file-transfer"
         },
@@ -12331,6 +12489,14 @@
         {
           "name": "Your Private Marketplace",
           "path": "marketplace/private-marketplace/your-private-marketplace"
+        },
+        {
+          "name": "Approval requests",
+          "path": "marketplace/private-marketplace/approval-requests"
+        },
+        {
+          "name": "Change sets",
+          "path": "marketplace/private-marketplace/change-sets"
         },
         {
           "name": "Notifications",
@@ -13933,7 +14099,7 @@
           "path": "transfer/home#/web-apps"
         },
         {
-          "name": "SFTP connectors",
+          "name": "SFTP Connectors",
           "path": "transfer/home#/sftp/connectors"
         },
         {
@@ -13957,7 +14123,7 @@
           "path": "transfer/home#/as2/connectors"
         },
         {
-          "name": "Feature spotlight",
+          "name": "Feature Spotlight",
           "path": "transfer/home#/feature-spotlight"
         },
         {
@@ -14007,6 +14173,10 @@
         {
           "name": "Delivery channels",
           "path": "notifications/home#/delivery-channels"
+        },
+        {
+          "name": "Organizations settings",
+          "path": "notifications/home#/organizations-settings"
         }
       ]
     },
@@ -14016,8 +14186,36 @@
       "consolePath": "wellarchitected/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "wellarchitected/home#c"
+          "name": "Well-Architected Tool",
+          "path": "wellarchitected/home#/welcome"
+        },
+        {
+          "name": "Dashboard",
+          "path": "wellarchitected/home#/dashboard"
+        },
+        {
+          "name": "Custom lenses",
+          "path": "wellarchitected/home#/lenses"
+        },
+        {
+          "name": "Share invitations",
+          "path": "wellarchitected/home#/invitations"
+        },
+        {
+          "name": "Notifications",
+          "path": "wellarchitected/home#/notifications"
+        },
+        {
+          "name": "Workloads",
+          "path": "wellarchitected/home#/workloads"
+        },
+        {
+          "name": "Review templates",
+          "path": "wellarchitected/home#/review-templates"
+        },
+        {
+          "name": "Profiles",
+          "path": "wellarchitected/home#/profiles"
         }
       ]
     },
@@ -14108,8 +14306,168 @@
       "global": true,
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "costmanagement/home#c"
+          "name": "Billing and Cost Management",
+          "path": "costmanagement/home#/home"
+        },
+        {
+          "name": "Dashboards",
+          "path": "costmanagement/home#/dashboards"
+        },
+        {
+          "name": "Bills",
+          "path": "billing/home#/bills"
+        },
+        {
+          "name": "Payments",
+          "path": "billing/home#/paymentsoverview"
+        },
+        {
+          "name": "Credits",
+          "path": "costmanagement/home#/credits"
+        },
+        {
+          "name": "Purchase Orders",
+          "path": "billing/home#/purchaseorders"
+        },
+        {
+          "name": "Cost Explorer",
+          "path": "costmanagement/home#/cost-explorer"
+        },
+        {
+          "name": "Cost Explorer Saved Reports",
+          "path": "costmanagement/home#/reports/overview"
+        },
+        {
+          "name": "Cost Anomaly Detection",
+          "path": "costmanagement/home#/anomaly-detection"
+        },
+        {
+          "name": "Free Tier",
+          "path": "costmanagement/home#/freetier"
+        },
+        {
+          "name": "Data Exports",
+          "path": "costmanagement/home#/bcm-data-exports"
+        },
+        {
+          "name": "Customer Carbon Footprint Tool",
+          "path": "costmanagement/home#/customer-carbon-footprint-tool"
+        },
+        {
+          "name": "Cost Categories",
+          "path": "costmanagement/home#/costcategories"
+        },
+        {
+          "name": "Cost Allocation Tags",
+          "path": "costmanagement/home#/tags"
+        },
+        {
+          "name": "Billing Conductor",
+          "path": "billingconductor/home"
+        },
+        {
+          "name": "Budgets",
+          "path": "costmanagement/home#/budgets"
+        },
+        {
+          "name": "Budgets Reports",
+          "path": "costmanagement/home#/budgets/reports"
+        },
+        {
+          "name": "Pricing Calculator",
+          "path": "costmanagement/home#/pricing-calculator"
+        },
+        {
+          "name": "Cost Optimization Hub",
+          "path": "costmanagement/home#/cost-optimization-hub"
+        },
+        {
+          "name": "Overview",
+          "path": "costmanagement/home#/savings-plans/overview"
+        },
+        {
+          "name": "Inventory",
+          "path": "costmanagement/home#/savings-plans/inventory"
+        },
+        {
+          "name": "Recommendations",
+          "path": "costmanagement/home#/savings-plans/recommendations"
+        },
+        {
+          "name": "Purchase Analyzer",
+          "path": "costmanagement/home#/savings-plans/purchase-analyzer"
+        },
+        {
+          "name": "Utilization Report",
+          "path": "costmanagement/home#/savings-plans/utilization"
+        },
+        {
+          "name": "Coverage Report",
+          "path": "costmanagement/home#/savings-plans/coverage"
+        },
+        {
+          "name": "Purchase Savings Plans",
+          "path": "costmanagement/home#/savings-plans/purchase"
+        },
+        {
+          "name": "Cart",
+          "path": "costmanagement/home#/savings-plans/cart"
+        },
+        {
+          "name": "Overview",
+          "path": "costmanagement/home#/ri/dashboard"
+        },
+        {
+          "name": "Recommendations",
+          "path": "costmanagement/home#/ri/recommendations"
+        },
+        {
+          "name": "Utilization Report",
+          "path": "costmanagement/home#/ri/utilization"
+        },
+        {
+          "name": "Coverage Report",
+          "path": "costmanagement/home#/ri/coverage"
+        },
+        {
+          "name": "Payment Preferences",
+          "path": "billing/home#/paymentpreferences"
+        },
+        {
+          "name": "Billing Preferences",
+          "path": "costmanagement/home#/preferences"
+        },
+        {
+          "name": "Cost Management Preferences",
+          "path": "costmanagement/home#/settings"
+        },
+        {
+          "name": "Tax Settings",
+          "path": "costmanagement/home#/tax-settings"
+        },
+        {
+          "name": "Invoice Configuration",
+          "path": "costmanagement/home#/invoice-management"
+        },
+        {
+          "name": "Billing Transfer",
+          "path": "costmanagement/home#/transferbilling"
+        },
+        {
+          "name": "Billing Home",
+          "path": "billing/home#/"
+        },
+        {
+          "name": "Cost Management Home",
+          "path": "costmanagement/home#/dashboard"
+        },
+        {
+          "name": "Cost and Usage Reports",
+          "path": "billing/home#/reports"
+        },
+        {
+          "name": "Rightsizing",
+          "path": "costmanagement/home#/rightsizing"
         }
       ]
     },
@@ -14202,6 +14560,14 @@
         {
           "name": "VPC origins",
           "path": "cloudfront/v4/home#/vpc-origins"
+        },
+        {
+          "name": "Multi-tenant distributions",
+          "path": "cloudfront/v4/home#/distributions/multi-tenant"
+        },
+        {
+          "name": "Distribution tenants",
+          "path": "cloudfront/v4/home#/tenants"
         },
         {
           "name": "Monitoring",
@@ -14414,6 +14780,10 @@
         {
           "name": "Alarms",
           "path": "cloudwatch/home#alarmsV2:"
+        },
+        {
+          "name": "50+",
+          "path": "cloudwatch/home#alarmsV2:?~(alarmListFilter~(tokens~(~(propertyKey~'alarmState~operator~'*3d~value~'OK))~operation~'and))"
         },
         {
           "name": "Overview",
@@ -14634,6 +15004,172 @@
         "cost analysis",
         "spend",
         "usage report"
+      ],
+      "features": [
+        {
+          "name": "Billing and Cost Management",
+          "path": "costmanagement/home#/home"
+        },
+        {
+          "name": "Dashboards",
+          "path": "costmanagement/home#/dashboards"
+        },
+        {
+          "name": "Bills",
+          "path": "billing/home#/bills"
+        },
+        {
+          "name": "Payments",
+          "path": "billing/home#/paymentsoverview"
+        },
+        {
+          "name": "Credits",
+          "path": "costmanagement/home#/credits"
+        },
+        {
+          "name": "Purchase Orders",
+          "path": "billing/home#/purchaseorders"
+        },
+        {
+          "name": "Cost Explorer",
+          "path": "costmanagement/home#/cost-explorer"
+        },
+        {
+          "name": "Cost Explorer Saved Reports",
+          "path": "costmanagement/home#/reports/overview"
+        },
+        {
+          "name": "Cost Anomaly Detection",
+          "path": "costmanagement/home#/anomaly-detection"
+        },
+        {
+          "name": "Free Tier",
+          "path": "costmanagement/home#/freetier"
+        },
+        {
+          "name": "Data Exports",
+          "path": "costmanagement/home#/bcm-data-exports"
+        },
+        {
+          "name": "Customer Carbon Footprint Tool",
+          "path": "costmanagement/home#/customer-carbon-footprint-tool"
+        },
+        {
+          "name": "Cost Categories",
+          "path": "costmanagement/home#/costcategories"
+        },
+        {
+          "name": "Cost Allocation Tags",
+          "path": "costmanagement/home#/tags"
+        },
+        {
+          "name": "Billing Conductor",
+          "path": "billingconductor/home"
+        },
+        {
+          "name": "Budgets",
+          "path": "costmanagement/home#/budgets"
+        },
+        {
+          "name": "Budgets Reports",
+          "path": "costmanagement/home#/budgets/reports"
+        },
+        {
+          "name": "Pricing Calculator",
+          "path": "costmanagement/home#/pricing-calculator"
+        },
+        {
+          "name": "Cost Optimization Hub",
+          "path": "costmanagement/home#/cost-optimization-hub"
+        },
+        {
+          "name": "Overview",
+          "path": "costmanagement/home#/savings-plans/overview"
+        },
+        {
+          "name": "Inventory",
+          "path": "costmanagement/home#/savings-plans/inventory"
+        },
+        {
+          "name": "Recommendations",
+          "path": "costmanagement/home#/savings-plans/recommendations"
+        },
+        {
+          "name": "Purchase Analyzer",
+          "path": "costmanagement/home#/savings-plans/purchase-analyzer"
+        },
+        {
+          "name": "Utilization Report",
+          "path": "costmanagement/home#/savings-plans/utilization"
+        },
+        {
+          "name": "Coverage Report",
+          "path": "costmanagement/home#/savings-plans/coverage"
+        },
+        {
+          "name": "Purchase Savings Plans",
+          "path": "costmanagement/home#/savings-plans/purchase"
+        },
+        {
+          "name": "Cart",
+          "path": "costmanagement/home#/savings-plans/cart"
+        },
+        {
+          "name": "Overview",
+          "path": "costmanagement/home#/ri/dashboard"
+        },
+        {
+          "name": "Recommendations",
+          "path": "costmanagement/home#/ri/recommendations"
+        },
+        {
+          "name": "Utilization Report",
+          "path": "costmanagement/home#/ri/utilization"
+        },
+        {
+          "name": "Coverage Report",
+          "path": "costmanagement/home#/ri/coverage"
+        },
+        {
+          "name": "Payment Preferences",
+          "path": "billing/home#/paymentpreferences"
+        },
+        {
+          "name": "Billing Preferences",
+          "path": "costmanagement/home#/preferences"
+        },
+        {
+          "name": "Cost Management Preferences",
+          "path": "costmanagement/home#/settings"
+        },
+        {
+          "name": "Tax Settings",
+          "path": "costmanagement/home#/tax-settings"
+        },
+        {
+          "name": "Invoice Configuration",
+          "path": "costmanagement/home#/invoice-management"
+        },
+        {
+          "name": "Billing Transfer",
+          "path": "costmanagement/home#/transferbilling"
+        },
+        {
+          "name": "Billing Home",
+          "path": "billing/home#/"
+        },
+        {
+          "name": "Cost Management Home",
+          "path": "costmanagement/home#/dashboard"
+        },
+        {
+          "name": "Cost and Usage Reports",
+          "path": "billing/home#/reports"
+        },
+        {
+          "name": "Rightsizing",
+          "path": "costmanagement/home#/rightsizing"
+        }
       ]
     },
     {
@@ -14762,7 +15298,29 @@
     {
       "id": "devicefarm",
       "name": "Device Farm",
-      "consolePath": "devicefarm/home"
+      "consolePath": "devicefarm/home",
+      "features": [
+        {
+          "name": "Device Farm",
+          "path": "devicefarm/home#/mobile/projects"
+        },
+        {
+          "name": "Device Slots",
+          "path": "devicefarm/home#/mobile/deviceslots"
+        },
+        {
+          "name": "Private Devices",
+          "path": "devicefarm/home#/mobile/privatedevices"
+        },
+        {
+          "name": "Public Devices",
+          "path": "devicefarm/home#/mobile/publicdevices"
+        },
+        {
+          "name": "Projects",
+          "path": "devicefarm/home#/browser/projects"
+        }
+      ]
     },
     {
       "id": "directconnect",
@@ -14772,14 +15330,6 @@
         {
           "name": "Direct Connect",
           "path": "directconnect/v2/home#/"
-        },
-        {
-          "name": "Interconnects",
-          "path": "directconnect/v2/home#/interconnects"
-        },
-        {
-          "name": "Hosted connections",
-          "path": "directconnect/v2/home#/hosted-connections"
         },
         {
           "name": "Connections",
@@ -14902,7 +15452,7 @@
         },
         {
           "name": "Integrations",
-          "path": "dynamodbv2/home#integrations?"
+          "path": "dynamodbv2/home#integrations"
         },
         {
           "name": "Reserved capacity",
@@ -15443,44 +15993,12 @@
       ],
       "features": [
         {
-          "name": "Amazon EventBridge",
-          "path": "events/home#/home"
-        },
-        {
-          "name": "Dashboard",
-          "path": "events/home#/dashboard"
-        },
-        {
-          "name": "Learn",
-          "path": "events/home#/learn"
-        },
-        {
-          "name": "Sandbox",
-          "path": "events/home#/explore"
-        },
-        {
-          "name": "Quick starts",
-          "path": "events/home#/quick-start"
-        },
-        {
-          "name": "Event buses",
-          "path": "events/home#/eventbuses"
-        },
-        {
           "name": "Rules",
           "path": "events/home#/rules"
         },
         {
-          "name": "Global endpoints",
-          "path": "events/home#/global-endpoints"
-        },
-        {
-          "name": "Archives",
-          "path": "events/home#/archives"
-        },
-        {
-          "name": "Replays",
-          "path": "events/home#/replays"
+          "name": "Buses",
+          "path": "events/home#/eventbuses"
         },
         {
           "name": "Pipes",
@@ -15489,30 +16007,6 @@
         {
           "name": "Schedules",
           "path": "scheduler/home#schedules"
-        },
-        {
-          "name": "Schedule groups",
-          "path": "scheduler/home#schedule-groups"
-        },
-        {
-          "name": "Scheduled rules (legacy)",
-          "path": "events/home#/scheduled-rules"
-        },
-        {
-          "name": "Partner event sources",
-          "path": "events/home#/partners"
-        },
-        {
-          "name": "API destinations",
-          "path": "events/home#/apidestinations"
-        },
-        {
-          "name": "Connections",
-          "path": "events/home#/connections"
-        },
-        {
-          "name": "Schemas",
-          "path": "events/home#/schemas"
         }
       ]
     },
@@ -16742,6 +17236,18 @@
           "path": "iot/home#/wireless/profiles"
         },
         {
+          "name": "Sidewalk",
+          "path": "iot/home#/wireless/sidewalk"
+        },
+        {
+          "name": "Devices",
+          "path": "iot/home#/wireless/sidewalk/devices"
+        },
+        {
+          "name": "Profiles",
+          "path": "iot/home#/wireless/sidewalk/profiles"
+        },
+        {
           "name": "Destinations",
           "path": "iot/home#/wireless/destinations"
         },
@@ -16909,7 +17415,7 @@
           "path": "kms/home#/kms/defaultKeys"
         },
         {
-          "name": "Customer-managed keys",
+          "name": "Customer managed keys",
           "path": "kms/home#/kms/keys"
         },
         {
@@ -17250,7 +17756,25 @@
     {
       "id": "managedservices",
       "name": "Managed Services",
-      "consolePath": "managedservices/home"
+      "consolePath": "managedservices/home",
+      "features": [
+        {
+          "name": "Contact us",
+          "path": "contact-us/"
+        },
+        {
+          "name": "AWS Marketplace",
+          "path": "marketplace"
+        },
+        {
+          "name": "Agentic AI",
+          "path": "ai/agentic-ai/"
+        },
+        {
+          "name": "Sign in to console",
+          "path": "console/home/"
+        }
+      ]
     },
     {
       "id": "mediaconnect",
@@ -17469,6 +17993,112 @@
         "elasticsearch",
         "search",
         "es"
+      ],
+      "features": [
+        {
+          "name": "Amazon OpenSearch Service",
+          "path": "aos/home#/opensearch"
+        },
+        {
+          "name": "Get started",
+          "path": "aos/home#/opensearch/getting-started"
+        },
+        {
+          "name": "Connected data sources",
+          "path": "aos/home#/opensearch/data-sources"
+        },
+        {
+          "name": "OpenSearch UI (Dashboards)",
+          "path": "aos/applications/home#/opensearch/applications"
+        },
+        {
+          "name": "Import history",
+          "path": "aos/home#/opensearch/import-history"
+        },
+        {
+          "name": "Dashboard",
+          "path": "aos/home#/opensearch/dashboard"
+        },
+        {
+          "name": "Domains",
+          "path": "aos/home#/opensearch/domains"
+        },
+        {
+          "name": "Reserved Instance leases",
+          "path": "aos/home#/opensearch/reserved-instances"
+        },
+        {
+          "name": "Packages",
+          "path": "aos/home#/opensearch/custom-packages"
+        },
+        {
+          "name": "VPC endpoints",
+          "path": "aos/home#/opensearch/vpc-endpoints"
+        },
+        {
+          "name": "Dashboard",
+          "path": "aos/home#/opensearch/get-started-serverless"
+        },
+        {
+          "name": "Collections",
+          "path": "aos/home#/opensearch/collections"
+        },
+        {
+          "name": "Collection groups",
+          "path": "aos/home#/opensearch/collection-groups"
+        },
+        {
+          "name": "Security",
+          "path": "aos/home#/opensearch/security"
+        },
+        {
+          "name": "Authentication",
+          "path": "aos/home#/opensearch/security/authentication"
+        },
+        {
+          "name": "Data access policies",
+          "path": "aos/home#/opensearch/security/access-policies"
+        },
+        {
+          "name": "Encryption policies",
+          "path": "aos/home#/opensearch/security/encryption-policies"
+        },
+        {
+          "name": "Network policies",
+          "path": "aos/home#/opensearch/security/network-policies"
+        },
+        {
+          "name": "Data lifecycle policies",
+          "path": "aos/home#/opensearch/data-lifecycle-policies"
+        },
+        {
+          "name": "VPC endpoints",
+          "path": "aos/home#/opensearch/vpcEndpoint"
+        },
+        {
+          "name": "Dashboard",
+          "path": "aos/osis/home#/osis/ingestion-dashboard"
+        },
+        {
+          "name": "Pipelines",
+          "path": "aos/osis/home#/osis/ingestion-pipelines"
+        },
+        {
+          "name": "VPC endpoints",
+          "path": "aos/osis/home#/osis/ingestion-vpc-endpoints"
+        },
+        {
+          "name": "Vector ingestion",
+          "path": "aos/osis/home#/osis/vector-ingestion"
+        },
+        {
+          "name": "Integrations",
+          "path": "aos/home#/opensearch/integrations"
+        },
+        {
+          "name": "Notifications",
+          "path": "aos/home#/opensearch/notifications"
+        }
       ]
     },
     {
@@ -17490,8 +18120,24 @@
       ],
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "organizations/v2/home/dashboard#c"
+          "name": "Dashboard",
+          "path": "organizations/v2/home/dashboard"
+        },
+        {
+          "name": "Invitations",
+          "path": "organizations/v2/home/invitations"
+        },
+        {
+          "name": "Policy management",
+          "path": "organizations/v2/home/policy-management"
+        },
+        {
+          "name": "AWS accounts",
+          "path": "organizations/v2/home/accounts"
+        },
+        {
+          "name": "Policies",
+          "path": "organizations/v2/home/policies"
         }
       ]
     },
@@ -17630,28 +18276,80 @@
       ],
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "route53/v2/home#c"
+          "name": "Route 53",
+          "path": "route53/v2/home#Home"
         },
         {
-          "name": "Support Centre",
-          "path": "support/home"
+          "name": "Dashboard",
+          "path": "route53/v2/home#Dashboard"
         },
         {
-          "name": "Account",
-          "path": "billing/home#/account"
+          "name": "Hosted zones",
+          "path": "route53/v2/hostedzones"
         },
         {
-          "name": "Organisation",
-          "path": "organizations/v2/home"
+          "name": "Health checks",
+          "path": "route53/v2/healthchecks/home"
         },
         {
-          "name": "Service Quotas",
-          "path": "servicequotas/home"
+          "name": "Profiles",
+          "path": "route53profiles/home"
         },
         {
-          "name": "Billing and Cost Management",
-          "path": "costmanagement/home#/"
+          "name": "Global resolvers",
+          "path": "route53globalresolver/home"
+        },
+        {
+          "name": "VPCs",
+          "path": "route53resolver/home#/vpcs"
+        },
+        {
+          "name": "Inbound endpoints",
+          "path": "route53resolver/home#/inbound-endpoints"
+        },
+        {
+          "name": "Outbound endpoints",
+          "path": "route53resolver/home#/outbound-endpoints"
+        },
+        {
+          "name": "Rules",
+          "path": "route53resolver/home#/rules"
+        },
+        {
+          "name": "Query logging",
+          "path": "route53resolver/home#/query-logging"
+        },
+        {
+          "name": "Outposts",
+          "path": "route53resolver/home#/resolveroutposts"
+        },
+        {
+          "name": "Registered domains",
+          "path": "route53/domains/home#/"
+        },
+        {
+          "name": "Requests",
+          "path": "route53/domains/home#/ListRequests"
+        },
+        {
+          "name": "CIDR collections",
+          "path": "route53/v2/hostedzones#CidrCollections"
+        },
+        {
+          "name": "Traffic policies",
+          "path": "route53/trafficflow/policies"
+        },
+        {
+          "name": "Policy records",
+          "path": "route53/trafficflow/records"
+        },
+        {
+          "name": "DNS Firewall",
+          "path": "vpc/home#DNSFirewallRuleGroups:"
+        },
+        {
+          "name": "Application Recovery Controller",
+          "path": "route53recovery/home"
         }
       ]
     },
@@ -17814,10 +18512,6 @@
         {
           "name": "Integrations",
           "path": "securityhub/home#/integrations"
-        },
-        {
-          "name": "Automations",
-          "path": "securityhub/home#/automation-rule"
         },
         {
           "name": "Custom actions",
@@ -18027,7 +18721,7 @@
       "consolePath": "storagegateway/home",
       "features": [
         {
-          "name": "Storage gateway",
+          "name": "Storage Gateway",
           "path": "storagegateway/home#?noRedirect=true"
         },
         {
@@ -18282,7 +18976,7 @@
           "path": "vpcconsole/home#igws:"
         },
         {
-          "name": "Egress-only Internet gateways",
+          "name": "Egress-only internet gateways",
           "path": "vpcconsole/home#EgressOnlyInternetGateways:"
         },
         {
@@ -18394,7 +19088,7 @@
           "path": "vpcconsole/home#VpnGateways:"
         },
         {
-          "name": "Site-to-site VPN concentrators",
+          "name": "Site-to-Site VPN Concentrators",
           "path": "vpcconsole/home#VpnConcentrators:"
         },
         {
@@ -18406,19 +19100,19 @@
           "path": "vpcconsole/home#ClientVPNEndpoints:"
         },
         {
-          "name": "Verified access instances",
+          "name": "Verified Access instances",
           "path": "vpcconsole/home#VerifiedAccessInstances:"
         },
         {
-          "name": "Verified access trust providers",
+          "name": "Verified Access trust providers",
           "path": "vpcconsole/home#VerifiedAccessTrustProviders:"
         },
         {
-          "name": "Verified access groups",
+          "name": "Verified Access groups",
           "path": "vpcconsole/home#VerifiedAccessGroups:"
         },
         {
-          "name": "Verified access endpoints",
+          "name": "Verified Access endpoints",
           "path": "vpcconsole/home#VerifiedAccessEndpoints:"
         },
         {
@@ -18466,7 +19160,7 @@
           "path": "networkmanager/home#/cwan"
         },
         {
-          "name": "VPC IP address manager",
+          "name": "VPC IP Address Manager",
           "path": "ipam/home"
         },
         {
@@ -18735,7 +19429,153 @@
     {
       "id": "xray",
       "name": "X-Ray",
-      "consolePath": "xray/home"
+      "consolePath": "xray/home",
+      "features": [
+        {
+          "name": "CloudWatch",
+          "path": "cloudwatch/home"
+        },
+        {
+          "name": "Ingestion",
+          "path": "cloudwatch/home#telemetry-config:"
+        },
+        {
+          "name": "Dashboards",
+          "path": "cloudwatch/home#dashboards/"
+        },
+        {
+          "name": "Alarms",
+          "path": "cloudwatch/home#alarmsV2:"
+        },
+        {
+          "name": "50+",
+          "path": "cloudwatch/home#alarmsV2:?~(alarmListFilter~(tokens~(~(propertyKey~'alarmState~operator~'*3d~value~'OK))~operation~'and))"
+        },
+        {
+          "name": "Overview",
+          "path": "cloudwatch/home#investigations/overview"
+        },
+        {
+          "name": "Investigations",
+          "path": "cloudwatch/home#investigations/list"
+        },
+        {
+          "name": "Configuration",
+          "path": "cloudwatch/home#investigations/configuration"
+        },
+        {
+          "name": "Model Invocations",
+          "path": "cloudwatch/home#gen-ai-observability/model-invocation"
+        },
+        {
+          "name": "Bedrock AgentCore",
+          "path": "cloudwatch/home#gen-ai-observability/agent-core"
+        },
+        {
+          "name": "Services",
+          "path": "cloudwatch/home#application-signals:services"
+        },
+        {
+          "name": "Application Map",
+          "path": "cloudwatch/home#application-signals:service-map"
+        },
+        {
+          "name": "Transaction Search",
+          "path": "cloudwatch/home#logsV2:transaction-search"
+        },
+        {
+          "name": "Service Level Objectives (SLO)",
+          "path": "cloudwatch/home#application-signals:slo"
+        },
+        {
+          "name": "Synthetics Canaries",
+          "path": "cloudwatch/home#synthetics:canary/list"
+        },
+        {
+          "name": "RUM",
+          "path": "cloudwatch/home#rum:dashboard?tab=overview"
+        },
+        {
+          "name": "Traces",
+          "path": "cloudwatch/home#xray:traces"
+        },
+        {
+          "name": "Trace Map",
+          "path": "cloudwatch/home#xray:service-map"
+        },
+        {
+          "name": "Application Insights",
+          "path": "cloudwatch/home#settings:AppInsightsSettings"
+        },
+        {
+          "name": "Container Insights",
+          "path": "cloudwatch/home#container-insights:"
+        },
+        {
+          "name": "Database Insights",
+          "path": "cloudwatch/home#database-insights:single-fleet"
+        },
+        {
+          "name": "Lambda Insights",
+          "path": "cloudwatch/home#lambda-insights:"
+        },
+        {
+          "name": "EC2 Resource Health",
+          "path": "cloudwatch/home#resource-health:ec2/map"
+        },
+        {
+          "name": "Log Management",
+          "path": "cloudwatch/home#logsV2:log-groups"
+        },
+        {
+          "name": "Log Analytics",
+          "path": "cloudwatch/home#log-analytics"
+        },
+        {
+          "name": "Log Anomalies",
+          "path": "cloudwatch/home#logsV2:logs-anomalies"
+        },
+        {
+          "name": "Live Tail",
+          "path": "cloudwatch/home#logsV2:live-tail"
+        },
+        {
+          "name": "Logs Insights",
+          "path": "cloudwatch/home#logsV2:logs-insights"
+        },
+        {
+          "name": "Contributor Insights",
+          "path": "cloudwatch/home#contributor-insights:"
+        },
+        {
+          "name": "All metrics",
+          "path": "cloudwatch/home#metricsV2"
+        },
+        {
+          "name": "Query Studio",
+          "path": "cloudwatch/home#query-studio"
+        },
+        {
+          "name": "Explorer",
+          "path": "cloudwatch/home#explorer"
+        },
+        {
+          "name": "Streams",
+          "path": "cloudwatch/home#metric-streams:streams"
+        },
+        {
+          "name": "Flow monitors",
+          "path": "cloudwatch/home#network-flow-monitor:"
+        },
+        {
+          "name": "Internet monitors",
+          "path": "cloudwatch/home#internet-monitor:"
+        },
+        {
+          "name": "Synthetic monitors",
+          "path": "cloudwatch/home#network-monitor:"
+        }
+      ]
     }
   ]
 }
