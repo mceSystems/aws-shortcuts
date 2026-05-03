@@ -125,12 +125,6 @@ const AWS_BAND_RGB: Record<string, [number, number, number]> = {
     const fromText = fromBand ? null : findColorName();
     const color = fromBand ?? fromText;
     const role = findRoleName();
-    console.log('[aws-shortcut/cs]', accountId, {
-      colorBand: fromBand,
-      colorText: fromText,
-      role,
-      url: location.href,
-    });
     if (color && color !== lastReported) {
       lastReported = color;
       safeSend({

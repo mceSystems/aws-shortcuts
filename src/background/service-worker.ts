@@ -51,7 +51,6 @@ chrome.webRequest.onSendHeaders.addListener(
 );
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[aws-shortcut] installed');
   void refreshOriginRule();
   void harvestOpenTabs();
   void chrome.sidePanel
@@ -232,9 +231,6 @@ async function harvestOpenTabs(): Promise<void> {
     const tabs = await chrome.tabs.query({
       url: ['https://*.console.aws.amazon.com/*'],
     });
-    console.log('[aws-shortcut] harvest: matched', tabs.length, 'console tabs');
-    // Seed the openTabs store immediately from the URL so the panel has rows
-    // before the content script reports back.
     await Promise.all(tabs.map((t) => upsertOpenTab(t)));
     const consoleScript = chrome.runtime
       .getManifest()
@@ -242,7 +238,6 @@ async function harvestOpenTabs(): Promise<void> {
         cs.matches?.some((m) => m.includes('console.aws.amazon.com')),
       )
       ?.js?.[0];
-    console.log('[aws-shortcut] harvest: script path', consoleScript);
 
     await Promise.all(
       tabs.map(async (tab) => {
@@ -250,16 +245,13 @@ async function harvestOpenTabs(): Promise<void> {
         const tabId = tab.id;
         try {
           await chrome.tabs.sendMessage(tabId, { type: 'RESCAN_TAB' });
-          console.log('[aws-shortcut] sendMessage ok for tab', tabId, tab.url);
-        } catch (msgErr) {
-          console.log('[aws-shortcut] sendMessage failed for tab', tabId, msgErr);
+        } catch {
           if (!consoleScript) return;
           try {
             await chrome.scripting.executeScript({
               target: { tabId },
               files: [consoleScript],
             });
-            console.log('[aws-shortcut] injected into tab', tabId);
           } catch (injErr) {
             console.warn('[aws-shortcut] inject failed for tab', tabId, injErr);
           }
@@ -667,12 +659,6 @@ async function resolveLaunchUrl(input: {
   // before harvest has propagated. Probe open tabs directly.
   if (!match) {
     match = await findLiveSessionFromOpenTabs(input.accountId);
-    if (match) {
-      console.log(
-        '[aws-shortcut/launch] real-time tab probe matched',
-        'session=', match.sessionSubdomain,
-      );
-    }
   }
 
   if (match) {
@@ -683,14 +669,6 @@ async function resolveLaunchUrl(input: {
       consolePath: input.consolePath,
     });
     const live = await isSessionLive(direct);
-    console.log(
-      '[aws-shortcut/launch]',
-      'account=', input.accountId,
-      'role=', input.roleName,
-      'session=', match.sessionSubdomain,
-      'live=', live,
-      'mode=', live ? 'direct' : 'portal-fallback',
-    );
     if (live) {
       return { ok: true, url: direct, mode: 'direct' };
     }
@@ -703,13 +681,6 @@ async function resolveLaunchUrl(input: {
             s.sessionSubdomain === match.sessionSubdomain
           ),
       ),
-    );
-  } else {
-    console.log(
-      '[aws-shortcut/launch]',
-      'account=', input.accountId,
-      'role=', input.roleName,
-      'no session match — using portal',
     );
   }
 
@@ -732,12 +703,6 @@ async function isSessionLive(url: string): Promise<boolean> {
     const now = Date.now() / 1000;
     const live = cookies.filter(
       (c) => !c.expirationDate || c.expirationDate > now,
-    );
-    console.log(
-      '[aws-shortcut/launch] cookie check',
-      'url=', url,
-      'count=', live.length,
-      'names=', live.map((c) => c.name),
     );
     return live.length > 0;
   } catch (e) {
@@ -811,10 +776,7 @@ function reconcileOrder(
 let inFlightCapture: Promise<MsgResponse> | null = null;
 
 function captureAndScanViaBgTab(): Promise<MsgResponse> {
-  if (inFlightCapture) {
-    console.log('[aws-shortcut/bg-tab] coalescing into in-flight capture');
-    return inFlightCapture;
-  }
+  if (inFlightCapture) return inFlightCapture;
   inFlightCapture = runCaptureAndScan().finally(() => {
     inFlightCapture = null;
   });
@@ -833,15 +795,6 @@ async function runCaptureAndScan(): Promise<MsgResponse> {
   const existing = await findPortalTab(portalHost);
   const focusedTabId = await getFocusedTabId();
   const userIsOnPortal = existing?.id !== undefined && existing.id === focusedTabId;
-  const branch = existing && !userIsOnPortal ? 'reload' : 'open-new';
-  console.log(
-    '[aws-shortcut/bg-tab] decision',
-    'existingUrl=', existing?.url ?? 'none',
-    'existingId=', existing?.id ?? 'none',
-    'focusedTabId=', focusedTabId ?? 'none',
-    'userIsOnPortal=', userIsOnPortal,
-    'branch=', branch,
-  );
 
   // Side-panel-only policy: focus tabs (no hidden bg open), and never
   // auto-close a tab we created. The user keeps control of their tabs.

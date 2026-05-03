@@ -21,7 +21,7 @@ type EndpointsData = {
 
 let endpointsCache: EndpointsData | null = null;
 
-export async function fetchBotocoreEndpoints(): Promise<EndpointsData> {
+async function fetchBotocoreEndpoints(): Promise<EndpointsData> {
   if (endpointsCache) return endpointsCache;
   const res = await fetch(BOTOCORE_ENDPOINTS_URL);
   if (!res.ok) throw new Error(`botocore endpoints HTTP ${res.status}`);
@@ -32,7 +32,7 @@ export async function fetchBotocoreEndpoints(): Promise<EndpointsData> {
 
 /** Map of botocore service code → isRegionalized flag (`global=true` when
  *  isRegionalized is explicitly false). Pulled from the AWS partition only. */
-export async function fetchGlobalServiceMap(): Promise<Map<string, boolean>> {
+async function fetchGlobalServiceMap(): Promise<Map<string, boolean>> {
   const data = await fetchBotocoreEndpoints();
   const aws = data.partitions.find((p) => p.partition === 'aws');
   const out = new Map<string, boolean>();

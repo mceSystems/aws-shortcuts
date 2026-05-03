@@ -26,7 +26,7 @@ export function walkVendorIcons(dir: string = ICONS_VENDOR_DIR): Map<string, str
   return out;
 }
 
-export function readIconMap(): Record<string, string> {
+function readIconMap(): Record<string, string> {
   if (!existsSync(ICON_MAP_PATH)) return {};
   const raw = readJson<Record<string, string>>(ICON_MAP_PATH);
   delete (raw as Record<string, unknown>)['$schema'];
@@ -35,7 +35,7 @@ export function readIconMap(): Record<string, string> {
 
 /** Filename guesses for a service derived from id + display name. Heuristic
  *  fallback when icon-map.json doesn't have a manual entry. */
-export function guessFilenames(id: string, name: string): string[] {
+function guessFilenames(id: string, name: string): string[] {
   const cleanName = name.replace(/^(Amazon|AWS)\s+/i, '').replace(/[^A-Za-z0-9]/g, '');
   const fullName = name.replace(/[^A-Za-z0-9]/g, '');
   const idCap = id.replace(/^./, (c) => c.toUpperCase());
@@ -51,7 +51,7 @@ export function guessFilenames(id: string, name: string): string[] {
   return [...guesses];
 }
 
-export function mimeFor(filename: string): string {
+function mimeFor(filename: string): string {
   const ext = extname(filename).toLowerCase();
   switch (ext) {
     case '.svg':
@@ -74,7 +74,7 @@ export function fileToDataUrl(absPath: string): { dataUrl: string; bytes: number
   return { dataUrl: `data:${mime};base64,${buf.toString('base64')}`, bytes: buf.byteLength };
 }
 
-export type ResolveResult = {
+type ResolveResult = {
   matched: Map<string, { filename: string; absPath: string }>;
   missing: string[];
 };

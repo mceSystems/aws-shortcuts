@@ -1,6 +1,6 @@
 // Pretty-print add/remove/change summaries between two id-keyed snapshots.
 
-export type Diff<T> = {
+type Diff<T> = {
   added: string[];
   removed: string[];
   changed: { id: string; field: string }[];

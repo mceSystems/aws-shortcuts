@@ -8,7 +8,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { CACHE_DIR, ICONS_TARBALL, ICONS_VENDOR_DIR, ICONS_VERSION } from './paths';
 
-export function ensureCacheDir(): void {
+function ensureCacheDir(): void {
   mkdirSync(CACHE_DIR, { recursive: true });
 }
 

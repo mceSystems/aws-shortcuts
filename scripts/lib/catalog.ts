@@ -15,13 +15,13 @@ export type Service = {
   aliases?: string[];
   features?: Feature[];
 };
-export type Catalog = {
+type Catalog = {
   schemaVersion: number;
   version: string;
   services: Service[];
 };
 
-export type Overrides = {
+type Overrides = {
   aliases?: Record<string, string[]>;
   consolePathOverrides?: Record<string, string>;
   nameOverrides?: Record<string, string>;

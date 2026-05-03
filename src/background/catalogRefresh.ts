@@ -135,9 +135,6 @@ export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
         [CATALOG_FETCHED_AT_KEY]: fetchedAt,
       });
       const updated = !cur || cur.version !== next.version;
-      console.log(
-        `[catalog] ${trigger} ${updated ? 'updated → ' : 'refreshed '}${next.version} (${next.services.length} services, ${countFeatures(next)} features, ${Object.keys(icons).length} icons) via ${source.label}`,
-      );
       return {
         ok: true,
         updated,
