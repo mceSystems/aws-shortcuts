@@ -137,14 +137,8 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
-# Local AWS Architecture Icons source (drop ZIP contents here; outputs are
-# generated into src/assets/icons/ by scripts/build-icons.ts and are committed).
-vendor/aws-icons-source/
-
-# Raw harvest dump from the dev-mode HarvestSection. Merge into
-# catalog/services.json via `npm run catalog:merge`, then this file is no
-# longer needed (and is regenerable any time).
-catalog/harvested.raw.json
+# Persisted SSO session for the catalog CLI (Playwright storageState).
+scripts/.auth/
 
 # Vite files
 vite.config.js.timestamp-*

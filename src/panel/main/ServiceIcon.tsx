@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ICONS } from '@/assets/icons';
-import { getCachedIconUrl, subscribeIconCache } from '@/shared/iconCache';
+import { getIcon, subscribeIcons } from '@/shared/iconStore';
 import styles from './ServiceIcon.module.css';
 
 type Props = {
@@ -11,12 +10,11 @@ type Props = {
 };
 
 export function ServiceIcon({ id, name, fallbackBg, size = 22 }: Props) {
-  // Resolve once per render but re-render whenever the runtime icon cache
-  // changes (e.g. SW just finished fetching a freshly-added service icon).
+  // Re-render when icons store updates (catalog refresh wrote a fresh icons.json).
   const [, setTick] = useState(0);
-  useEffect(() => subscribeIconCache(() => setTick((n) => n + 1)), []);
+  useEffect(() => subscribeIcons(() => setTick((n) => n + 1)), []);
 
-  const url = getCachedIconUrl(id) ?? ICONS[id];
+  const url = getIcon(id);
   if (url) {
     return (
       <span className={styles.iconBox} style={{ width: size, height: size }}>

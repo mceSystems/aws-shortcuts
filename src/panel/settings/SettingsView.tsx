@@ -1,8 +1,5 @@
 import { CatalogSection } from '@/options/CatalogSection';
-import { HarvestSection } from '@/options/HarvestSection';
 import styles from './SettingsView.module.css';
-
-const isDev = import.meta.env.DEV;
 
 type Props = {
   onBack: () => void;
@@ -19,7 +16,6 @@ export function SettingsView({ onBack }: Props) {
       </div>
       <div className={styles.body}>
         <CatalogSection />
-        {isDev && <HarvestSection />}
       </div>
     </div>
   );

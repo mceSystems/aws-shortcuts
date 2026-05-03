@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "version": "2026.05.01",
+  "schemaVersion": 3,
+  "version": "2026.05.03",
   "services": [
     {
       "id": "activate",
@@ -227,8 +227,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CustomerEnablement/Activate.png"
+      ]
     },
     {
       "id": "appflow",
@@ -455,8 +454,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/AppFlow.png"
+      ]
     },
     {
       "id": "a2i",
@@ -683,8 +681,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/AugmentedAIA2I.png"
+      ]
     },
     {
       "id": "bedrock",
@@ -919,8 +916,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
+      ]
     },
     {
       "id": "bedrockagentcore",
@@ -987,14 +983,12 @@
           "name": "Amazon Bedrock",
           "path": "bedrock/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
+      ]
     },
     {
       "id": "biodiscovery",
       "name": "Amazon Bio Discovery",
-      "consolePath": "biodiscovery/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
+      "consolePath": "biodiscovery/home"
     },
     {
       "id": "braket",
@@ -1045,8 +1039,7 @@
           "name": "Announcements",
           "path": "braket/home#/announcements"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/QuantumTechnologies/Braket.png"
+      ]
     },
     {
       "id": "chimesdk",
@@ -1237,13 +1230,13 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/ChimeSDK.png"
+      ]
     },
     {
       "id": "codecatalyst",
       "name": "Amazon CodeCatalyst",
       "consolePath": "codecatalyst/home",
+      "global": true,
       "features": [
         {
           "name": "Amazon CodeCatalyst",
@@ -1257,8 +1250,7 @@
           "name": "IAM Identity Center",
           "path": "codecatalyst/home#/sso"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/CodeCatalyst.png"
+      ]
     },
     {
       "id": "codeguru",
@@ -1469,8 +1461,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/CodeGuru.png"
+      ]
     },
     {
       "id": "comprehend",
@@ -1705,8 +1696,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Comprehend.png"
+      ]
     },
     {
       "id": "comprehendmedical",
@@ -1941,8 +1931,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/ComprehendMedical.png"
+      ]
     },
     {
       "id": "connect",
@@ -1961,8 +1950,7 @@
           "name": "Integrations",
           "path": "connect/v2/app/applications"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Connect.png"
+      ]
     },
     {
       "id": "scn",
@@ -1977,8 +1965,7 @@
           "name": "Give us feedback",
           "path": "scn/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Connect.png"
+      ]
     },
     {
       "id": "connecthealth",
@@ -2177,8 +2164,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Connect.png"
+      ]
     },
     {
       "id": "firehose",
@@ -2193,8 +2179,7 @@
           "name": "Firehose streams",
           "path": "firehose/home#/streams?noRedirect"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/KinesisDataFirehose.png"
+      ]
     },
     {
       "id": "datazone",
@@ -2269,8 +2254,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/DataZone.png"
+      ]
     },
     {
       "id": "devopsguru",
@@ -2497,8 +2481,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/DevOpsGuru.png"
+      ]
     },
     {
       "id": "docdb",
@@ -2573,8 +2556,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/DocumentDB.png"
+      ]
     },
     {
       "id": "evs",
@@ -2605,8 +2587,7 @@
           "name": "Route 53",
           "path": "route53/v2/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/VMwareCloudonAWS.png"
+      ]
     },
     {
       "id": "events",
@@ -2685,8 +2666,7 @@
           "name": "Schemas",
           "path": "events/home#/schemas"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/EventBridge.png"
+      ]
     },
     {
       "id": "finspace",
@@ -2709,8 +2689,7 @@
           "name": "Data providers",
           "path": "finspace/data-providers"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/FinSpace.png"
+      ]
     },
     {
       "id": "forecast",
@@ -2937,8 +2916,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Forecast.png"
+      ]
     },
     {
       "id": "frauddetector",
@@ -3169,8 +3147,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/FraudDetector.png"
+      ]
     },
     {
       "id": "gameliftservers",
@@ -3397,8 +3374,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Games/GameLift.png"
+      ]
     },
     {
       "id": "gameliftstreams",
@@ -3625,8 +3601,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Games/GameLift.png"
+      ]
     },
     {
       "id": "grafana",
@@ -3701,8 +3676,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ManagedGrafana.png"
+      ]
     },
     {
       "id": "inspector",
@@ -3821,8 +3795,7 @@
           "name": "Storage",
           "path": "console/services#storage"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Inspector.png"
+      ]
     },
     {
       "id": "ivs",
@@ -3833,8 +3806,7 @@
           "name": "Skip to Main Content",
           "path": "ivs/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/InteractiveVideoService.png"
+      ]
     },
     {
       "id": "kendra",
@@ -4057,8 +4029,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Kendra.png"
+      ]
     },
     {
       "id": "keyspaces",
@@ -4085,8 +4056,7 @@
           "name": "Getting started exercise",
           "path": "keyspaces/v2/home#getting-started"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/Keyspaces.png"
+      ]
     },
     {
       "id": "lexv2",
@@ -4297,8 +4267,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Lex.png"
+      ]
     },
     {
       "id": "location",
@@ -4373,14 +4342,12 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/FrontEndWebMobile/LocationService.png"
+      ]
     },
     {
       "id": "lookoutequipment",
       "name": "Amazon Lookout for Equipment",
-      "consolePath": "lookoutequipment/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/LookoutforEquipment.png"
+      "consolePath": "lookoutequipment/home"
     },
     {
       "id": "macie",
@@ -4611,14 +4578,12 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Macie.png"
+      ]
     },
     {
       "id": "managedblockchain",
       "name": "Amazon Managed Blockchain",
-      "consolePath": "managedblockchain/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Blockchain/ManagedBlockchain.png"
+      "consolePath": "managedblockchain/home"
     },
     {
       "id": "memorydb",
@@ -4669,14 +4634,12 @@
           "name": "Service updates",
           "path": "memorydb/home#/service-updates"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/MemoryDBforRedis.png"
+      ]
     },
     {
       "id": "monitron",
       "name": "Amazon Monitron",
-      "consolePath": "monitron/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Monitron.png"
+      "consolePath": "monitron/home"
     },
     {
       "id": "amazonmq",
@@ -4903,14 +4866,12 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/MQ.png"
+      ]
     },
     {
       "id": "novaact",
       "name": "Amazon Nova Act",
-      "consolePath": "nova-act/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Bedrock.png"
+      "consolePath": "nova-act/home"
     },
     {
       "id": "aos",
@@ -5117,8 +5078,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/OpenSearchService.png"
+      ]
     },
     {
       "id": "personalize",
@@ -5137,8 +5097,7 @@
           "name": "Manage dataset groups",
           "path": "personalize/home#/datasetGroups"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Personalize.png"
+      ]
     },
     {
       "id": "pinpointv2",
@@ -5149,8 +5108,7 @@
           "name": "Skip to Main Content",
           "path": "pinpointv2/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Pinpoint.png"
+      ]
     },
     {
       "id": "polly",
@@ -5381,8 +5339,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Polly.png"
+      ]
     },
     {
       "id": "prometheus",
@@ -5457,12 +5414,11 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ManagedServiceforPrometheus.png"
+      ]
     },
     {
       "id": "chatbot",
-      "name": "Amazon Q Developer in chat applications (previously AWS Chatbot)Generative AI-po",
+      "name": "Amazon Q Developer in chat applications (previousl",
       "consolePath": "chatbot/home",
       "features": [
         {
@@ -5489,8 +5445,7 @@
           "name": "Chat applications policies",
           "path": "chatbot/home#/orgs-settings/chatbot-policies"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/Chatbot.png"
+      ]
     },
     {
       "id": "redshiftv2",
@@ -5565,8 +5520,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/Redshift.png"
+      ]
     },
     {
       "id": "rekognition",
@@ -5801,8 +5755,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Rekognition.png"
+      ]
     },
     {
       "id": "route53globalresolver",
@@ -6021,8 +5974,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/Route53.png"
+      ]
     },
     {
       "id": "sagemaker",
@@ -6183,8 +6135,7 @@
           "name": "Tutorials",
           "path": "sagemaker/home#/tutorials"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/SageMaker.png"
+      ]
     },
     {
       "id": "ses",
@@ -6305,8 +6256,7 @@
           "name": "Email archiving",
           "path": "ses/home#/mail-manager/email-archiving"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/SimpleEmailService.png"
+      ]
     },
     {
       "id": "textract",
@@ -6513,8 +6463,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Textract.png"
+      ]
     },
     {
       "id": "timestream",
@@ -6749,8 +6698,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/Timestream.png"
+      ]
     },
     {
       "id": "transcribe",
@@ -6985,8 +6933,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Transcribe.png"
+      ]
     },
     {
       "id": "translate",
@@ -7193,8 +7140,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Translate.png"
+      ]
     },
     {
       "id": "verifiedpermissions",
@@ -7437,8 +7383,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/VerifiedPermissions.png"
+      ]
     },
     {
       "id": "zocalo",
@@ -7513,8 +7458,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/WorkDocs.png"
+      ]
     },
     {
       "id": "workmail",
@@ -7765,8 +7709,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/WorkMail.png"
+      ]
     },
     {
       "id": "apigateway",
@@ -7987,8 +7930,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/APIGateway.png"
+      ]
     },
     {
       "id": "discovery",
@@ -8239,8 +8181,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/ApplicationDiscoveryService.png"
+      ]
     },
     {
       "id": "route53recovery",
@@ -8315,8 +8256,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/Route53ApplicationRecoveryController.png"
+      ]
     },
     {
       "id": "athena",
@@ -8397,8 +8337,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/Athena.png"
+      ]
     },
     {
       "id": "rds",
@@ -8489,8 +8428,7 @@
           "name": "Certificate update",
           "path": "rds/home#ca-cert-update:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/RDS.png"
+      ]
     },
     {
       "id": "dsql",
@@ -8565,8 +8503,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/Aurora.png"
+      ]
     },
     {
       "id": "amplify",
@@ -8809,8 +8746,7 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/FrontEndWebMobile/Amplify.png"
+      ]
     },
     {
       "id": "appmesh",
@@ -8885,8 +8821,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/AppMesh.png"
+      ]
     },
     {
       "id": "apprunner",
@@ -9109,8 +9044,7 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/AppRunner.png"
+      ]
     },
     {
       "id": "appstudio",
@@ -9333,136 +9267,12 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/FrontEndWebMobile/AmplifyAWSAmplifyStudio.png"
-    },
-    {
-      "id": "systemsmanager",
-      "name": "AWS AppConfig",
-      "consolePath": "systems-manager/home",
-      "popular": true,
-      "aliases": [
-        "SSM",
-        "ops",
-        "patching"
-      ],
-      "features": [
-        {
-          "name": "AWS Systems Manager",
-          "path": "systems-manager/home#welcome"
-        },
-        {
-          "name": "Review node insights",
-          "path": "systems-manager/review-node-insights"
-        },
-        {
-          "name": "Explore nodes",
-          "path": "systems-manager/explore-nodes"
-        },
-        {
-          "name": "Diagnose and remediate",
-          "path": "systems-manager/diagnose-and-remediate"
-        },
-        {
-          "name": "Just-in-time node access",
-          "path": "systems-manager/just-in-time-node-access"
-        },
-        {
-          "name": "Compliance",
-          "path": "systems-manager/compliance"
-        },
-        {
-          "name": "Distributor",
-          "path": "systems-manager/distributor"
-        },
-        {
-          "name": "Fleet Manager",
-          "path": "systems-manager/fleet-manager"
-        },
-        {
-          "name": "Hybrid Activations",
-          "path": "systems-manager/activations"
-        },
-        {
-          "name": "Inventory",
-          "path": "systems-manager/inventory"
-        },
-        {
-          "name": "Patch Manager",
-          "path": "systems-manager/patch-manager"
-        },
-        {
-          "name": "Run Command",
-          "path": "systems-manager/run-command"
-        },
-        {
-          "name": "Session Manager",
-          "path": "systems-manager/session-manager"
-        },
-        {
-          "name": "State Manager",
-          "path": "systems-manager/state-manager"
-        },
-        {
-          "name": "Automation",
-          "path": "systems-manager/automation"
-        },
-        {
-          "name": "Change Calendar",
-          "path": "systems-manager/change-calendar"
-        },
-        {
-          "name": "Change Manager",
-          "path": "systems-manager/change-manager"
-        },
-        {
-          "name": "Documents",
-          "path": "systems-manager/documents"
-        },
-        {
-          "name": "Maintenance Windows",
-          "path": "systems-manager/maintenance-windows"
-        },
-        {
-          "name": "Quick Setup",
-          "path": "systems-manager/quick-setup"
-        },
-        {
-          "name": "AppConfig",
-          "path": "systems-manager/appconfig"
-        },
-        {
-          "name": "Application Manager",
-          "path": "systems-manager/appmanager"
-        },
-        {
-          "name": "Parameter Store",
-          "path": "systems-manager/parameters"
-        },
-        {
-          "name": "CloudWatch Dashboard",
-          "path": "systems-manager/explorer/cloudwatch"
-        },
-        {
-          "name": "Explorer",
-          "path": "systems-manager/explorer"
-        },
-        {
-          "name": "Incident Manager",
-          "path": "systems-manager/incidents/home"
-        },
-        {
-          "name": "OpsCenter",
-          "path": "systems-manager/opsitems"
-        }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/SystemsManager.png"
+      ]
     },
     {
       "id": "appfabric",
       "name": "AWS AppFabric",
-      "consolePath": "appfabric/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/AppFabric.png"
+      "consolePath": "appfabric/home"
     },
     {
       "id": "mgn",
@@ -9470,207 +9280,62 @@
       "consolePath": "mgn/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "mgn/home#c"
+          "name": "Application Migration Service",
+          "path": "mgn/home#/welcome"
         },
         {
-          "name": "Recently visited",
-          "path": "console/services#recentlyVisited"
+          "name": "Source servers",
+          "path": "mgn/home#/sourceServers"
         },
         {
-          "name": "Favorites",
-          "path": "console/services#favorites"
+          "name": "Applications",
+          "path": "mgn/home#/applications"
         },
         {
-          "name": "All applications",
-          "path": "console/applications#allApplications"
+          "name": "Waves",
+          "path": "mgn/home#/waves"
         },
         {
-          "name": "All services",
-          "path": "console/services#allServices"
+          "name": "Global view",
+          "path": "mgn/home#/globalView"
         },
         {
-          "name": "Analytics",
-          "path": "console/services#analytics"
+          "name": "Launch history",
+          "path": "mgn/home#/launchHistory"
         },
         {
-          "name": "Application Integration",
-          "path": "console/services#appservices"
+          "name": "MGN connectors",
+          "path": "mgn/home#/connectors"
         },
         {
-          "name": "Blockchain",
-          "path": "console/services#blockchain"
+          "name": "Import and Export",
+          "path": "mgn/home#/null-link"
         },
         {
-          "name": "Business Applications",
-          "path": "console/services#applications"
+          "name": "Import",
+          "path": "mgn/home#/import"
         },
         {
-          "name": "Cloud Financial Management",
-          "path": "console/services#cost_management"
+          "name": "Export",
+          "path": "mgn/home#/export"
         },
         {
-          "name": "Compute",
-          "path": "console/services#compute"
+          "name": "Replication template",
+          "path": "mgn/home#/replicationTemplate"
         },
         {
-          "name": "Containers",
-          "path": "console/services#containers"
+          "name": "Launch template",
+          "path": "mgn/home#/launchTemplate"
         },
         {
-          "name": "Customer Enablement",
-          "path": "console/services#customer_enablement"
+          "name": "Post-launch template",
+          "path": "mgn/home#/postLaunchTemplate"
         },
         {
-          "name": "Database",
-          "path": "console/services#database"
-        },
-        {
-          "name": "Developer Tools",
-          "path": "console/services#developer_tools"
-        },
-        {
-          "name": "End User Computing",
-          "path": "console/services#desktop"
-        },
-        {
-          "name": "Front-end Web & Mobile",
-          "path": "console/services#mobileservices"
-        },
-        {
-          "name": "Game Development",
-          "path": "console/services#gamedev"
-        },
-        {
-          "name": "Internet of Things",
-          "path": "console/services#internet_of_things"
-        },
-        {
-          "name": "Machine Learning",
-          "path": "console/services#ai"
-        },
-        {
-          "name": "Management & Governance",
-          "path": "console/services#management_tools"
-        },
-        {
-          "name": "Media Services",
-          "path": "console/services#media"
-        },
-        {
-          "name": "Migration & Transfer",
-          "path": "console/services#migration"
-        },
-        {
-          "name": "Networking & Content Delivery",
-          "path": "console/services#networking"
-        },
-        {
-          "name": "Quantum Technologies",
-          "path": "console/services#delta"
-        },
-        {
-          "name": "Satellite",
-          "path": "console/services#satellite"
-        },
-        {
-          "name": "Security, Identity, & Compliance",
-          "path": "console/services#security_and_identity"
-        },
-        {
-          "name": "Storage",
-          "path": "console/services#storage"
-        },
-        {
-          "name": "AWS App MeshEasily monitor and control microservices",
-          "path": "appmesh/home"
-        },
-        {
-          "name": "Aurora and RDSManaged Relational Database Service",
-          "path": "rds/home"
-        },
-        {
-          "name": "AthenaServerless interactive analytics service",
-          "path": "athena/home"
-        },
-        {
-          "name": "API GatewayBuild, Deploy and Manage APIs",
-          "path": "apigateway/home"
-        },
-        {
-          "name": "Amazon WorkMailSecure Email and Calendaring Service",
-          "path": "workmail/v2/home"
-        },
-        {
-          "name": "Amazon WorkDocsSecure Enterprise Storage and Sharing Service",
-          "path": "zocalo/home"
-        },
-        {
-          "name": "Amazon TranslatePowerful Neural Machine Translation",
-          "path": "translate/home"
-        },
-        {
-          "name": "Amazon TranscribePowerful Speech Recognition",
-          "path": "transcribe/home"
-        },
-        {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
-        },
-        {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
-        },
-        {
-          "name": "Lambda",
-          "path": "lambda/home"
-        },
-        {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
-        },
-        {
-          "name": "S3",
-          "path": "s3/home"
-        },
-        {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
-        },
-        {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
-        },
-        {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
-        },
-        {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
-        },
-        {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
-        },
-        {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
-        },
-        {
-          "name": "EC2",
-          "path": "ec2/home"
-        },
-        {
-          "name": "Route 53",
-          "path": "route53/v2/home"
-        },
-        {
-          "name": "IAM",
-          "path": "iam/home"
+          "name": "User preferences",
+          "path": "mgn/home#/userPreferences"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/ApplicationMigrationService.png"
+      ]
     },
     {
       "id": "appsync",
@@ -9750,13 +9415,13 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/AppSync.png"
+      ]
     },
     {
       "id": "artifact",
       "name": "AWS Artifact",
       "consolePath": "artifact/v2/home",
+      "global": true,
       "features": [
         {
           "name": "AWS Artifact",
@@ -9774,8 +9439,7 @@
           "name": "Notification",
           "path": "artifact/v2/notification"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Artifact.png"
+      ]
     },
     {
       "id": "auditmanager",
@@ -10014,8 +9678,7 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/AuditManager.png"
+      ]
     },
     {
       "id": "autoscaling",
@@ -10250,8 +9913,7 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/AutoScaling.png"
+      ]
     },
     {
       "id": "b2bi",
@@ -10278,8 +9940,7 @@
           "name": "Transformers",
           "path": "b2bi/home#/transformers"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/B2BDataInterchange.png"
+      ]
     },
     {
       "id": "backup",
@@ -10370,13 +10031,13 @@
           "name": "CloudWatch",
           "path": "cloudwatch/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/Backup.png"
+      ]
     },
     {
       "id": "billingconductor",
       "name": "AWS Billing Conductor",
       "consolePath": "billingconductor/home",
+      "global": true,
       "features": [
         {
           "name": "Skip to Main Content",
@@ -10394,8 +10055,7 @@
           "name": "Manage Local Zones",
           "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/BillingConductor.png"
+      ]
     },
     {
       "id": "cleanrooms",
@@ -10406,8 +10066,7 @@
           "name": "Skip to Main Content",
           "path": "cleanrooms/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/CleanRooms.png"
+      ]
     },
     {
       "id": "cloudmap",
@@ -10638,8 +10297,7 @@
           "name": "IAM",
           "path": "iam/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/CloudMap.png"
+      ]
     },
     {
       "id": "computeoptimizer",
@@ -10647,231 +10305,74 @@
       "consolePath": "compute-optimizer/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "compute-optimizer/home#c"
+          "name": "AWS Compute Optimizer",
+          "path": "compute-optimizer/home"
         },
         {
-          "name": "Recently visited",
-          "path": "console/services#recentlyVisited"
+          "name": "Dashboard",
+          "path": "compute-optimizer/home#/dashboard"
         },
         {
-          "name": "Favourites",
-          "path": "console/services#favorites"
+          "name": "Exports",
+          "path": "compute-optimizer/home#/exports-list"
         },
         {
-          "name": "All applications",
-          "path": "console/applications#allApplications"
+          "name": "EC2 instances",
+          "path": "compute-optimizer/home#/resources-lists/ec2"
         },
         {
-          "name": "All services",
-          "path": "console/services#allServices"
+          "name": "EC2 Auto Scaling groups",
+          "path": "compute-optimizer/home#/resources-lists/asg"
         },
         {
-          "name": "Analytics",
-          "path": "console/services#analytics"
+          "name": "EBS volumes",
+          "path": "compute-optimizer/home#/resources-lists/ebs"
         },
         {
-          "name": "Application Integration",
-          "path": "console/services#appservices"
+          "name": "Lambda functions",
+          "path": "compute-optimizer/home#/resources-lists/lambda"
         },
         {
-          "name": "Blockchain",
-          "path": "console/services#blockchain"
+          "name": "Aurora and RDS databases",
+          "path": "compute-optimizer/home#/resources-lists/rds"
         },
         {
-          "name": "Business Applications",
-          "path": "console/services#applications"
+          "name": "ECS services on Fargate",
+          "path": "compute-optimizer/home#/resources-lists/ecs-services-fargate"
         },
         {
-          "name": "Cloud Financial Management",
-          "path": "console/services#cost_management"
+          "name": "Licenses",
+          "path": "compute-optimizer/home#/resources-lists/license"
         },
         {
-          "name": "Compute",
-          "path": "console/services#compute"
+          "name": "Idle resources",
+          "path": "compute-optimizer/home#/resources-lists/idle"
         },
         {
-          "name": "Containers",
-          "path": "console/services#containers"
+          "name": "Recommended actions",
+          "path": "compute-optimizer/home#/automation/recommended-actions"
         },
         {
-          "name": "Customer Enablement",
-          "path": "console/services#customer_enablement"
+          "name": "Automation rules",
+          "path": "compute-optimizer/home#/automation/rules"
         },
         {
-          "name": "Database",
-          "path": "console/services#database"
+          "name": "Automation events",
+          "path": "compute-optimizer/home#/automation/events"
         },
         {
-          "name": "Developer Tools",
-          "path": "console/services#developer_tools"
+          "name": "Account management",
+          "path": "compute-optimizer/home#/preferences/accounts"
         },
         {
-          "name": "End User Computing",
-          "path": "console/services#desktop"
+          "name": "General",
+          "path": "compute-optimizer/home#/preferences/general"
         },
         {
-          "name": "Front-end Web & Mobile",
-          "path": "console/services#mobileservices"
-        },
-        {
-          "name": "Game Development",
-          "path": "console/services#gamedev"
-        },
-        {
-          "name": "Internet of Things",
-          "path": "console/services#internet_of_things"
-        },
-        {
-          "name": "Machine Learning",
-          "path": "console/services#ai"
-        },
-        {
-          "name": "Management & Governance",
-          "path": "console/services#management_tools"
-        },
-        {
-          "name": "Media Services",
-          "path": "console/services#media"
-        },
-        {
-          "name": "Migration & Transfer",
-          "path": "console/services#migration"
-        },
-        {
-          "name": "Networking & Content Delivery",
-          "path": "console/services#networking"
-        },
-        {
-          "name": "Quantum Technologies",
-          "path": "console/services#delta"
-        },
-        {
-          "name": "Satellite",
-          "path": "console/services#satellite"
-        },
-        {
-          "name": "Security, Identity, & Compliance",
-          "path": "console/services#security_and_identity"
-        },
-        {
-          "name": "Storage",
-          "path": "console/services#storage"
-        },
-        {
-          "name": "AWS Cloud MapBuild a dynamic map of your cloud",
-          "path": "cloudmap/home"
-        },
-        {
-          "name": "AWS Billing ConductorSimplifying your billing practice",
-          "path": "billingconductor/home"
-        },
-        {
-          "name": "AWS ArtifactSecurity compliance reports and agreements",
-          "path": "artifact/v2/home"
-        },
-        {
-          "name": "AWS App MeshEasily monitor and control microservices",
-          "path": "appmesh/home"
-        },
-        {
-          "name": "Support Centre",
-          "path": "support/home"
-        },
-        {
-          "name": "See all user settings",
-          "path": "settings/home"
-        },
-        {
-          "name": "Manage Regions",
-          "path": "billing/home#/account?AWS-Regions"
-        },
-        {
-          "name": "Manage local zones",
-          "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
-        },
-        {
-          "name": "Account",
-          "path": "billing/home#/account"
-        },
-        {
-          "name": "Organisation",
-          "path": "organizations/v2/home"
-        },
-        {
-          "name": "Service Quotas",
-          "path": "servicequotas/home"
-        },
-        {
-          "name": "Billing and Cost Management",
-          "path": "costmanagement/home#/"
-        },
-        {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
-        },
-        {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
-        },
-        {
-          "name": "Lambda",
-          "path": "lambda/home"
-        },
-        {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
-        },
-        {
-          "name": "S3",
-          "path": "s3/home"
-        },
-        {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
-        },
-        {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
-        },
-        {
-          "name": "API Gateway",
-          "path": "apigateway/home"
-        },
-        {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
-        },
-        {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
-        },
-        {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
-        },
-        {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
-        },
-        {
-          "name": "EC2",
-          "path": "ec2/home"
-        },
-        {
-          "name": "Route 53",
-          "path": "route53/v2/home"
-        },
-        {
-          "name": "IAM",
-          "path": "iam/home"
-        },
-        {
-          "name": "Aurora and RDS",
-          "path": "rds/home"
+          "name": "Rightsizing",
+          "path": "compute-optimizer/home#/preferences/rightsizing"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/ComputeOptimizer.png"
+      ]
     },
     {
       "id": "config",
@@ -10951,8 +10452,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/Config.png"
+      ]
     },
     {
       "id": "dataexchange",
@@ -11191,8 +10691,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/DataExchange.png"
+      ]
     },
     {
       "id": "datatransferterminal",
@@ -11211,8 +10710,7 @@
           "name": "Facilities",
           "path": "datatransferterminal/facilities"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/TransferFamily.png"
+      ]
     },
     {
       "id": "deadlinecloud",
@@ -11415,8 +10913,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/ThinkboxDeadline.png"
+      ]
     },
     {
       "id": "aidevops",
@@ -11439,8 +10936,7 @@
           "name": "Feedback",
           "path": "feedback"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/DevOpsGuru.png"
+      ]
     },
     {
       "id": "drs",
@@ -11448,239 +10944,42 @@
       "consolePath": "drs/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "drs/home#c"
+          "name": "AWS Elastic Disaster Recovery",
+          "path": "drs/home#/welcome"
         },
         {
-          "name": "Recently visited",
-          "path": "console/services#recentlyVisited"
+          "name": "Source servers",
+          "path": "drs/home#/sourceServers"
         },
         {
-          "name": "Favorites",
-          "path": "console/services#favorites"
+          "name": "Recovery instances",
+          "path": "drs/home#/recoveryInstances"
         },
         {
-          "name": "All applications",
-          "path": "console/applications#allApplications"
+          "name": "Source networks",
+          "path": "drs/home#/sourceNetworks"
         },
         {
-          "name": "All services",
-          "path": "console/services#allServices"
+          "name": "Recovery job history",
+          "path": "drs/home#/launchHistory"
         },
         {
-          "name": "Analytics",
-          "path": "console/services#analytics"
+          "name": "Default replication",
+          "path": "drs/home#/defaultReplicationSettings"
         },
         {
-          "name": "Application Integration",
-          "path": "console/services#appservices"
+          "name": "Default launch",
+          "path": "drs/home#/defaultLaunchSettings"
         },
         {
-          "name": "Blockchain",
-          "path": "console/services#blockchain"
+          "name": "Trusted accounts",
+          "path": "drs/home#/trustedAccountsSettings"
         },
         {
-          "name": "Business Applications",
-          "path": "console/services#applications"
-        },
-        {
-          "name": "Cloud Financial Management",
-          "path": "console/services#cost_management"
-        },
-        {
-          "name": "Compute",
-          "path": "console/services#compute"
-        },
-        {
-          "name": "Containers",
-          "path": "console/services#containers"
-        },
-        {
-          "name": "Customer Enablement",
-          "path": "console/services#customer_enablement"
-        },
-        {
-          "name": "Database",
-          "path": "console/services#database"
-        },
-        {
-          "name": "Developer Tools",
-          "path": "console/services#developer_tools"
-        },
-        {
-          "name": "End User Computing",
-          "path": "console/services#desktop"
-        },
-        {
-          "name": "Front-end Web & Mobile",
-          "path": "console/services#mobileservices"
-        },
-        {
-          "name": "Game Development",
-          "path": "console/services#gamedev"
-        },
-        {
-          "name": "Internet of Things",
-          "path": "console/services#internet_of_things"
-        },
-        {
-          "name": "Machine Learning",
-          "path": "console/services#ai"
-        },
-        {
-          "name": "Management & Governance",
-          "path": "console/services#management_tools"
-        },
-        {
-          "name": "Media Services",
-          "path": "console/services#media"
-        },
-        {
-          "name": "Migration & Transfer",
-          "path": "console/services#migration"
-        },
-        {
-          "name": "Networking & Content Delivery",
-          "path": "console/services#networking"
-        },
-        {
-          "name": "Quantum Technologies",
-          "path": "console/services#delta"
-        },
-        {
-          "name": "Satellite",
-          "path": "console/services#satellite"
-        },
-        {
-          "name": "Security, Identity, & Compliance",
-          "path": "console/services#security_and_identity"
-        },
-        {
-          "name": "Storage",
-          "path": "console/services#storage"
-        },
-        {
-          "name": "AWS Deadline CloudSimplified render management",
-          "path": "deadlinecloud/home"
-        },
-        {
-          "name": "AWS ConfigTrack Resource Inventory and Changes",
-          "path": "config/home"
-        },
-        {
-          "name": "AWS Cloud MapBuild a dynamic map of your cloud",
-          "path": "cloudmap/home"
-        },
-        {
-          "name": "AWS Billing ConductorSimplifying your billing practice",
-          "path": "billingconductor/home"
-        },
-        {
-          "name": "AWS ArtifactSecurity compliance reports and agreements",
-          "path": "artifact/v2/home"
-        },
-        {
-          "name": "Support Center",
-          "path": "support/home"
-        },
-        {
-          "name": "See all user settings",
-          "path": "settings/home"
-        },
-        {
-          "name": "N. Virginiaus-east-1",
-          "path": "drs/home#/home"
-        },
-        {
-          "name": "Manage Regions",
-          "path": "billing/home#/account?AWS-Regions"
-        },
-        {
-          "name": "Manage Local Zones",
-          "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
-        },
-        {
-          "name": "Account",
-          "path": "billing/home#/account"
-        },
-        {
-          "name": "Organization",
-          "path": "organizations/v2/home"
-        },
-        {
-          "name": "Service Quotas",
-          "path": "servicequotas/home"
-        },
-        {
-          "name": "Billing and Cost Management",
-          "path": "costmanagement/home#/"
-        },
-        {
-          "name": "CloudWatch",
-          "path": "cloudwatch/home"
-        },
-        {
-          "name": "CloudFront",
-          "path": "cloudfront/v4/home"
-        },
-        {
-          "name": "Lambda",
-          "path": "lambda/home"
-        },
-        {
-          "name": "DynamoDB",
-          "path": "dynamodbv2/home"
-        },
-        {
-          "name": "S3",
-          "path": "s3/home"
-        },
-        {
-          "name": "Systems Manager",
-          "path": "systems-manager/home"
-        },
-        {
-          "name": "CloudFormation",
-          "path": "cloudformation/home"
-        },
-        {
-          "name": "API Gateway",
-          "path": "apigateway/home"
-        },
-        {
-          "name": "Cognito",
-          "path": "cognito/v2/home"
-        },
-        {
-          "name": "Simple Queue Service",
-          "path": "sqs/v3/home"
-        },
-        {
-          "name": "Secrets Manager",
-          "path": "secretsmanager/home"
-        },
-        {
-          "name": "Elastic Container Service",
-          "path": "ecs/v2/home"
-        },
-        {
-          "name": "EC2",
-          "path": "ec2/home"
-        },
-        {
-          "name": "Route 53",
-          "path": "route53/v2/home"
-        },
-        {
-          "name": "IAM",
-          "path": "iam/home"
-        },
-        {
-          "name": "Aurora and RDS",
-          "path": "rds/home"
+          "name": "Default post-launch actions",
+          "path": "drs/home#/defaultPostLaunchActionsSettings"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/ElasticDisasterRecovery.png"
+      ]
     },
     {
       "id": "endusermessaging",
@@ -11919,8 +11218,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/SimpleNotificationService.png"
+      ]
     },
     {
       "id": "entityresolution",
@@ -11995,8 +11293,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/EntityResolution.png"
+      ]
     },
     {
       "id": "wafv2",
@@ -12231,8 +11528,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/FirewallManager.png"
+      ]
     },
     {
       "id": "fis",
@@ -12279,8 +11575,7 @@
           "name": "Share feedback",
           "path": "fis/home#feedback_fis"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/FaultInjectionSimulator.png"
+      ]
     },
     {
       "id": "forsap",
@@ -12307,8 +11602,7 @@
           "name": "AWS Launch Wizard for SAP",
           "path": "launchwizard"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/BusinessApplications.png"
+      ]
     },
     {
       "id": "ec2globalview",
@@ -12316,11 +11610,18 @@
       "consolePath": "ec2globalview/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "awsglobalview/home#c"
+          "name": "AWS Global View",
+          "path": "awsglobalview/home#RegionExplorer"
+        },
+        {
+          "name": "Global search",
+          "path": "awsglobalview/home#GlobalSearch"
+        },
+        {
+          "name": "Regions and Zones",
+          "path": "awsglobalview/home#RegionsAndZones"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/EC2.png"
+      ]
     },
     {
       "id": "glue",
@@ -12337,8 +11638,7 @@
           "name": "Skip to Main Content",
           "path": "glue/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/Glue.png"
+      ]
     },
     {
       "id": "databrew",
@@ -12413,13 +11713,13 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/GlueDataBrew.png"
+      ]
     },
     {
       "id": "health",
       "name": "AWS Health Dashboard",
       "consolePath": "health/home",
+      "global": true,
       "features": [
         {
           "name": "AWS Health Dashboard",
@@ -12457,8 +11757,7 @@
           "name": "Time settings",
           "path": "health/home#/settings"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/HealthDashboard.png"
+      ]
     },
     {
       "id": "medicalimaging",
@@ -12665,8 +11964,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/HealthImaging.png"
+      ]
     },
     {
       "id": "healthlake",
@@ -12741,8 +12039,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/HealthLake.png"
+      ]
     },
     {
       "id": "omics",
@@ -12797,14 +12094,12 @@
           "name": "All resource shares",
           "path": "omics/home#/dataShares"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/HealthOmics.png"
+      ]
     },
     {
       "id": "iotfleetwise",
       "name": "AWS IoT FleetWise",
-      "consolePath": "iotfleetwise/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTFleetWise.png"
+      "consolePath": "iotfleetwise/home"
     },
     {
       "id": "lakeformation",
@@ -12879,8 +12174,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/LakeFormation.png"
+      ]
     },
     {
       "id": "licensemanager",
@@ -12963,8 +12257,7 @@
           "name": "Delegated administration",
           "path": "license-manager/home#/settings/delegatedAdmin"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/LicenseManager.png"
+      ]
     },
     {
       "id": "m2",
@@ -12999,32 +12292,51 @@
           "name": "Transfer tasks",
           "path": "m2/home#/file-transfer/transfer-tasks"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/MainframeModernization.png"
+      ]
     },
     {
       "id": "marketplace",
       "name": "AWS Marketplace",
       "consolePath": "marketplace/home",
+      "global": true,
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "marketplace/subscriptions#c"
+          "name": "AWS Marketplace",
+          "path": "marketplace/landing"
         },
         {
-          "name": "Support Center",
-          "path": "support/home"
+          "name": "Discover products",
+          "path": "marketplace/search"
         },
         {
-          "name": "Manage Regions",
-          "path": "billing/home#/account?AWS-Regions"
+          "name": "Procurement insights",
+          "path": "marketplace/procurement-insights"
         },
         {
-          "name": "Manage Local Zones",
-          "path": "awsglobalview/home#RegionsAndZones:tabId=lz"
+          "name": "Manage subscriptions",
+          "path": "marketplace/subscriptions"
+        },
+        {
+          "name": "Private offers",
+          "path": "marketplace/private-offers"
+        },
+        {
+          "name": "Vendor Insights",
+          "path": "marketplace/vendor-insights"
+        },
+        {
+          "name": "Private Marketplace",
+          "path": "marketplace/private-marketplace"
+        },
+        {
+          "name": "Your Private Marketplace",
+          "path": "marketplace/private-marketplace/your-private-marketplace"
+        },
+        {
+          "name": "Notifications",
+          "path": "marketplace/notifications"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/General/Marketplace.png"
+      ]
     },
     {
       "id": "migrationhub",
@@ -13099,27 +12411,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/MigrationHub.png"
-    },
-    {
-      "id": "organizations",
-      "name": "AWS Organizations",
-      "consolePath": "organizations/v2/home",
-      "popular": true,
-      "aliases": [
-        "AWS Organizations",
-        "OU",
-        "organizational unit",
-        "accounts"
-      ],
-      "features": [
-        {
-          "name": "Skip to Main Content",
-          "path": "organizations/v2/home/dashboard#c"
-        }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/Organizations.png"
+      ]
     },
     {
       "id": "outposts",
@@ -13186,8 +12478,7 @@
           "name": "Share feedback",
           "path": "outposts/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/Outpostsfamily.png"
+      ]
     },
     {
       "id": "panorama",
@@ -13398,13 +12689,13 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Panorama.png"
+      ]
     },
     {
       "id": "partnercentral",
       "name": "AWS Partner Central",
       "consolePath": "partnercentral/home",
+      "global": true,
       "features": [
         {
           "name": "Skip to Main Content",
@@ -13638,8 +12929,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/EventBridgeSaasPartnerEvent.png"
+      ]
     },
     {
       "id": "paymentcryptography",
@@ -13714,8 +13004,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/PaymentCryptography.png"
+      ]
     },
     {
       "id": "acmpca",
@@ -13746,14 +13035,12 @@
           "name": "AWS Private CA Connector for SCEP",
           "path": "pca-connector-scep/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/PrivateCertificateAuthority.png"
+      ]
     },
     {
       "id": "proton",
       "name": "AWS Proton",
-      "consolePath": "proton/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/Proton.png"
+      "consolePath": "proton/home"
     },
     {
       "id": "repostprivate",
@@ -13828,8 +13115,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CustomerEnablement/rePostPrivate.png"
+      ]
     },
     {
       "id": "resiliencehub",
@@ -14036,8 +13322,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ResilienceHub.png"
+      ]
     },
     {
       "id": "resourceexplorer",
@@ -14057,19 +13342,18 @@
           "path": "resource-explorer/home#/views"
         },
         {
-          "name": "Resource groups",
+          "name": "Resource Groups",
           "path": "resource-groups/groups"
         },
         {
-          "name": "Tag policies",
+          "name": "Tag Policies",
           "path": "resource-groups/tag-policies"
         },
         {
           "name": "Resource Access Manager",
           "path": "ram/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ResourceExplorer.png"
+      ]
     },
     {
       "id": "securityagent",
@@ -14300,8 +13584,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/SecurityHub.png"
+      ]
     },
     {
       "id": "securityir",
@@ -14376,8 +13659,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/SecurityHub.png"
+      ]
     },
     {
       "id": "signer",
@@ -14452,8 +13734,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Signer.png"
+      ]
     },
     {
       "id": "snowfamily",
@@ -14528,8 +13809,13 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/Snowball.png"
+      ]
+    },
+    {
+      "id": "support",
+      "name": "AWS Support",
+      "consolePath": "support/",
+      "global": true
     },
     {
       "id": "sustainability",
@@ -14537,11 +13823,22 @@
       "consolePath": "sustainability/home",
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "sustainability/home#c"
+          "name": "AWS Sustainability",
+          "path": "sustainability/get-started"
+        },
+        {
+          "name": "Carbon emissions",
+          "path": "sustainability/carbon-emissions"
+        },
+        {
+          "name": "Reports",
+          "path": "sustainability/reports"
+        },
+        {
+          "name": "Release notes",
+          "path": "sustainability/release-notes"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/BillingConductor.png"
+      ]
     },
     {
       "id": "tnb",
@@ -14616,8 +13913,7 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/TelcoNetworkBuilder.png"
+      ]
     },
     {
       "id": "transfer",
@@ -14676,14 +13972,12 @@
           "name": "About SFTP connectors",
           "path": "transfer/home#/connectors-home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/TransferFamily.png"
+      ]
     },
     {
       "id": "transform",
       "name": "AWS Transform",
-      "consolePath": "transform/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/ApplicationMigrationService.png"
+      "consolePath": "transform/home"
     },
     {
       "id": "notifications",
@@ -14713,13 +14007,8 @@
         {
           "name": "Delivery channels",
           "path": "notifications/home#/delivery-channels"
-        },
-        {
-          "name": "Organizations settings",
-          "path": "notifications/home#/organizations-settings"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/SimpleNotificationService.png"
+      ]
     },
     {
       "id": "wellarchitected",
@@ -14730,14 +14019,12 @@
           "name": "Skip to Main Content",
           "path": "wellarchitected/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/WellArchitectedTool.png"
+      ]
     },
     {
       "id": "wickr",
       "name": "AWS Wickr",
-      "consolePath": "wickr/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/Wickr.png"
+      "consolePath": "wickr/home"
     },
     {
       "id": "batch",
@@ -14812,20 +14099,19 @@
           "name": "Aurora and RDS",
           "path": "rds/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/Batch.png"
+      ]
     },
     {
       "id": "costmanagement",
       "name": "Billing and Cost Management",
-      "consolePath": "costmanagement/home",
+      "consolePath": "costmanagement/home#/",
+      "global": true,
       "features": [
         {
           "name": "Skip to Main Content",
           "path": "costmanagement/home#c"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/CostExplorer.png"
+      ]
     },
     {
       "id": "acm",
@@ -14834,32 +14120,30 @@
       "features": [
         {
           "name": "AWS Certificate Manager (ACM)",
-          "path": "acm/welcome#/welcome"
+          "path": "acm/certificates/list#/welcome"
         },
         {
           "name": "List certificates",
-          "path": "acm/welcome#/certificates/list"
+          "path": "acm/certificates/list#/certificates/list"
         },
         {
           "name": "Request certificate",
-          "path": "acm/welcome#/certificates/request"
+          "path": "acm/certificates/list#/certificates/request"
         },
         {
           "name": "Import certificate",
-          "path": "acm/welcome#/certificates/import"
+          "path": "acm/certificates/list#/certificates/import"
         },
         {
           "name": "AWS Private CA",
           "path": "acm-pca/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/CertificateManager.png"
+      ]
     },
     {
       "id": "cloud9",
       "name": "Cloud9",
-      "consolePath": "cloud9/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/Cloud9.png"
+      "consolePath": "cloud9/home"
     },
     {
       "id": "cloudformation",
@@ -14881,14 +14165,14 @@
           "name": "StackSets",
           "path": "cloudformation/home#/stacksets"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/CloudFormation.png"
+      ]
     },
     {
       "id": "cloudfront",
       "name": "CloudFront",
       "consolePath": "cloudfront/v4/home",
       "popular": true,
+      "global": true,
       "aliases": [
         "CDN",
         "edge",
@@ -14918,18 +14202,6 @@
         {
           "name": "VPC origins",
           "path": "cloudfront/v4/home#/vpc-origins"
-        },
-        {
-          "name": "Multi-tenant distributions",
-          "path": "cloudfront/v4/home#/distributions/multi-tenant"
-        },
-        {
-          "name": "Distribution tenants",
-          "path": "cloudfront/v4/home#/tenants"
-        },
-        {
-          "name": "Connection groups",
-          "path": "cloudfront/v4/home#/connection-groups"
         },
         {
           "name": "Monitoring",
@@ -14999,26 +14271,22 @@
           "name": "Resource sharing",
           "path": "cloudfront/v4/home#/resource-sharing"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/CloudFront.png"
+      ]
     },
     {
       "id": "cloudhsm",
       "name": "CloudHSM",
-      "consolePath": "cloudhsm/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/CloudHSM.png"
+      "consolePath": "cloudhsm/home"
     },
     {
       "id": "cloudsearchv2",
       "name": "CloudSearch",
-      "consolePath": "cloudsearchv2/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/CloudSearch.png"
+      "consolePath": "cloudsearchv2/home"
     },
     {
       "id": "cloudshell",
       "name": "CloudShell",
-      "consolePath": "cloudshell/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/CloudShell.png"
+      "consolePath": "cloudshell/home"
     },
     {
       "id": "cloudtrail",
@@ -15032,15 +14300,46 @@
       ],
       "features": [
         {
-          "name": "Event History",
-          "path": "cloudtrail/home#/events"
+          "name": "CloudTrail",
+          "path": "cloudtrailv2/home#/welcome"
+        },
+        {
+          "name": "Dashboard",
+          "path": "cloudtrailv2/home#/dashboard"
+        },
+        {
+          "name": "Event history",
+          "path": "cloudtrailv2/home#/events"
+        },
+        {
+          "name": "Insights",
+          "path": "cloudtrailv2/home#/insights"
         },
         {
           "name": "Trails",
-          "path": "cloudtrail/home#/trails"
+          "path": "cloudtrailv2/home#/trails"
+        },
+        {
+          "name": "Lake",
+          "path": "cloudtrailv2/home#/lake"
+        },
+        {
+          "name": "Dashboards",
+          "path": "cloudtrailv2/home#/lake/dashboards/highlights"
+        },
+        {
+          "name": "Query",
+          "path": "cloudtrailv2/home#/lake/query"
+        },
+        {
+          "name": "Event data stores",
+          "path": "cloudtrailv2/home#/lake/eventDataStores"
+        },
+        {
+          "name": "Integrations",
+          "path": "cloudtrailv2/home#/lake/integrations"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/CloudTrail.png"
+      ]
     },
     {
       "id": "cloudtrailv2",
@@ -15087,8 +14386,7 @@
           "name": "Integrations",
           "path": "cloudtrailv2/home#/lake/integrations"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/CloudTrail.png"
+      ]
     },
     {
       "id": "cloudwatch",
@@ -15241,8 +14539,7 @@
           "name": "Synthetic monitors",
           "path": "cloudwatch/home#network-monitor:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/CloudWatch.png"
+      ]
     },
     {
       "id": "codesuite",
@@ -15273,14 +14570,12 @@
           "name": "Account metrics",
           "path": "codesuite/codebuild/metrics"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/CodeArtifact.png"
+      ]
     },
     {
       "id": "codecommit",
       "name": "CodeCommit",
-      "consolePath": "codecommit/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/CodeCommit.png"
+      "consolePath": "codecommit/home"
     },
     {
       "id": "cognito",
@@ -15299,13 +14594,13 @@
           "name": "Identity pools",
           "path": "cognito/v2/identity/identity-pools"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Cognito.png"
+      ]
     },
     {
       "id": "controltower",
       "name": "Control Tower",
       "consolePath": "controltower/home",
+      "global": true,
       "features": [
         {
           "name": "AWS Control Tower",
@@ -15327,20 +14622,19 @@
           "name": "Launch solutions with the Getting Started library",
           "path": "servicecatalog/home#getting-started-library"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ControlTower.png"
+      ]
     },
     {
       "id": "costexplorer",
       "name": "Cost Explorer",
       "consolePath": "cost-management/home#/cost-explorer",
       "popular": true,
+      "global": true,
       "aliases": [
         "cost analysis",
         "spend",
         "usage report"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/CostExplorer.png"
+      ]
     },
     {
       "id": "dms",
@@ -15431,8 +14725,7 @@
           "name": "Support lifecycle policy",
           "path": "dms/v2/home#/lifecyclePolicy"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/DatabaseMigrationService.png"
+      ]
     },
     {
       "id": "datasync",
@@ -15459,20 +14752,17 @@
           "name": "Agents",
           "path": "datasync/home#/agents"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MigrationTransfer/DataSync.png"
+      ]
     },
     {
       "id": "detective",
       "name": "Detective",
-      "consolePath": "detective/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/Detective.png"
+      "consolePath": "detective/home"
     },
     {
       "id": "devicefarm",
       "name": "Device Farm",
-      "consolePath": "devicefarm/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/FrontEndWebMobile/DeviceFarm.png"
+      "consolePath": "devicefarm/home"
     },
     {
       "id": "directconnect",
@@ -15523,8 +14813,7 @@
           "name": "AWS Interconnect - last mile",
           "path": "directconnect/v2/home#/lastmile"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/DirectConnect.png"
+      ]
     },
     {
       "id": "directoryservicev2",
@@ -15551,8 +14840,7 @@
           "name": "Schemas",
           "path": "directoryservicev2/home#!/cloud-schemas"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/DirectoryService.png"
+      ]
     },
     {
       "id": "dynamodb",
@@ -15573,8 +14861,7 @@
           "name": "PartiQL editor",
           "path": "dynamodbv2/home#partiQL"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/DynamoDB.png"
+      ]
     },
     {
       "id": "dynamodbv2",
@@ -15637,8 +14924,7 @@
           "name": "Events",
           "path": "dynamodbv2/home#dax-events"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/DynamoDB.png"
+      ]
     },
     {
       "id": "ec2",
@@ -15660,6 +14946,10 @@
         {
           "name": "Dashboard",
           "path": "ec2/home#Home:"
+        },
+        {
+          "name": "AWS Global View",
+          "path": "ec2globalview/home"
         },
         {
           "name": "Events",
@@ -15750,11 +15040,14 @@
           "path": "ec2/home#TargetGroups:"
         },
         {
+          "name": "Trust Stores",
+          "path": "ec2/home#TrustStores:"
+        },
+        {
           "name": "Auto Scaling Groups",
           "path": "ec2/home#AutoScalingGroups:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/EC2.png"
+      ]
     },
     {
       "id": "imagebuilder",
@@ -15763,62 +15056,61 @@
       "features": [
         {
           "name": "EC2 Image Builder",
-          "path": "imagebuilder/home#/landingPage?region=us-west-2"
+          "path": "imagebuilder/home#/landingPage?region=us-east-1"
         },
         {
           "name": "Image pipelines",
-          "path": "imagebuilder/home#/pipelines?region=us-west-2"
+          "path": "imagebuilder/home#/pipelines?region=us-east-1"
         },
         {
           "name": "Images",
-          "path": "imagebuilder/home#/images?region=us-west-2"
+          "path": "imagebuilder/home#/images?region=us-east-1"
         },
         {
           "name": "Components",
-          "path": "imagebuilder/home#/components?region=us-west-2"
+          "path": "imagebuilder/home#/components?region=us-east-1"
         },
         {
           "name": "Image recipes",
-          "path": "imagebuilder/home#/imageRecipes?region=us-west-2"
+          "path": "imagebuilder/home#/imageRecipes?region=us-east-1"
         },
         {
           "name": "Container recipes",
-          "path": "imagebuilder/home#/containerRecipes?region=us-west-2"
+          "path": "imagebuilder/home#/containerRecipes?region=us-east-1"
         },
         {
           "name": "Infrastructure configurations",
-          "path": "imagebuilder/home#/infrastructureConfigurations?region=us-west-2"
+          "path": "imagebuilder/home#/infrastructureConfigurations?region=us-east-1"
         },
         {
           "name": "Distribution settings",
-          "path": "imagebuilder/home#/distributionSettings?region=us-west-2"
+          "path": "imagebuilder/home#/distributionSettings?region=us-east-1"
         },
         {
           "name": "Image workflows",
-          "path": "imagebuilder/home#/workflows?region=us-west-2"
+          "path": "imagebuilder/home#/workflows?region=us-east-1"
         },
         {
           "name": "Lifecycle policies",
-          "path": "imagebuilder/home#/lifecyclePolicies?region=us-west-2"
+          "path": "imagebuilder/home#/lifecyclePolicies?region=us-east-1"
         },
         {
           "name": "Security findings",
-          "path": "imagebuilder/home#/securityFindings?region=us-west-2"
+          "path": "imagebuilder/home#/securityFindings?region=us-east-1"
         },
         {
           "name": "Security scanning settings",
-          "path": "imagebuilder/home#/securityScanningSettings?region=us-west-2"
+          "path": "imagebuilder/home#/securityScanningSettings?region=us-east-1"
         },
         {
           "name": "Subscriptions",
-          "path": "imagebuilder/home#/subscriptions?region=us-west-2"
+          "path": "imagebuilder/home#/subscriptions?region=us-east-1"
         },
         {
           "name": "Discover products",
-          "path": "imagebuilder/home#/discover-products?region=us-west-2"
+          "path": "imagebuilder/home#/discover-products?region=us-east-1"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/EC2ImageBuilder.png"
+      ]
     },
     {
       "id": "efs",
@@ -15849,8 +15141,7 @@
           "name": "AWS Transfer",
           "path": "transfer"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/EFS.png"
+      ]
     },
     {
       "id": "elasticbeanstalk",
@@ -15873,8 +15164,7 @@
           "name": "Change history",
           "path": "elasticbeanstalk/home#/change-history"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/ElasticBeanstalk.png"
+      ]
     },
     {
       "id": "ecr",
@@ -15895,8 +15185,7 @@
           "name": "Private registry",
           "path": "ecr/private-registry"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Containers/ElasticContainerRegistry.png"
+      ]
     },
     {
       "id": "ecs",
@@ -15951,14 +15240,13 @@
         },
         {
           "name": "Discover products",
-          "path": "marketplace/home#/search!mpSearch/search?filter%3AFULFILLMENT_OPTION_TYPE=CONTAINER&filter%3ACONTAINER_SUPPORTED_SERVICE=ECS&filter%3AREGION=us-west-2"
+          "path": "marketplace/home#/search!mpSearch/search?filter%3AFULFILLMENT_OPTION_TYPE=CONTAINER&filter%3ACONTAINER_SUPPORTED_SERVICE=ECS&filter%3AREGION=us-east-1"
         },
         {
           "name": "Subscriptions",
           "path": "marketplace/home#/subscriptions"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Containers/ElasticContainerService.png"
+      ]
     },
     {
       "id": "eks",
@@ -16001,10 +15289,9 @@
         },
         {
           "name": "AWS Batch",
-          "path": "batch/home#first-run-eks-on-batch?region=us-west-2"
+          "path": "batch/home#first-run-eks-on-batch?region=us-east-1"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Containers/ElasticKubernetesService.png"
+      ]
     },
     {
       "id": "elasticache",
@@ -16075,14 +15362,12 @@
           "name": "Amazon MemoryDB",
           "path": "memorydb/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/ElastiCache.png"
+      ]
     },
     {
       "id": "elementalappliancessoftware",
       "name": "Elemental Appliances & Software",
-      "consolePath": "elemental-appliances-software/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalAppliancesSoftware.png"
+      "consolePath": "elemental-appliances-software/home"
     },
     {
       "id": "elementalinference",
@@ -16097,8 +15382,7 @@
           "name": "Feeds",
           "path": "elemental-inference/home#/feeds"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/ElasticInference.png"
+      ]
     },
     {
       "id": "emr",
@@ -16142,11 +15426,10 @@
           "path": "emr/home#/studios"
         },
         {
-          "name": "Workspaces (notebooks)",
+          "name": "Workspaces (Notebooks)",
           "path": "emr/home#/workspaces"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/EMR.png"
+      ]
     },
     {
       "id": "eventbridge",
@@ -16160,12 +15443,44 @@
       ],
       "features": [
         {
+          "name": "Amazon EventBridge",
+          "path": "events/home#/home"
+        },
+        {
+          "name": "Dashboard",
+          "path": "events/home#/dashboard"
+        },
+        {
+          "name": "Learn",
+          "path": "events/home#/learn"
+        },
+        {
+          "name": "Sandbox",
+          "path": "events/home#/explore"
+        },
+        {
+          "name": "Quick starts",
+          "path": "events/home#/quick-start"
+        },
+        {
+          "name": "Event buses",
+          "path": "events/home#/eventbuses"
+        },
+        {
           "name": "Rules",
           "path": "events/home#/rules"
         },
         {
-          "name": "Buses",
-          "path": "events/home#/eventbuses"
+          "name": "Global endpoints",
+          "path": "events/home#/global-endpoints"
+        },
+        {
+          "name": "Archives",
+          "path": "events/home#/archives"
+        },
+        {
+          "name": "Replays",
+          "path": "events/home#/replays"
         },
         {
           "name": "Pipes",
@@ -16174,9 +15489,32 @@
         {
           "name": "Schedules",
           "path": "scheduler/home#schedules"
+        },
+        {
+          "name": "Schedule groups",
+          "path": "scheduler/home#schedule-groups"
+        },
+        {
+          "name": "Scheduled rules (legacy)",
+          "path": "events/home#/scheduled-rules"
+        },
+        {
+          "name": "Partner event sources",
+          "path": "events/home#/partners"
+        },
+        {
+          "name": "API destinations",
+          "path": "events/home#/apidestinations"
+        },
+        {
+          "name": "Connections",
+          "path": "events/home#/connections"
+        },
+        {
+          "name": "Schemas",
+          "path": "events/home#/schemas"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/EventBridge.png"
+      ]
     },
     {
       "id": "fsx",
@@ -16215,13 +15553,13 @@
           "name": "FSx on Service Quotas",
           "path": "servicequotas/home/services/fsx/quotas"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/FSx.png"
+      ]
     },
     {
       "id": "globalaccelerator",
       "name": "Global Accelerator",
       "consolePath": "globalaccelerator/home",
+      "global": true,
       "features": [
         {
           "name": "AWS Global Accelerator",
@@ -16231,8 +15569,7 @@
           "name": "Cross-account attachments",
           "path": "globalaccelerator/home#CrossAccountAttachmentDashboard:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/GlobalAccelerator.png"
+      ]
     },
     {
       "id": "groundstation",
@@ -16271,20 +15608,19 @@
           "name": "Mission profiles",
           "path": "groundstation/home#/mission-profiles/"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Satellite/GroundStation.png"
+      ]
     },
     {
       "id": "guardduty",
       "name": "GuardDuty",
-      "consolePath": "guardduty/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/GuardDuty.png"
+      "consolePath": "guardduty/home"
     },
     {
       "id": "iam",
       "name": "IAM",
       "consolePath": "iam/home",
       "popular": true,
+      "global": true,
       "aliases": [
         "Identity and Access Management",
         "permissions",
@@ -16367,27 +15703,25 @@
           "name": "AWS Organizations",
           "path": "organizations"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/IdentityandAccessManagement.png"
+      ]
     },
     {
       "id": "sso",
       "name": "IAM Identity Center",
       "consolePath": "singlesignon/home",
       "popular": true,
+      "global": true,
       "aliases": [
         "SSO",
         "single sign-on",
         "AWS SSO",
         "identity center"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/IAMIdentityCenter.png"
+      ]
     },
     {
       "id": "singlesignon",
       "name": "IAM Identity Center",
-      "consolePath": "singlesignon/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/IAMIdentityCenter.png"
+      "consolePath": "singlesignon/home"
     },
     {
       "id": "composer",
@@ -16402,8 +15736,7 @@
           "name": "Canvas",
           "path": "composer/canvas"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/ApplicationComposer.png"
+      ]
     },
     {
       "id": "iot",
@@ -16543,6 +15876,18 @@
           "path": "iot/home#/wireless/profiles"
         },
         {
+          "name": "Sidewalk",
+          "path": "iot/home#/wireless/sidewalk"
+        },
+        {
+          "name": "Devices",
+          "path": "iot/home#/wireless/sidewalk/devices"
+        },
+        {
+          "name": "Profiles",
+          "path": "iot/home#/wireless/sidewalk/profiles"
+        },
+        {
           "name": "Destinations",
           "path": "iot/home#/wireless/destinations"
         },
@@ -16678,8 +16023,7 @@
           "name": "Feature spotlight",
           "path": "iot/home#/featurespotlight"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTCore.png"
+      ]
     },
     {
       "id": "devicedefender",
@@ -16819,6 +16163,18 @@
           "path": "iot/home#/wireless/profiles"
         },
         {
+          "name": "Sidewalk",
+          "path": "iot/home#/wireless/sidewalk"
+        },
+        {
+          "name": "Devices",
+          "path": "iot/home#/wireless/sidewalk/devices"
+        },
+        {
+          "name": "Profiles",
+          "path": "iot/home#/wireless/sidewalk/profiles"
+        },
+        {
           "name": "Destinations",
           "path": "iot/home#/wireless/destinations"
         },
@@ -16954,8 +16310,7 @@
           "name": "Feature spotlight",
           "path": "iot/home#/featurespotlight"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTDeviceDefender.png"
+      ]
     },
     {
       "id": "iotdm",
@@ -17095,6 +16450,18 @@
           "path": "iot/home#/wireless/profiles"
         },
         {
+          "name": "Sidewalk",
+          "path": "iot/home#/wireless/sidewalk"
+        },
+        {
+          "name": "Devices",
+          "path": "iot/home#/wireless/sidewalk/devices"
+        },
+        {
+          "name": "Profiles",
+          "path": "iot/home#/wireless/sidewalk/profiles"
+        },
+        {
           "name": "Destinations",
           "path": "iot/home#/wireless/destinations"
         },
@@ -17230,14 +16597,12 @@
           "name": "Feature spotlight",
           "path": "iot/home#/featurespotlight"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTDeviceManagement.png"
+      ]
     },
     {
       "id": "iotevents",
       "name": "IoT Events",
-      "consolePath": "iotevents/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTEvents.png"
+      "consolePath": "iotevents/home"
     },
     {
       "id": "greengrass",
@@ -17512,20 +16877,17 @@
           "name": "Feature spotlight",
           "path": "iot/home#/featurespotlight"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTGreengrass.png"
+      ]
     },
     {
       "id": "iotsitewise",
       "name": "IoT SiteWise",
-      "consolePath": "iotsitewise/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTSiteWise.png"
+      "consolePath": "iotsitewise/home"
     },
     {
       "id": "iottwinmaker",
       "name": "IoT TwinMaker",
-      "consolePath": "iottwinmaker/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/InternetOfThings/IoTTwinMaker.png"
+      "consolePath": "iottwinmaker/home"
     },
     {
       "id": "kms",
@@ -17558,8 +16920,7 @@
           "name": "External key stores",
           "path": "kms/home#/kms/custom-key-stores/external"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/KeyManagementService.png"
+      ]
     },
     {
       "id": "kinesis",
@@ -17594,8 +16955,7 @@
           "name": "AWS Glue Schema Registry",
           "path": "glue/home#catalog:tab=schemaRegistries;schemaRegistriesView=schema-registries-list"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/Kinesis.png"
+      ]
     },
     {
       "id": "kinesisvideo",
@@ -17614,14 +16974,12 @@
           "name": "Signaling channels",
           "path": "signalingChannels"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/KinesisVideoStreams.png"
+      ]
     },
     {
       "id": "amazonq",
       "name": "Kiro",
-      "consolePath": "amazonq/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MachineLearning/Q.png"
+      "consolePath": "amazonq/home"
     },
     {
       "id": "lambda",
@@ -17661,8 +17019,7 @@
           "name": "Step Functions state machines",
           "path": "lambda/home#/statemachines"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/Lambda.png"
+      ]
     },
     {
       "id": "launchwizard",
@@ -17681,12 +17038,11 @@
           "name": "All deployments",
           "path": "launchwizard/home#/deployment/list/"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/LaunchWizard.png"
+      ]
     },
     {
       "id": "globalview",
-      "name": "Manage local zones",
+      "name": "Manage Local Zones",
       "consolePath": "awsglobalview/home#RegionsAndZones:tabId=lz",
       "features": [
         {
@@ -17701,14 +17057,14 @@
           "name": "Regions and Zones",
           "path": "awsglobalview/home#RegionsAndZones"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Groups/VPC.png"
+      ]
     },
     {
       "id": "billing",
       "name": "Manage Regions",
       "consolePath": "billing/home#/account?AWS-Regions",
       "popular": true,
+      "global": true,
       "aliases": [
         "invoices",
         "payment",
@@ -17879,38 +17235,32 @@
           "name": "Rightsizing",
           "path": "costmanagement/home#/rightsizing"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CloudFinancialManagement/BillingConductor.png"
+      ]
     },
     {
       "id": "mwaa",
       "name": "Managed Apache Airflow",
-      "consolePath": "mwaa/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/ManagedWorkflowsforApacheAirflow.png"
+      "consolePath": "mwaa/home"
     },
     {
       "id": "flink",
       "name": "Managed Apache Flink",
-      "consolePath": "flink/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/ManagedServiceforApacheFlink.png"
+      "consolePath": "flink/home"
     },
     {
       "id": "managedservices",
       "name": "Managed Services",
-      "consolePath": "managedservices/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CustomerEnablement/ManagedServices.png"
+      "consolePath": "managedservices/home"
     },
     {
       "id": "mediaconnect",
       "name": "MediaConnect",
-      "consolePath": "mediaconnect/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaConnect.png"
+      "consolePath": "mediaconnect/home"
     },
     {
       "id": "mediaconvert",
       "name": "MediaConvert",
-      "consolePath": "mediaconvert/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaConvert.png"
+      "consolePath": "mediaconvert/home"
     },
     {
       "id": "medialive",
@@ -17965,20 +17315,17 @@
           "name": "Workflow monitor",
           "path": "medialive/monitor"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaLive.png"
+      ]
     },
     {
       "id": "mediapackage",
       "name": "MediaPackage",
-      "consolePath": "mediapackage/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaPackage.png"
+      "consolePath": "mediapackage/home"
     },
     {
       "id": "mediastore",
       "name": "MediaStore",
-      "consolePath": "mediastore/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaStore.png"
+      "consolePath": "mediastore/home"
     },
     {
       "id": "mediatailor",
@@ -17997,8 +17344,7 @@
           "name": "Channels",
           "path": "mediatailor/home#/channels"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/MediaServices/ElementalMediaTailor.png"
+      ]
     },
     {
       "id": "msk",
@@ -18057,8 +17403,7 @@
           "name": "Customer survey",
           "path": "msk/home#/landing"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/ManagedStreamingforApacheKafka.png"
+      ]
     },
     {
       "id": "neptune",
@@ -18113,8 +17458,7 @@
           "name": "Notebooks",
           "path": "neptune/home#notebooks:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/Neptune.png"
+      ]
     },
     {
       "id": "opensearch",
@@ -18125,14 +17469,31 @@
         "elasticsearch",
         "search",
         "es"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Analytics/OpenSearchService.png"
+      ]
     },
     {
       "id": "odb",
       "name": "Oracle Database@AWS",
-      "consolePath": "odb/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Database/AuroraOracleInstance.png"
+      "consolePath": "odb/home"
+    },
+    {
+      "id": "organizations",
+      "name": "Organization",
+      "consolePath": "organizations/v2/home",
+      "popular": true,
+      "global": true,
+      "aliases": [
+        "AWS Organizations",
+        "OU",
+        "organizational unit",
+        "accounts"
+      ],
+      "features": [
+        {
+          "name": "Skip to Main Content",
+          "path": "organizations/v2/home/dashboard#c"
+        }
+      ]
     },
     {
       "id": "pcs",
@@ -18151,8 +17512,7 @@
           "name": "Quick Launch",
           "path": "pcs/home#/quick-launch"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/ParallelCluster.png"
+      ]
     },
     {
       "id": "rbin",
@@ -18171,8 +17531,7 @@
           "name": "Retention rules",
           "path": "rbin/home#/RetentionRules"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/BackupRecoveryPointObjective.png"
+      ]
     },
     {
       "id": "rosa",
@@ -18191,8 +17550,7 @@
           "name": "Contracts",
           "path": "rosa/home#/contracts"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Containers/RedHatOpenShiftServiceonAWS.png"
+      ]
     },
     {
       "id": "ram",
@@ -18231,8 +17589,7 @@
           "name": "Managed permissions library",
           "path": "ram/home#Permissions:"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/ResourceAccessManager.png"
+      ]
     },
     {
       "id": "resourcegroups",
@@ -18259,14 +17616,14 @@
           "name": "Tag Policies",
           "path": "resource-groups/tag-policies"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ResourceExplorer.png"
+      ]
     },
     {
       "id": "route53",
       "name": "Route 53",
       "consolePath": "route53/v2/home",
       "popular": true,
+      "global": true,
       "aliases": [
         "DNS",
         "domains"
@@ -18296,8 +17653,7 @@
           "name": "Billing and Cost Management",
           "path": "costmanagement/home#/"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/NetworkingContentDelivery/Route53.png"
+      ]
     },
     {
       "id": "rtbfabric",
@@ -18320,8 +17676,7 @@
           "name": "Responder gateways",
           "path": "rtbfabric/responder"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/BusinessApplications/AppFabric.png"
+      ]
     },
     {
       "id": "s3",
@@ -18410,14 +17765,12 @@
           "name": "Permissions",
           "path": "s3/marketplace/permissions"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/SimpleStorageService.png"
+      ]
     },
     {
       "id": "glacier",
       "name": "S3 Glacier",
-      "consolePath": "glacier/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/SimpleStorageServiceGlacier.png"
+      "consolePath": "glacier/home"
     },
     {
       "id": "secretsmanager",
@@ -18427,20 +17780,75 @@
       "aliases": [
         "secrets",
         "credentials"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/SecretsManager.png"
+      ]
     },
     {
       "id": "securityhub",
       "name": "Security Hub",
       "consolePath": "securityhub/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/SecurityHub.png"
+      "features": [
+        {
+          "name": "Security Hub CSPM",
+          "path": "securityhub/home#/landing"
+        },
+        {
+          "name": "Summary",
+          "path": "securityhub/home#/summary"
+        },
+        {
+          "name": "Controls",
+          "path": "securityhub/home#/controls"
+        },
+        {
+          "name": "Security standards",
+          "path": "securityhub/home#/standards"
+        },
+        {
+          "name": "Insights",
+          "path": "securityhub/home#/insights"
+        },
+        {
+          "name": "Findings",
+          "path": "securityhub/home#/findings"
+        },
+        {
+          "name": "Integrations",
+          "path": "securityhub/home#/integrations"
+        },
+        {
+          "name": "Automations",
+          "path": "securityhub/home#/automation-rule"
+        },
+        {
+          "name": "Custom actions",
+          "path": "securityhub/home#/settings/actions"
+        },
+        {
+          "name": "General",
+          "path": "securityhub/home#/settings/general"
+        },
+        {
+          "name": "Regions",
+          "path": "securityhub/home#/settings/regions"
+        },
+        {
+          "name": "Configuration",
+          "path": "securityhub/home#/configuration"
+        },
+        {
+          "name": "Usage",
+          "path": "securityhub/home#/settings/usage"
+        },
+        {
+          "name": "Security Hub",
+          "path": "securityhub/v2/home#onboard"
+        }
+      ]
     },
     {
       "id": "securitylake",
       "name": "Security Lake",
-      "consolePath": "securitylake/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/SecurityLake.png"
+      "consolePath": "securitylake/home"
     },
     {
       "id": "serverlessrepo",
@@ -18459,8 +17867,7 @@
           "name": "Published applications",
           "path": "serverlessrepo/home#/published-applications"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Compute/ServerlessApplicationRepository.png"
+      ]
     },
     {
       "id": "servicecatalog",
@@ -18515,8 +17922,7 @@
           "name": "Attribute groups",
           "path": "servicecatalog/home#/attribute-groups/"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ServiceCatalog.png"
+      ]
     },
     {
       "id": "servicequotas",
@@ -18547,8 +17953,7 @@
           "name": "Automatic Management",
           "path": "servicequotas/home/amSettings"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/ServiceCatalog.png"
+      ]
     },
     {
       "id": "sns",
@@ -18586,8 +17991,7 @@
           "name": "Text messaging (SMS)",
           "path": "sns/v3/home#/mobile/text-messaging"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/SimpleNotificationService.png"
+      ]
     },
     {
       "id": "sqs",
@@ -18598,8 +18002,7 @@
         "Simple Queue Service",
         "queue",
         "message queue"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/SimpleQueueService.png"
+      ]
     },
     {
       "id": "stepfunctions",
@@ -18611,14 +18014,12 @@
         "state machine",
         "orchestration",
         "sfn"
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/StepFunctions.png"
+      ]
     },
     {
       "id": "states",
       "name": "Step Functions",
-      "consolePath": "states/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/StepFunctions.png"
+      "consolePath": "states/home"
     },
     {
       "id": "storagegateway",
@@ -18649,14 +18050,7 @@
           "name": "Pools",
           "path": "storagegateway/home#/pools"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Storage/StorageGateway.png"
-    },
-    {
-      "id": "support",
-      "name": "Support",
-      "consolePath": "support/",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/CustomerEnablement/Support.png"
+      ]
     },
     {
       "id": "swf",
@@ -18671,30 +18065,185 @@
           "name": "Domains",
           "path": "swf/v2/home#/domains"
         }
+      ]
+    },
+    {
+      "id": "systemsmanager",
+      "name": "Systems Manager",
+      "consolePath": "systems-manager/home",
+      "popular": true,
+      "aliases": [
+        "SSM",
+        "ops",
+        "patching"
       ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ApplicationIntegration/StepFunctions.png"
+      "features": [
+        {
+          "name": "AWS Systems Manager",
+          "path": "systems-manager/home#welcome"
+        },
+        {
+          "name": "Review node insights",
+          "path": "systems-manager/review-node-insights"
+        },
+        {
+          "name": "Explore nodes",
+          "path": "systems-manager/explore-nodes"
+        },
+        {
+          "name": "Diagnose and remediate",
+          "path": "systems-manager/diagnose-and-remediate"
+        },
+        {
+          "name": "Just-in-time node access",
+          "path": "systems-manager/just-in-time-node-access"
+        },
+        {
+          "name": "Compliance",
+          "path": "systems-manager/compliance"
+        },
+        {
+          "name": "Distributor",
+          "path": "systems-manager/distributor"
+        },
+        {
+          "name": "Fleet Manager",
+          "path": "systems-manager/fleet-manager"
+        },
+        {
+          "name": "Hybrid Activations",
+          "path": "systems-manager/activations"
+        },
+        {
+          "name": "Inventory",
+          "path": "systems-manager/inventory"
+        },
+        {
+          "name": "Patch Manager",
+          "path": "systems-manager/patch-manager"
+        },
+        {
+          "name": "Run Command",
+          "path": "systems-manager/run-command"
+        },
+        {
+          "name": "Session Manager",
+          "path": "systems-manager/session-manager"
+        },
+        {
+          "name": "State Manager",
+          "path": "systems-manager/state-manager"
+        },
+        {
+          "name": "Automation",
+          "path": "systems-manager/automation"
+        },
+        {
+          "name": "Change Calendar",
+          "path": "systems-manager/change-calendar"
+        },
+        {
+          "name": "Change Manager",
+          "path": "systems-manager/change-manager"
+        },
+        {
+          "name": "Documents",
+          "path": "systems-manager/documents"
+        },
+        {
+          "name": "Maintenance Windows",
+          "path": "systems-manager/maintenance-windows"
+        },
+        {
+          "name": "Quick Setup",
+          "path": "systems-manager/quick-setup"
+        },
+        {
+          "name": "AppConfig",
+          "path": "systems-manager/appconfig"
+        },
+        {
+          "name": "Application Manager",
+          "path": "systems-manager/appmanager"
+        },
+        {
+          "name": "Parameter Store",
+          "path": "systems-manager/parameters"
+        },
+        {
+          "name": "CloudWatch Dashboard",
+          "path": "systems-manager/explorer/cloudwatch"
+        },
+        {
+          "name": "Explorer",
+          "path": "systems-manager/explorer"
+        },
+        {
+          "name": "Incident Manager",
+          "path": "systems-manager/incidents/home"
+        },
+        {
+          "name": "OpsCenter",
+          "path": "systems-manager/opsitems"
+        }
+      ]
     },
     {
       "id": "trustedadvisor",
       "name": "Trusted Advisor",
       "consolePath": "trustedadvisor/home",
+      "global": true,
       "features": [
         {
-          "name": "Skip to Main Content",
-          "path": "trustedadvisor/home#c"
+          "name": "Trusted Advisor",
+          "path": "landing"
         },
         {
-          "name": "Support Center",
-          "path": "support/home"
+          "name": "Priority",
+          "path": "trustedadvisor/home#/priority"
+        },
+        {
+          "name": "Recommendations",
+          "path": "trustedadvisor/home#/dashboard"
+        },
+        {
+          "name": "Cost optimization",
+          "path": "trustedadvisor/home#/category/cost-optimizing"
+        },
+        {
+          "name": "Performance",
+          "path": "trustedadvisor/home#/category/performance"
+        },
+        {
+          "name": "Security",
+          "path": "trustedadvisor/home#/category/security"
+        },
+        {
+          "name": "Fault tolerance",
+          "path": "trustedadvisor/home#/category/fault-tolerance"
+        },
+        {
+          "name": "Service limits",
+          "path": "trustedadvisor/home#/category/service-limits"
+        },
+        {
+          "name": "Operational excellence",
+          "path": "trustedadvisor/home#/category/operational-excellence"
+        },
+        {
+          "name": "Manage Trusted Advisor",
+          "path": "trustedadvisor/home#/preferences/manage-trusted-advisor"
+        },
+        {
+          "name": "Notifications",
+          "path": "trustedadvisor/home#/preferences/notifications"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/ManagementGovernance/TrustedAdvisor.png"
+      ]
     },
     {
       "id": "console",
       "name": "View all services",
-      "consolePath": "console/services",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/General/AWSManagementConsole.png"
+      "consolePath": "console/services"
     },
     {
       "id": "vpc",
@@ -18924,8 +18473,7 @@
           "name": "AWS Firewall Manager",
           "path": "wafv2/fmsv2/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/Groups/VPC.png"
+      ]
     },
     {
       "id": "wafv2pro",
@@ -19000,8 +18548,7 @@
           "name": "Switch to the old WAF console",
           "path": "wafv2-pro/switch-to-wafv2"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/SecurityIdentityCompliance/WAF.png"
+      ]
     },
     {
       "id": "workspaces",
@@ -19100,8 +18647,7 @@
           "name": "Quick Links",
           "path": "appstream2/home#/tutorials?src=sidebar"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/EndUserComputing/WorkSpacesFamilyAmazonWorkSpaces.png"
+      ]
     },
     {
       "id": "appstream2",
@@ -19148,8 +18694,7 @@
           "name": "Amazon WorkSpaces",
           "path": "workspaces/v2/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/EndUserComputing/AppStream.png"
+      ]
     },
     {
       "id": "workspacesweb",
@@ -19180,20 +18725,17 @@
           "name": "Amazon WorkSpaces",
           "path": "workspaces/v2/home"
         }
-      ],
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/EndUserComputing/WorkSpacesFamilyAmazonWorkSpaces.png"
+      ]
     },
     {
       "id": "workspacesthinclient",
       "name": "WorkSpaces Thin Client",
-      "consolePath": "workspaces-thin-client/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/EndUserComputing/WorkSpacesThinClient.png"
+      "consolePath": "workspaces-thin-client/home"
     },
     {
       "id": "xray",
       "name": "X-Ray",
-      "consolePath": "xray/home",
-      "iconUrl": "https://cdn.jsdelivr.net/gh/awslabs/aws-icons-for-plantuml@v18.0/dist/DeveloperTools/XRay.png"
+      "consolePath": "xray/home"
     }
   ]
 }

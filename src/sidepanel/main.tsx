@@ -1,11 +1,11 @@
 import { createRoot } from 'react-dom/client';
 import '@/styles/tokens.css';
 import { initCatalogStore } from '@/shared/catalogStore';
-import { initIconCacheStore } from '@/shared/iconCache';
+import { initIconStore } from '@/shared/iconStore';
 import { App } from '@/panel/App';
 
 void initCatalogStore();
-void initIconCacheStore();
+void initIconStore();
 
 const root = document.getElementById('root');
 if (root) {

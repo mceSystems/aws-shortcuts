@@ -32,11 +32,7 @@ export type Msg =
       /** Feature path if a deep link, omitted for service home. */
       featurePath?: string;
     }
-  | { type: 'REFRESH_CATALOG' }
-  | { type: 'REFRESH_ICONS' }
-  | { type: 'HARVEST_SERVICES'; debug?: boolean }
-  | { type: 'HARVEST_FEATURES'; serviceIds?: string[] }
-  | { type: 'HARVEST_CANCEL' };
+  | { type: 'REFRESH_CATALOG' };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };
@@ -53,42 +49,12 @@ export type MsgResponse =
         version: string;
         services: number;
         features: number;
+        icons: number;
         fetchedAt: number;
         source: string;
       };
-      icons?: {
-        fetched: number;
-        reused: number;
-        failed: number;
-        total: number;
-        bytes: number;
-      };
-      harvest?: {
-        services?: HarvestedService[];
-        features?: Record<string, HarvestedFeature[]>;
-        skipped?: { id: string; reason: string }[];
-      };
     }
   | { ok: false; error: string };
-
-export type HarvestedService = {
-  id: string;
-  name: string;
-  consolePath: string;
-  iconUrl?: string;
-};
-
-export type HarvestedFeature = { name: string; path: string };
-
-export type HarvestProgress = {
-  type: 'HARVEST_PROGRESS';
-  phase: 'services' | 'features';
-  done: number;
-  total: number;
-  current?: string;
-  /** Cumulative feature count seen so far during a feature harvest. */
-  featuresCount?: number;
-};
 
 export function send(msg: Msg): Promise<MsgResponse> {
   return new Promise((resolve) => {

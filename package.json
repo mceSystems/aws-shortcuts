@@ -8,12 +8,11 @@
     "build": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
-    "icons:fetch": "tsx scripts/fetch-icons.ts",
-    "icons:build": "tsx scripts/build-icons.ts",
-    "icons:check": "tsx scripts/build-icons.ts --check",
-    "catalog:merge": "tsx scripts/merge-harvested.ts",
-    "predev": "npm run icons:build -- --allow-missing",
-    "prebuild": "npm run icons:build -- --allow-missing"
+    "catalog:auth": "tsx scripts/auth.ts",
+    "catalog:services": "tsx scripts/update-services.ts",
+    "catalog:features": "tsx scripts/update-features.ts",
+    "catalog:icons": "tsx scripts/update-icons.ts",
+    "catalog:all": "tsx scripts/update-all.ts"
   },
   "dependencies": {
     "preact": "^10.29.1",
@@ -27,9 +26,11 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
-    "svgo": "^4.0.1",
     "tsx": "^4.21.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.59.1"
   }
 }

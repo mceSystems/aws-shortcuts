@@ -2,10 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/tokens.css';
 import { CatalogSection } from './CatalogSection';
-import { HarvestSection } from './HarvestSection';
 import styles from './options.module.css';
-
-const isDev = import.meta.env.DEV;
 
 const root = document.getElementById('root');
 if (root) {
@@ -18,7 +15,6 @@ if (root) {
         </header>
         <main className={styles.main}>
           <CatalogSection />
-          {isDev && <HarvestSection />}
         </main>
       </div>
     </StrictMode>,

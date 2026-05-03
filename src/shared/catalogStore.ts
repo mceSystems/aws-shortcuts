@@ -1,14 +1,12 @@
-// Catalog runtime store. Bundled JSON ships as bootstrap so the popup
-// renders immediately on first install or when offline. The SW fetches the
-// canonical copy from GitHub (jsDelivr CDN, raw fallback) on alarm /
-// onInstalled / onStartup and writes it to chrome.storage.local. Remote
-// always wins — bundled is only used until the first successful fetch lands.
-//
-// Subscribers (popup React tree) are notified via storage.onChanged so the
-// UI re-renders when a fresh catalog arrives mid-session.
+// Catalog runtime store. Bundled JSON ships as bootstrap so the panel renders
+// immediately on first install or when offline. The SW fetches the canonical
+// copies (services.json + icons.json) from GitHub via jsDelivr → raw fallback,
+// writes both to chrome.storage.local in a single transaction. Remote always
+// wins after the first successful fetch; bundled is only the boot snapshot.
 
 import type { Catalog, ServiceCatalogEntry } from './types';
 import bundled from '@catalog/services.json';
+import { ICONS_STORAGE_KEY } from './iconStore';
 
 const STORAGE_KEY = 'catalog';
 const FETCHED_AT_KEY = 'catalogFetchedAt';
@@ -33,7 +31,6 @@ export function subscribeCatalog(listener: Listener): () => void {
   return () => listeners.delete(listener);
 }
 
-/** One-shot init: hydrate from chrome.storage.local. Safe to await many times. */
 export function initCatalogStore(): Promise<void> {
   if (initPromise) return initPromise;
   initPromise = (async () => {
@@ -43,12 +40,10 @@ export function initCatalogStore(): Promise<void> {
       if (stored && validateCatalog(stored) && shouldPreferStored(stored)) {
         adopt(stored);
       } else if (stored) {
-        // Stored remote catalog is older than bundled — drop it so the next
-        // chrome.storage.onChanged write doesn't downgrade us either.
         await chrome.storage.local.remove(STORAGE_KEY);
       }
     } catch {
-      // ignore — keep bundled snapshot
+      // keep bundled snapshot
     }
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local' || !changes[STORAGE_KEY]) return;
@@ -59,7 +54,6 @@ export function initCatalogStore(): Promise<void> {
   return initPromise;
 }
 
-/** Stored catalog wins only if it's newer or has more entries than bundled. */
 function shouldPreferStored(stored: Catalog): boolean {
   const b = bundled as Catalog;
   if (stored.services.length > b.services.length) return true;
@@ -95,6 +89,7 @@ export type CatalogStatus = {
   version: string;
   services: number;
   features: number;
+  icons: number;
   fetchedAt: number | null;
   bundled: boolean;
 };
@@ -106,14 +101,17 @@ function countFeatures(c: Catalog): number {
 }
 
 export async function readCatalogStatus(): Promise<CatalogStatus> {
-  const got = await chrome.storage.local.get([STORAGE_KEY, FETCHED_AT_KEY]);
+  const got = await chrome.storage.local.get([STORAGE_KEY, FETCHED_AT_KEY, ICONS_STORAGE_KEY]);
   const stored = got[STORAGE_KEY] as Catalog | undefined;
   const fetchedAt = (got[FETCHED_AT_KEY] as number | undefined) ?? null;
+  const icons = got[ICONS_STORAGE_KEY] as Record<string, string> | undefined;
+  const iconCount = icons ? Object.keys(icons).length : 0;
   if (stored && validateCatalog(stored)) {
     return {
       version: stored.version,
       services: stored.services.length,
       features: countFeatures(stored),
+      icons: iconCount,
       fetchedAt,
       bundled: false,
     };
@@ -123,6 +121,7 @@ export async function readCatalogStatus(): Promise<CatalogStatus> {
     version: b.version,
     services: b.services.length,
     features: countFeatures(b),
+    icons: iconCount,
     fetchedAt: null,
     bundled: true,
   };

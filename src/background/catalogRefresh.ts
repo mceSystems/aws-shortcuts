@@ -1,4 +1,5 @@
-// Periodic catalog refresh from GitHub. jsDelivr edge cache primary,
+// Periodic catalog refresh from GitHub. Single operation refreshes both
+// services.json + icons.json in parallel. jsDelivr edge cache primary,
 // raw.githubusercontent.com fallback for tail-of-the-world reliability.
 //
 // Runs on:
@@ -6,25 +7,34 @@
 //   - chrome.runtime.onStartup (Chrome cold start)
 //   - chrome.alarms 'catalog-refresh' (every 24h)
 //
-// Writes Catalog payload to chrome.storage.local; popup catalogStore picks
-// it up via storage.onChanged. Bundled JSON in the extension is fallback —
-// remote always wins on successful fetch.
+// Writes both Catalog + IconsMap to chrome.storage.local atomically.
+// Subscribers (catalogStore, iconStore) pick up via storage.onChanged.
+// Bundled JSON is fallback — remote always wins on successful fetch.
 //
-// Failure handling: keep last-known stored catalog. Never clear on error.
+// Failure handling: keep last-known stored payloads. Never clear on error.
 // Schema-validate before writing to prevent malformed remote from breaking
-// the popup.
+// the panel.
 
 import type { Catalog } from '@/shared/types';
 import { CATALOG_FETCHED_AT_KEY, CATALOG_STORAGE_KEY, validateCatalog } from '@/shared/catalogStore';
-import { refreshIcons } from './iconRefresh';
+import { ICONS_STORAGE_KEY, validateIcons, type IconsMap } from '@/shared/iconStore';
 
 const REPO = 'netanel-mce/aws-shortcut';
 const BRANCH = 'main';
-const PATH = 'catalog/services.json';
 
-const URLS = [
-  `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/${PATH}`,
-  `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${PATH}`,
+type Source = { label: string; services: string; icons: string };
+
+const SOURCES: Source[] = [
+  {
+    label: 'jsdelivr',
+    services: `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/catalog/services.json`,
+    icons: `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/catalog/icons.json`,
+  },
+  {
+    label: 'raw.githubusercontent',
+    services: `https://raw.githubusercontent.com/${REPO}/${BRANCH}/catalog/services.json`,
+    icons: `https://raw.githubusercontent.com/${REPO}/${BRANCH}/catalog/icons.json`,
+  },
 ];
 
 const ALARM_NAME = 'catalog-refresh';
@@ -34,15 +44,10 @@ export function installCatalogRefresh(): void {
   chrome.runtime.onInstalled.addListener(() => {
     void ensureAlarm();
     void refreshCatalog('onInstalled');
-    // Independent icon kick: covers offline first install where catalog
-    // refresh fails entirely. Reads bundled catalog iconUrls and fetches
-    // whatever it can. No-op for cache entries already populated.
-    kickIconRefresh('onInstalled-direct');
   });
   chrome.runtime.onStartup.addListener(() => {
     void ensureAlarm();
     void refreshCatalog('onStartup');
-    kickIconRefresh('onStartup-direct');
   });
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name !== ALARM_NAME) return;
@@ -57,7 +62,16 @@ async function ensureAlarm(): Promise<void> {
 }
 
 export type RefreshResult =
-  | { ok: true; updated: boolean; version: string; services: number; features: number; fetchedAt: number; source: string }
+  | {
+      ok: true;
+      updated: boolean;
+      version: string;
+      services: number;
+      features: number;
+      icons: number;
+      fetchedAt: number;
+      source: string;
+    }
   | { ok: false; error: string };
 
 function countFeatures(c: Catalog): number {
@@ -68,72 +82,80 @@ function countFeatures(c: Catalog): number {
 
 export async function refreshCatalog(trigger: string): Promise<RefreshResult> {
   const errors: string[] = [];
-  for (const url of URLS) {
+  for (const source of SOURCES) {
     try {
-      const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) {
-        const msg = `HTTP ${res.status} from ${url}`;
-        console.warn(`[catalog] ${trigger} ${msg}`);
-        errors.push(msg);
+      const [svcRes, iconsRes] = await Promise.all([
+        fetch(source.services, { cache: 'no-cache' }),
+        fetch(source.icons, { cache: 'no-cache' }),
+      ]);
+      if (!svcRes.ok) {
+        errors.push(`HTTP ${svcRes.status} from ${source.services}`);
         continue;
       }
-      const json = (await res.json()) as unknown;
-      if (!validateCatalog(json)) {
-        const msg = `invalid shape from ${url}`;
-        console.warn(`[catalog] ${trigger} ${msg}`);
-        errors.push(msg);
+      if (!iconsRes.ok) {
+        errors.push(`HTTP ${iconsRes.status} from ${source.icons}`);
         continue;
       }
-      const next = json as Catalog;
+      const [svcJson, iconsJson] = await Promise.all([svcRes.json(), iconsRes.json()]);
+      if (!validateCatalog(svcJson)) {
+        errors.push(`invalid services shape from ${source.services}`);
+        continue;
+      }
+      if (!validateIcons(iconsJson)) {
+        errors.push(`invalid icons shape from ${source.icons}`);
+        continue;
+      }
+      const next = svcJson as Catalog;
+      const icons = iconsJson as IconsMap;
       const cur = await readStoredCatalog();
       const fetchedAt = Date.now();
-      if (cur && cur.version === next.version) {
-        console.log(`[catalog] ${trigger} version unchanged (${cur.version})`);
-        // Always write catalog to storage even when version matches: on
-        // first install `cur` is null and we still need the catalog
-        // available so iconRefresh can read it. Idempotent for same-version
-        // re-writes.
-        await chrome.storage.local.set({
-          [CATALOG_STORAGE_KEY]: next,
-          [CATALOG_FETCHED_AT_KEY]: fetchedAt,
-        });
-        kickIconRefresh(trigger);
-        return { ok: true, updated: false, version: cur.version, services: cur.services.length, features: countFeatures(cur), fetchedAt, source: url };
-      }
-      // Don't downgrade — if remote has fewer services AND an older version
-      // string, keep what we have. Avoids the dev-time hazard where the
-      // public repo lags the locally-merged catalog.
+
+      // Don't downgrade — protects against the dev-time hazard where the
+      // public repo lags a locally-merged catalog.
       if (cur && next.services.length < cur.services.length && next.version < cur.version) {
-        console.warn(`[catalog] ${trigger} remote (${next.version}, ${next.services.length}) is older than stored (${cur.version}, ${cur.services.length}); skipping`);
+        console.warn(
+          `[catalog] ${trigger} remote (${next.version}, ${next.services.length}) older than stored (${cur.version}, ${cur.services.length}); skipping`,
+        );
         await chrome.storage.local.set({ [CATALOG_FETCHED_AT_KEY]: fetchedAt });
-        kickIconRefresh(trigger);
-        return { ok: true, updated: false, version: cur.version, services: cur.services.length, features: countFeatures(cur), fetchedAt, source: url };
+        return {
+          ok: true,
+          updated: false,
+          version: cur.version,
+          services: cur.services.length,
+          features: countFeatures(cur),
+          icons: Object.keys(icons).length,
+          fetchedAt,
+          source: source.label,
+        };
       }
+
       await chrome.storage.local.set({
         [CATALOG_STORAGE_KEY]: next,
+        [ICONS_STORAGE_KEY]: icons,
         [CATALOG_FETCHED_AT_KEY]: fetchedAt,
       });
-      console.log(`[catalog] ${trigger} updated → ${next.version} (${next.services.length} services, ${countFeatures(next)} features)`);
-      kickIconRefresh(trigger);
-      return { ok: true, updated: true, version: next.version, services: next.services.length, features: countFeatures(next), fetchedAt, source: url };
+      const updated = !cur || cur.version !== next.version;
+      console.log(
+        `[catalog] ${trigger} ${updated ? 'updated → ' : 'refreshed '}${next.version} (${next.services.length} services, ${countFeatures(next)} features, ${Object.keys(icons).length} icons) via ${source.label}`,
+      );
+      return {
+        ok: true,
+        updated,
+        version: next.version,
+        services: next.services.length,
+        features: countFeatures(next),
+        icons: Object.keys(icons).length,
+        fetchedAt,
+        source: source.label,
+      };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`[catalog] ${trigger} fetch failed for ${url}:`, msg);
-      errors.push(`${url}: ${msg}`);
+      console.warn(`[catalog] ${trigger} fetch failed for ${source.label}:`, msg);
+      errors.push(`${source.label}: ${msg}`);
     }
   }
   console.warn(`[catalog] ${trigger} all sources failed; keeping prior catalog`);
   return { ok: false, error: errors.join('; ') || 'all sources failed' };
-}
-
-/** Fire-and-forget icon refresh after catalog write. Failures are logged
- *  but never fail the catalog refresh — stale icons are tolerable, a
- *  missing catalog is not. The icon worker dedupes against the cache, so
- *  calling this on every successful catalog refresh is cheap. */
-function kickIconRefresh(trigger: string): void {
-  void refreshIcons(`after-${trigger}`).catch((err) =>
-    console.warn(`[catalog] icon refresh failed:`, err),
-  );
 }
 
 async function readStoredCatalog(): Promise<Catalog | null> {

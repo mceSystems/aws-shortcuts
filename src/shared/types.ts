@@ -67,16 +67,15 @@ export type ServiceCatalogEntry = {
   name: string;
   consolePath: string;
   /** Curated "popular" flag. Bumps service in empty-query default order +
-   * small score bonus for fuzzy matches. Set via merge tool from
-   * catalog/overrides.json:popular. */
+   * small score bonus for fuzzy matches. */
   popular?: boolean;
+  /** Service is region-pinned (IAM, Route53, CloudFront, …). Launcher pins
+   * to us-east-1 regardless of account preferred region. Sourced from
+   * botocore endpoints.json `isRegionalized: false`. */
+  global?: boolean;
   /** Full names + synonyms used for search (e.g. "Simple Email Service" for ses). */
   aliases?: string[];
   features?: ServiceFeature[];
-  /** Public URL for the service icon. Emitted by merge-harvested.ts from
-   * scripts/icon-map.json. SW fetches these on catalog refresh and caches
-   * each as a data URL in chrome.storage.local (see iconCache.ts). */
-  iconUrl?: string;
 };
 
 export type Catalog = {
