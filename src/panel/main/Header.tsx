@@ -4,12 +4,11 @@ import styles from './Header.module.css';
 type Props = {
   onSettings?: () => void;
   onRefresh?: () => void;
-  onPalette?: () => void;
   onOpenPortal?: () => void;
   portalUrl?: string;
 };
 
-export function Header({ onSettings, onRefresh, onPalette, onOpenPortal, portalUrl }: Props) {
+export function Header({ onSettings, onRefresh, onOpenPortal, portalUrl }: Props) {
   return (
     <header className={styles.header}>
       <span className={styles.brand}>
@@ -30,16 +29,8 @@ export function Header({ onSettings, onRefresh, onPalette, onOpenPortal, portalU
       <button
         type="button"
         className={styles.iconBtn}
-        onClick={onPalette}
-        title="Open command palette (Cmd+K)"
-      >
-        ⌘K
-      </button>
-      <button
-        type="button"
-        className={styles.iconBtn}
         onClick={onRefresh}
-        title="Refresh accounts"
+        title="Rescan open tabs"
       >
         ↻
       </button>

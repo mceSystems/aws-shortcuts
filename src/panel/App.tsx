@@ -140,7 +140,7 @@ export function App() {
     <div className={styles.app}>
       <Main
         onOpenSettings={() => setPhase('settings')}
-        onWipe={wipeAll}
+        onWipe={import.meta.env.DEV ? wipeAll : undefined}
       />
     </div>
   );

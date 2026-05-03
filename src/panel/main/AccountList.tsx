@@ -11,6 +11,8 @@ type Props = {
   selectedId: string | null;
   onSelect: (accountId: string) => void;
   editing: boolean;
+  /** Header-only render for collapsed section: only the selected row, or nothing. */
+  compactSelected?: boolean;
 };
 
 type DropTarget =
@@ -25,12 +27,27 @@ export function AccountList({
   selectedId,
   onSelect,
   editing,
+  compactSelected,
 }: Props) {
   const byId = useMemo(() => {
     const m = new Map<string, Account>();
     for (const a of accounts) m.set(a.accountId, a);
     return m;
   }, [accounts]);
+
+  if (compactSelected) {
+    const selected = selectedId ? byId.get(selectedId) : undefined;
+    if (!selected) return null;
+    return (
+      <div className={styles.list}>
+        <AccountRow
+          account={selected}
+          selected
+          onClick={() => onSelect(selected.accountId)}
+        />
+      </div>
+    );
+  }
 
   const visible = useMemo(
     () => accountOrder.map((id) => byId.get(id)).filter((a): a is Account => Boolean(a)),

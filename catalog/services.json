@@ -18936,8 +18936,18 @@
     },
     {
       "id": "console",
-      "name": "View all services",
-      "consolePath": "console/services"
+      "name": "Console Home",
+      "consolePath": "console/home",
+      "features": [
+        {
+          "name": "All services",
+          "path": "console/services"
+        },
+        {
+          "name": "Home",
+          "path": "console/home"
+        }
+      ]
     },
     {
       "id": "vpc",

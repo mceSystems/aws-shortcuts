@@ -75,11 +75,40 @@
 }
 
 .sectionCaret {
-  font-size: 10px;
+  font-size: 16px;
   line-height: 1;
   color: var(--ink-400);
-  width: 8px;
-  display: inline-block;
+  width: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(0deg);
+  transition: transform var(--dur-fast);
+}
+
+.sectionCaretOpen {
+  transform: rotate(90deg);
+}
+
+.sectionLabelCollapsed {
+  cursor: pointer;
+}
+
+.sectionLabelCollapsed:hover .sectionToggle,
+.sectionLabelCollapsed:hover .sectionCaret {
+  color: var(--ink-700);
+}
+
+.collapsedBody {
+  cursor: pointer;
+}
+
+.collapsedBody > * {
+  pointer-events: none;
+}
+
+.collapsedBody [data-compact-clickable] {
+  pointer-events: auto;
 }
 
 .sectionGrip {
@@ -149,6 +178,11 @@
 .resizer:active .resizerHandle {
   background: var(--accent);
   width: 64px;
+}
+
+.resizingBody {
+  cursor: row-resize !important;
+  user-select: none !important;
 }
 
 .placeholder {

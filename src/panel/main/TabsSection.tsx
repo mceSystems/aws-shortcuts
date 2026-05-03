@@ -15,14 +15,61 @@ type Pill = 'favorites' | 'tabs';
 type Props = {
   accounts: Account[];
   onRequestSaveFavorite?: (pending: PendingFavorite) => void;
+  /** Header-only render for collapsed section: pill bar only, no body. */
+  compact?: boolean;
+  /** Controlled pill state (lifted into Main's persisted layout). */
+  pill?: Pill;
+  onPillChange?: (next: Pill) => void;
 };
 
-export function TabsSection({ accounts, onRequestSaveFavorite }: Props) {
-  const [pill, setPill] = useState<Pill>('favorites');
+export function TabsSection({
+  accounts,
+  onRequestSaveFavorite,
+  compact,
+  pill: pillProp,
+  onPillChange,
+}: Props) {
+  const [pillUncontrolled, setPillUncontrolled] = useState<Pill>('favorites');
+  const pill = pillProp ?? pillUncontrolled;
+  const setPill = (next: Pill) => {
+    if (onPillChange) onPillChange(next);
+    else setPillUncontrolled(next);
+  };
   const [favoritesEditing, setFavoritesEditing] = useState(false);
   const { openTabs } = useOpenTabs();
   const { recents } = useRecents();
   const { favorites } = useFavorites();
+
+  if (compact) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.pillBar} data-compact-clickable="">
+          <button
+            type="button"
+            className={[styles.pill, pill === 'favorites' ? styles.pillActive : '']
+              .filter(Boolean)
+              .join(' ')}
+            onClick={() => setPill('favorites')}
+          >
+            <StarIcon />
+            <span>Favorites</span>
+            {favorites.length > 0 && <span className={styles.count}>{favorites.length}</span>}
+          </button>
+          <button
+            type="button"
+            className={[styles.pill, pill === 'tabs' ? styles.pillActive : '']
+              .filter(Boolean)
+              .join(' ')}
+            onClick={() => setPill('tabs')}
+          >
+            <TabsIcon />
+            <span>Tabs</span>
+            {openTabs.length > 0 && <span className={styles.count}>{openTabs.length}</span>}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.section}>

@@ -14,9 +14,11 @@ type Props = {
   account: Account | null;
   ssoConfig?: SsoConfig;
   onRequestSaveFavorite?: (pending: PendingFavorite) => void;
+  /** Header-only render for collapsed section: input row only, no list/picker. */
+  compact?: boolean;
 };
 
-export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite }: Props) {
+export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compact }: Props) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const [featureCursor, setFeatureCursor] = useState(0);
@@ -376,7 +378,7 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite }: Pro
     return () => window.removeEventListener('keydown', handler, true);
   }, []);
 
-  if (pickedFeature && account) {
+  if (pickedFeature && account && !compact) {
     if (!pickerService?.features) {
       // Auto-close handled by the effect above; render nothing this frame.
       return null;
@@ -413,6 +415,33 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite }: Pro
           : missingRegion
             ? `No region set for ${account!.alias || account!.name}.`
             : null;
+
+  if (compact) {
+    return (
+      <div className={styles.root}>
+        <div className={styles.inputRow}>
+          <span className={styles.icon} aria-hidden>
+            <SearchIcon />
+          </span>
+          <input
+            ref={inputRef}
+            className={styles.input}
+            type="text"
+            placeholder={
+              account
+                ? `Search services in ${account.alias || account.name}…`
+                : 'Search services… (pick an account to open)'
+            }
+            value={query}
+            readOnly
+            tabIndex={-1}
+            spellCheck={false}
+            autoComplete="off"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.root}>

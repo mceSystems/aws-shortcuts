@@ -24,21 +24,24 @@ type Props = {
   onWipe?: () => void;
 };
 
-type SectionId = 'account' | 'service' | 'tabs';
+type SectionId = 'account' | 'service' | 'favorites';
+type FavoritesPill = 'favorites' | 'tabs';
 
 type LayoutState = {
   order: SectionId[];
   weights: Record<SectionId, number>;
   collapsed: Record<SectionId, boolean>;
+  favoritesPill: FavoritesPill;
 };
 
 const DEFAULT_LAYOUT: LayoutState = {
-  order: ['account', 'service', 'tabs'],
-  weights: { account: 2, service: 2, tabs: 1 },
-  collapsed: { account: false, service: false, tabs: false },
+  order: ['account', 'service', 'favorites'],
+  weights: { account: 2, service: 2, favorites: 1 },
+  collapsed: { account: false, service: false, favorites: false },
+  favoritesPill: 'favorites',
 };
 
-const LAYOUT_STORAGE_KEY = 'panel.section.layout.v1';
+const LAYOUT_STORAGE_KEY = 'panel.section.layout.v2';
 const MIN_SECTION_PX = 60;
 
 export function Main({ onOpenSettings, onWipe }: Props) {
@@ -79,7 +82,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
   const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
     account: null,
     service: null,
-    tabs: null,
+    favorites: null,
   });
 
   function toggleCollapsed(id: SectionId) {
@@ -100,63 +103,71 @@ export function Main({ onOpenSettings, onWipe }: Props) {
     });
   }
 
-  const sections: Record<SectionId, { label: string; render: () => ReactNode; action?: ReactNode }> =
-    useMemo(
-      () => ({
-        account: {
-          label: 'Account',
-          action:
-            loaded && accounts.length > 0 ? (
-              <AccountsEditButton
-                editing={editing}
-                onToggle={() => setEditing((v) => !v)}
-              />
-            ) : null,
-          render: () =>
-            loaded ? (
-              <AccountList
-                accounts={accounts}
-                accountOrder={accountOrder}
-                hiddenAccountIds={hiddenAccountIds}
-                selectedId={selectedId}
-                onSelect={(id) => selectAccount(id === selectedId ? null : id)}
-                editing={editing}
-              />
-            ) : (
-              <div className={styles.skeleton} />
-            ),
-        },
-        service: {
-          label: selectedAccount ? 'Features Explorer' : 'Pick an account first',
-          render: () => (
-            <ServiceSearch
-              account={selectedAccount}
-              ssoConfig={ssoConfig}
-              onRequestSaveFavorite={setPendingFavorite}
+  const sections: Record<
+    SectionId,
+    { label: string; render: (compact: boolean) => ReactNode; action?: ReactNode }
+  > = useMemo(
+    () => ({
+      account: {
+        label: 'Account',
+        action:
+          loaded && accounts.length > 0 ? (
+            <AccountsEditButton
+              editing={editing}
+              onToggle={() => setEditing((v) => !v)}
             />
-          ),
-        },
-        tabs: {
-          label: 'Tabs',
-          render: () => (
-            <TabsSection
+          ) : null,
+        render: (compact) =>
+          loaded ? (
+            <AccountList
               accounts={accounts}
-              onRequestSaveFavorite={setPendingFavorite}
+              accountOrder={accountOrder}
+              hiddenAccountIds={hiddenAccountIds}
+              selectedId={selectedId}
+              onSelect={(id) => { if (id !== selectedId) selectAccount(id); }}
+              editing={editing}
+              compactSelected={compact}
             />
+          ) : (
+            <div className={styles.skeleton} />
           ),
-        },
-      }),
-      [
-        loaded,
-        accounts,
-        accountOrder,
-        hiddenAccountIds,
-        selectedId,
-        editing,
-        selectedAccount,
-        ssoConfig,
-      ],
-    );
+      },
+      service: {
+        label: selectedAccount ? 'Features Explorer' : 'Pick an account first',
+        render: (compact) => (
+          <ServiceSearch
+            account={selectedAccount}
+            ssoConfig={ssoConfig}
+            onRequestSaveFavorite={setPendingFavorite}
+            compact={compact}
+          />
+        ),
+      },
+      favorites: {
+        label: 'Favorites',
+        render: (compact) => (
+          <TabsSection
+            accounts={accounts}
+            onRequestSaveFavorite={setPendingFavorite}
+            compact={compact}
+            pill={layout.favoritesPill}
+            onPillChange={(p) => setLayout((cur) => ({ ...cur, favoritesPill: p }))}
+          />
+        ),
+      },
+    }),
+    [
+      loaded,
+      accounts,
+      accountOrder,
+      hiddenAccountIds,
+      selectedId,
+      editing,
+      selectedAccount,
+      ssoConfig,
+      layout.favoritesPill,
+    ],
+  );
 
   // Build the visible list. While editing accounts the panel hides Service and
   // Tabs to give the account list full focus.
@@ -169,9 +180,6 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         onSettings={onOpenSettings}
         onRefresh={() => {
           void send({ type: 'RESCAN_OPEN_TABS' });
-        }}
-        onPalette={() => {
-          // cmd+k overlay coming next
         }}
         portalUrl={ssoConfig?.startUrl}
         onOpenPortal={() => {
@@ -210,7 +218,7 @@ export function Main({ onOpenSettings, onWipe }: Props) {
                   sectionRefs.current[id] = el;
                 }}
               >
-                {cfg.render()}
+                {cfg.render(collapsed)}
               </Section>
               {showResizer && (
                 <Resizer
@@ -254,6 +262,7 @@ function loadLayout(): LayoutState {
       order: sanitizeOrder(parsed.order),
       weights: { ...DEFAULT_LAYOUT.weights, ...(parsed.weights ?? {}) },
       collapsed: { ...DEFAULT_LAYOUT.collapsed, ...(parsed.collapsed ?? {}) },
+      favoritesPill: parsed.favoritesPill ?? DEFAULT_LAYOUT.favoritesPill,
     };
   } catch {
     return DEFAULT_LAYOUT;
@@ -269,7 +278,7 @@ function saveLayout(state: LayoutState): void {
 }
 
 function sanitizeOrder(order: SectionId[] | undefined): SectionId[] {
-  const all: SectionId[] = ['account', 'service', 'tabs'];
+  const all: SectionId[] = ['account', 'service', 'favorites'];
   if (!order) return DEFAULT_LAYOUT.order;
   const seen = new Set<SectionId>();
   const cleaned = order.filter((id): id is SectionId => {
@@ -349,7 +358,9 @@ function Section({
       }
     >
       <div
-        className={styles.sectionLabel}
+        className={[styles.sectionLabel, collapsed ? styles.sectionLabelCollapsed : '']
+          .filter(Boolean)
+          .join(' ')}
         draggable={draggable}
         onDragStart={
           draggable
@@ -359,28 +370,59 @@ function Section({
               }
             : undefined
         }
+        onClick={collapsed ? onToggleCollapsed : undefined}
+        role={collapsed ? 'button' : undefined}
+        tabIndex={collapsed ? 0 : undefined}
+        onKeyDown={
+          collapsed
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onToggleCollapsed();
+                }
+              }
+            : undefined
+        }
       >
         <button
           type="button"
           className={styles.sectionToggle}
           aria-expanded={!collapsed}
-          onClick={onToggleCollapsed}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleCollapsed();
+          }}
           title={collapsed ? 'Expand' : 'Collapse'}
         >
-          <span className={styles.sectionCaret} aria-hidden>
-            {collapsed ? '▸' : '▾'}
+          <span
+            className={[styles.sectionCaret, !collapsed ? styles.sectionCaretOpen : '']
+              .filter(Boolean)
+              .join(' ')}
+            aria-hidden
+          >
+            ›
           </span>
           <span>{label}</span>
         </button>
         <span className={styles.sectionLine} />
-        {action}
+        {!collapsed && action}
         {draggable && (
           <span className={styles.sectionGrip} aria-hidden title="Drag to reorder">
             <GripIcon />
           </span>
         )}
       </div>
-      {!collapsed && children}
+      {collapsed ? (
+        <div
+          className={styles.collapsedBody}
+          onClick={onToggleCollapsed}
+          aria-hidden
+        >
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </section>
   );
 }
@@ -424,8 +466,9 @@ function Resizer({
     function onUp() {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
-      document.body.classList.remove(styles.resizingBody ?? '');
+      if (styles.resizingBody) document.body.classList.remove(styles.resizingBody);
     }
+    if (styles.resizingBody) document.body.classList.add(styles.resizingBody);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
   }
@@ -460,3 +503,4 @@ function GripIcon() {
     </svg>
   );
 }
+
