@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import type { Account } from '@/shared/types';
+import { send } from '@/shared/messages';
 import { OpenList } from './OpenList';
+import { RecentList } from './RecentList';
 import { useOpenTabs } from './useOpenTabs';
+import { useRecents } from './useRecents';
 import styles from './TabsSection.module.css';
 
 type Pill = 'favorites' | 'tabs';
@@ -13,6 +16,7 @@ type Props = {
 export function TabsSection({ accounts }: Props) {
   const [pill, setPill] = useState<Pill>('favorites');
   const { openTabs } = useOpenTabs();
+  const { recents } = useRecents();
 
   return (
     <section className={styles.section}>
@@ -47,6 +51,22 @@ export function TabsSection({ accounts }: Props) {
           <>
             <div className={styles.subLabel}>Open</div>
             <OpenList openTabs={openTabs} accounts={accounts} />
+            <div className={styles.subLabelRow}>
+              <span className={styles.subLabel}>Recently closed</span>
+              {recents.length > 0 && (
+                <button
+                  type="button"
+                  className={styles.clearBtn}
+                  title="Clear recently closed"
+                  onClick={() => {
+                    void send({ type: 'CLEAR_RECENTS' });
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <RecentList recents={recents} openTabs={openTabs} accounts={accounts} />
           </>
         )}
       </div>

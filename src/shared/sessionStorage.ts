@@ -68,6 +68,8 @@ export type OpenTabInfo = {
   region: string;
   serviceId: string;
   consolePath: string;
+  /** Stable key for matching open vs recent. See dedupeKeyFromConsolePath. */
+  dedupeKey: string;
   /** Joined from currentSessions when known; '' until SESSION_OBSERVED arrives. */
   roleName: string;
   observedAt: number;

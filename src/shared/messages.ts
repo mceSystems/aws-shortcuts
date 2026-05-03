@@ -32,7 +32,8 @@ export type Msg =
       /** Feature path if a deep link, omitted for service home. */
       featurePath?: string;
     }
-  | { type: 'REFRESH_CATALOG' };
+  | { type: 'REFRESH_CATALOG' }
+  | { type: 'CLEAR_RECENTS' };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */
 export type ContentScriptMsg = { type: 'RESCAN_TAB' };

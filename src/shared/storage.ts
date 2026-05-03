@@ -80,3 +80,19 @@ export async function getLocal(): Promise<LocalSchema> {
 export async function setLocal(patch: Partial<LocalSchema>): Promise<void> {
   await chrome.storage.local.set(patch);
 }
+
+let localMutateChain: Promise<void> = Promise.resolve();
+
+/** Serialized read-modify-write for chrome.storage.local. Multiple events
+ *  (e.g. several tabs closing at once) can race otherwise. */
+export function mutateLocal(
+  fn: (state: LocalSchema) => Partial<LocalSchema> | null | Promise<Partial<LocalSchema> | null>,
+): Promise<void> {
+  const next = localMutateChain.then(async () => {
+    const cur = await getLocal();
+    const patch = await fn(cur);
+    if (patch) await setLocal(patch);
+  });
+  localMutateChain = next.catch(() => {});
+  return next;
+}

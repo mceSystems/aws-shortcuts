@@ -1,6 +1,6 @@
 import type { Msg, MsgResponse } from '@/shared/messages';
-import type { Account } from '@/shared/types';
-import { getSync, mutateSync } from '@/shared/storage';
+import type { Account, Recent } from '@/shared/types';
+import { getSync, mutateLocal, mutateSync } from '@/shared/storage';
 import {
   getSessionState,
   setBearer,
@@ -10,7 +10,7 @@ import {
 } from '@/shared/sessionStorage';
 import { awsColorToHex } from '@/shared/colors';
 import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
-import { MULTI_SESSION_HOST_RE, parseConsoleUrl } from '@/shared/consoleUrl';
+import { MULTI_SESSION_HOST_RE, fullDedupeKey, parseConsoleUrl } from '@/shared/consoleUrl';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
 import { bumpOpenCount } from '@/shared/openCounts';
@@ -82,10 +82,71 @@ chrome.tabs.onRemoved.addListener((tabId) => {
     return mutated ? next : cur;
   });
   void mutateOpenTabs((cur) => {
-    if (!cur.some((t) => t.tabId === tabId)) return cur;
+    const closed = cur.find((t) => t.tabId === tabId);
+    if (!closed) return cur;
+    void recordRecent(closed);
     return cur.filter((t) => t.tabId !== tabId);
   });
 });
+
+const RECENTS_CAP = 50;
+
+async function recordRecent(t: {
+  accountId: string;
+  roleName: string;
+  region: string;
+  serviceId: string;
+  consolePath: string;
+  url: string;
+  title: string;
+}): Promise<void> {
+  // Skip entries lacking the bits needed for a clean relaunch.
+  if (!t.accountId || !t.serviceId || !t.consolePath) return;
+  const dedupeKey = fullDedupeKey({
+    accountId: t.accountId,
+    roleName: t.roleName,
+    region: t.region,
+    consolePath: t.consolePath,
+  });
+  await mutateLocal((state) => {
+    const list = state.recents;
+    const now = Date.now();
+    const idx = list.findIndex((r) => r.dedupeKey === dedupeKey);
+    let next: Recent[];
+    if (idx >= 0) {
+      const existing = list[idx];
+      const updated: Recent = {
+        ...existing,
+        // Latest variant wins for relaunch — most recent resource state.
+        consolePath: t.consolePath,
+        url: t.url,
+        title: t.title || existing.title,
+        roleName: t.roleName || existing.roleName,
+        region: t.region || existing.region,
+        hits: existing.hits + 1,
+        ts: now,
+      };
+      next = [updated, ...list.slice(0, idx), ...list.slice(idx + 1)];
+    } else {
+      const fresh: Recent = {
+        id: `r_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+        accountId: t.accountId,
+        roleName: t.roleName,
+        region: t.region,
+        serviceId: t.serviceId,
+        consolePath: t.consolePath,
+        dedupeKey,
+        url: t.url,
+        title: t.title,
+        ts: now,
+        hits: 1,
+      };
+      next = [fresh, ...list];
+    }
+    if (next.length > RECENTS_CAP) next = next.slice(0, RECENTS_CAP);
+    return { recents: next };
+  });
+}
 
 // Track URL + title for every open multi-session console tab. Drives the
 // Open list in the side panel.
@@ -110,6 +171,7 @@ async function upsertOpenTab(tab: chrome.tabs.Tab): Promise<void> {
   );
   await mutateOpenTabs((cur) => {
     const idx = cur.findIndex((t) => t.tabId === tab.id);
+    const roleName = session?.roleName ?? cur[idx]?.roleName ?? '';
     const entry = {
       tabId: tab.id!,
       windowId: tab.windowId ?? -1,
@@ -120,16 +182,20 @@ async function upsertOpenTab(tab: chrome.tabs.Tab): Promise<void> {
       region: parsed.region,
       serviceId: parsed.serviceId,
       consolePath: parsed.consolePath,
-      roleName: session?.roleName ?? '',
+      dedupeKey: fullDedupeKey({
+        accountId: parsed.accountId!,
+        roleName,
+        region: parsed.region,
+        consolePath: parsed.consolePath,
+      }),
+      roleName,
       observedAt: Date.now(),
     };
     if (idx === -1) return [...cur, entry];
     const existing = cur[idx];
-    // Preserve role if we already had one and the session lookup didn't find anything.
-    const merged = { ...entry, roleName: entry.roleName || existing.roleName };
-    if (sameOpenTab(existing, merged)) return cur;
+    if (sameOpenTab(existing, entry)) return cur;
     const next = [...cur];
-    next[idx] = merged;
+    next[idx] = entry;
     return next;
   });
 }
@@ -436,7 +502,16 @@ async function handle(msg: Msg): Promise<MsgResponse> {
             t.roleName !== msg.roleName
           ) {
             mutated = true;
-            return { ...t, roleName: msg.roleName };
+            return {
+              ...t,
+              roleName: msg.roleName,
+              dedupeKey: fullDedupeKey({
+                accountId: t.accountId,
+                roleName: msg.roleName,
+                region: t.region,
+                consolePath: t.consolePath,
+              }),
+            };
           }
           return t;
         });
@@ -482,6 +557,11 @@ async function handle(msg: Msg): Promise<MsgResponse> {
 
     case 'RESOLVE_LAUNCH_URL': {
       return resolveLaunchUrl(msg);
+    }
+
+    case 'CLEAR_RECENTS': {
+      await mutateLocal(() => ({ recents: [] }));
+      return { ok: true };
     }
 
     case 'REFRESH_CATALOG': {

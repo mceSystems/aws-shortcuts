@@ -53,9 +53,14 @@ export type Recent = {
   accountId: string;
   roleName: string;
   region: string;
-  service: string;
-  feature?: string;
+  serviceId: string;
+  /** Path + query (no `region=`) + hash. Round-trips through RESOLVE_LAUNCH_URL. */
+  consolePath: string;
+  /** Stable key — same resource id across volatile view params. */
+  dedupeKey: string;
+  /** Original URL the tab held when it was closed. Display only. */
   url: string;
+  title?: string;
   ts: number;
   hits: number;
 };
