@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { Account, Favorite } from '@/shared/types';
 import type { OpenTabInfo } from '@/shared/sessionStorage';
 import { sanitizeConsolePathForFavorite } from '@/shared/consoleUrl';
@@ -6,6 +6,7 @@ import { chipColor } from '@/shared/colors';
 import { findServiceById } from '@/shared/serviceCatalog';
 import { send } from '@/shared/messages';
 import { openOrFocusTab } from '@/shared/tabs';
+import { OpenInOtherPanel } from './OpenInOtherPanel';
 import { ServiceIcon } from './ServiceIcon';
 import { TabRow } from './TabRow';
 import styles from './TabsSection.module.css';
@@ -19,6 +20,8 @@ type Props = {
 };
 
 export function FavoritesView({ favorites, accounts, openTabs, editing }: Props) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   if (favorites.length === 0) {
     return <div className={styles.empty}>No favorites yet</div>;
   }
@@ -28,21 +31,67 @@ export function FavoritesView({ favorites, accounts, openTabs, editing }: Props)
   const accountById = new Map(accounts.map((a) => [a.accountId, a]));
   return (
     <div className={styles.list}>
-      {favorites.map((f) => (
-        <TabRow
-          key={f.id}
-          serviceId={f.serviceId}
-          consolePath={f.consolePath}
-          account={accountById.get(f.accountId)}
-          accountFallbackId={f.accountId}
-          roleName={f.roleName}
-          region={f.region}
-          label={f.label}
-          onClick={() => launchFavorite(f, openTabs)}
-          trailing={<LaunchIcon />}
-        />
-      ))}
+      {favorites.map((f) => {
+        const expanded = expandedId === f.id;
+        return (
+          <Fragment key={f.id}>
+            <TabRow
+              serviceId={f.serviceId}
+              consolePath={f.consolePath}
+              account={accountById.get(f.accountId)}
+              accountFallbackId={f.accountId}
+              roleName={f.roleName}
+              region={f.region}
+              label={f.label}
+              onClick={() => launchFavorite(f, openTabs)}
+              trailing={
+                <>
+                  <MoreButton
+                    active={expanded}
+                    onClick={() => setExpandedId(expanded ? null : f.id)}
+                  />
+                  <LaunchIcon />
+                </>
+              }
+            />
+            {expanded && (
+              <OpenInOtherPanel
+                accounts={accounts}
+                initialAccountId={f.accountId}
+                initialRoleName={f.roleName}
+                initialRegion={f.region}
+                serviceId={f.serviceId}
+                featurePath={f.featurePath}
+                consolePath={f.consolePath}
+                onClose={() => setExpandedId(null)}
+              />
+            )}
+          </Fragment>
+        );
+      })}
     </div>
+  );
+}
+
+function MoreButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className={[styles.rowSaveBtn, active ? styles.rowSaveBtnActive : ''].filter(Boolean).join(' ')}
+      title="Open in another account/role/region"
+      aria-label="Open in another account/role/region"
+      aria-pressed={active}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <circle cx="5" cy="12" r="1.5" />
+        <circle cx="12" cy="12" r="1.5" />
+        <circle cx="19" cy="12" r="1.5" />
+      </svg>
+    </button>
   );
 }
 
