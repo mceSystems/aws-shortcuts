@@ -144,3 +144,6 @@ scripts/.auth/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Web Store release zips (built from dist/)
+release/
