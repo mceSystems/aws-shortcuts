@@ -6,6 +6,12 @@ export default defineManifest({
   name: 'AWS Shortcut',
   version: pkg.version,
   description: pkg.description,
+  icons: {
+    16: 'src/assets/icons/icon-16.png',
+    32: 'src/assets/icons/icon-32.png',
+    48: 'src/assets/icons/icon-48.png',
+    128: 'src/assets/icons/icon-128.png',
+  },
   permissions: [
     'storage',
     'tabs',
@@ -49,6 +55,11 @@ export default defineManifest({
     // HTML is still bundled (kept around as a fallback / future palette
     // surface) but is not auto-attached to the action.
     default_title: 'AWS Shortcut',
+    default_icon: {
+      16: 'src/assets/icons/icon-16.png',
+      32: 'src/assets/icons/icon-32.png',
+      48: 'src/assets/icons/icon-48.png',
+    },
   },
   side_panel: {
     default_path: 'src/sidepanel/index.html',

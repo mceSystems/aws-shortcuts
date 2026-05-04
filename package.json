@@ -2,6 +2,12 @@
   "name": "aws-shortcut",
   "version": "0.1.0",
   "description": "Chrome extension for one-click access to AWS resources via SSO",
+  "license": "MIT",
+  "homepage": "https://github.com/mceSystems/aws-shortcuts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mceSystems/aws-shortcuts.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
