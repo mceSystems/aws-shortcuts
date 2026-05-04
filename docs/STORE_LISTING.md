@@ -62,7 +62,7 @@ Paste each block into its own field on the Privacy practices tab. Every required
 
 ### `declarativeNetRequest`
 
-> Required to register a single dynamic rule that rewrites the `Origin` and `Referer` headers on extension-initiated requests to the AWS portal API (`portal.sso.<region>.amazonaws.com`). The portal API rejects requests with `Origin: chrome-extension://...`, so without this rule the API will not respond. The rule's `condition` pins `initiatorDomains` to this extension's ID and `requestDomains` to the user's configured portal hostname (parsed from the start URL the user pasted in onboarding), so the rule only fires on outbound XHRs the extension itself sends to that exact portal host.
+> Required to register a single dynamic rule that rewrites the `Origin` and `Referer` headers on extension-initiated XHRs hitting the AWS portal API. The portal API rejects requests with `Origin: chrome-extension://...`, so without this rule the API will not respond. The rule's `condition` pins `initiatorDomains` to this extension's ID, restricts `resourceTypes` to `XMLHTTPREQUEST`, and uses `urlFilter: 'portal.sso.'` to target the redirected leg of the portal call (the AWS SSO start URL on `awsapps.com` redirects to `portal.sso.<region>.amazonaws.com` and that's where the rewrite is needed). Because `initiatorDomains` pins to this extension, the rule cannot fire on any traffic the extension did not itself originate.
 
 ### `declarativeNetRequestWithHostAccess`
 
