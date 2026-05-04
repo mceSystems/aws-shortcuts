@@ -296,6 +296,18 @@ async function refreshOriginRule(): Promise<void> {
       });
       return;
     }
+    // Constrain the rule to the user's configured portal hostname rather
+    // than every host containing "portal.sso." — the broader filter would
+    // match unrelated hosts in theory, even though `initiatorDomains` already
+    // limits firing to extension-initiated requests.
+    const portalHostname = (() => {
+      try {
+        return new URL(portalHost).hostname;
+      } catch {
+        return null;
+      }
+    })();
+
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [ORIGIN_RULE_ID],
       addRules: [
@@ -318,7 +330,9 @@ async function refreshOriginRule(): Promise<void> {
             ],
           },
           condition: {
-            urlFilter: 'portal.sso.',
+            ...(portalHostname
+              ? { requestDomains: [portalHostname] }
+              : { urlFilter: 'portal.sso.' }),
             resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
             initiatorDomains: [chrome.runtime.id],
           },

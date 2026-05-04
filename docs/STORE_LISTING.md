@@ -62,7 +62,7 @@ Paste each block into its own field on the Privacy practices tab. Every required
 
 ### `declarativeNetRequest`
 
-> Required to register a single dynamic rule that rewrites the `Origin` and `Referer` headers on extension-initiated requests to the AWS portal API (`portal.sso.<region>.amazonaws.com`). The portal API rejects requests with `Origin: chrome-extension://...`, so without this rule the API will not respond. The rule is scoped to the user's configured portal host only.
+> Required to register a single dynamic rule that rewrites the `Origin` and `Referer` headers on extension-initiated requests to the AWS portal API (`portal.sso.<region>.amazonaws.com`). The portal API rejects requests with `Origin: chrome-extension://...`, so without this rule the API will not respond. The rule's `condition` pins `initiatorDomains` to this extension's ID and `requestDomains` to the user's configured portal hostname (parsed from the start URL the user pasted in onboarding), so the rule only fires on outbound XHRs the extension itself sends to that exact portal host.
 
 ### `declarativeNetRequestWithHostAccess`
 
@@ -70,7 +70,7 @@ Paste each block into its own field on the Privacy practices tab. Every required
 
 ### `scripting`
 
-> Inject a small content script into AWS console tabs (`*.console.aws.amazon.com`) when the toolbar action runs. The script reads visible chrome of the page (account ID, role, region, color band, multi-session subdomain) and reports it back to the side panel so the panel can stay in sync with what the user has open. No DOM modification, no exfiltration.
+> The extension declares a content script for `https://*.console.aws.amazon.com/*` in its manifest, so Chrome auto-injects it on AWS console tabs at `document_idle`. The script reads visible page chrome (account ID, role, region, color band, multi-session subdomain) and reports it back to the side panel so the panel stays in sync with what the user has open. The `scripting` permission itself is used only as a fallback: when the service worker re-harvests already-open tabs (e.g. on extension update or re-enable) and the auto-injected script is not yet present, `chrome.scripting.executeScript` re-injects the same bundled script file. The script does not modify page content; it only patches `history.pushState`/`history.replaceState` so it can observe SPA navigations within the AWS console. No data is sent off-device.
 
 ### `sidePanel`
 
