@@ -19,7 +19,7 @@ import type { Catalog } from '@/shared/types';
 import { CATALOG_FETCHED_AT_KEY, CATALOG_STORAGE_KEY, validateCatalog } from '@/shared/catalogStore';
 import { ICONS_STORAGE_KEY, validateIcons, type IconsMap } from '@/shared/iconStore';
 
-const REPO = 'netanel-mce/aws-shortcut';
+const REPO = 'mceSystems/aws-shortcuts';
 const BRANCH = 'main';
 
 type Source = { label: string; services: string; icons: string };
