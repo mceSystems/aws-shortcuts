@@ -6,7 +6,7 @@ Reference text to paste into the Chrome Web Store developer dashboard at submiss
 
 ## Single-purpose statement
 
-> AWS Shortcut helps users open the right AWS console — for the right account, role, and region — in one click, by reusing their existing IAM Identity Center (AWS SSO) browser session. The extension does not host an authentication flow of its own; it assembles the right console URL and lets AWS handle sign-in.
+> AWS Shortcut helps users open the right AWS console — for the right account, role, and region — in one click, by reusing their existing IAM Identity Center (AWS SSO) browser session.
 
 ## Short description (≤132 chars)
 
@@ -41,78 +41,43 @@ Reference text to paste into the Chrome Web Store developer dashboard at submiss
 
 ## Permission justifications
 
-Paste each block into its own field on the Privacy practices tab. Every required permission has its own field.
+Paste these into the dashboard form, one per permission, when prompted.
 
 ### Host permissions
 
-> The extension reads from the AWS endpoints the user already accesses through their browser:
-> - `portal.sso.<region>.amazonaws.com` and `*.awsapps.com` — list the user's accounts and roles via the IAM Identity Center portal API, using the same bearer token the browser already sends.
-> - `*.console.aws.amazon.com` and `*.signin.aws.amazon.com` — open the target console URL after a user click, observe the user's open console tabs to keep the side panel in sync (account ID, role, region, color band), and detect when a session ends.
-> - `cdn.jsdelivr.net` and `raw.githubusercontent.com` — fetch the public service catalog JSON from the extension's GitHub repo on a once-per-24-hour schedule.
->
-> No other hosts are contacted, and no data is sent to servers operated by the extension authors.
-
-### `alarms`
-
-> Schedule a once-per-24-hour background refresh of the bundled AWS service catalog from the extension's public GitHub repository (via the jsDelivr CDN) so the in-extension service search stays current with new AWS services.
+> The extension needs to talk to your IAM Identity Center portal (`portal.sso.<region>.amazonaws.com`, `*.awsapps.com`) to list the accounts and roles you have access to, and to the AWS console (`*.console.aws.amazon.com`, `*.signin.aws.amazon.com`) to launch the right URL when you click. It also fetches the bundled service catalog from the public jsDelivr CDN (`cdn.jsdelivr.net`) and GitHub raw (`raw.githubusercontent.com`) once a day.
 
 ### `cookies`
 
-> Detect whether the user already has a live AWS console session for a given multi-session subdomain. The extension only inspects the presence and expiry timestamp of cookies on AWS console hosts to decide whether to deep-link directly to the console or fall back to the AWS federation redirect. Cookie values are never read.
-
-### `declarativeNetRequest`
-
-> Required to register a single dynamic rule that rewrites the `Origin` and `Referer` headers on extension-initiated XHRs hitting the AWS portal API. The portal API rejects requests with `Origin: chrome-extension://...`, so without this rule the API will not respond. The rule's `condition` pins `initiatorDomains` to this extension's ID, restricts `resourceTypes` to `XMLHTTPREQUEST`, and uses `urlFilter: 'portal.sso.'` to target the redirected leg of the portal call (the AWS SSO start URL on `awsapps.com` redirects to `portal.sso.<region>.amazonaws.com` and that's where the rewrite is needed). Because `initiatorDomains` pins to this extension, the rule cannot fire on any traffic the extension did not itself originate.
-
-### `declarativeNetRequestWithHostAccess`
-
-> Required so the same `Origin`/`Referer`-rewrite rule above can target host-specific URLs (the user's configured AWS portal host) rather than only generic header transforms. No other use.
-
-### `scripting`
-
-> The extension declares a content script for `https://*.console.aws.amazon.com/*` in its manifest, so Chrome auto-injects it on AWS console tabs at `document_idle`. The script reads visible page chrome (account ID, role, region, color band, multi-session subdomain) and reports it back to the side panel so the panel stays in sync with what the user has open. The `scripting` permission itself is used only as a fallback: when the service worker re-harvests already-open tabs (e.g. on extension update or re-enable) and the auto-injected script is not yet present, `chrome.scripting.executeScript` re-injects the same bundled script file. The script does not modify page content; it only patches `history.pushState`/`history.replaceState` so it can observe SPA navigations within the AWS console. No data is sent off-device.
-
-### `sidePanel`
-
-> The primary user interface of the extension is a Chrome side panel. This permission is required to register and open it.
-
-### `storage`
-
-> Persist the user's IAM Identity Center start URL, list of accounts and roles, role/region preferences, favorites, recently-closed tabs, and side-panel layout. Stored in `chrome.storage.sync` (account/prefs), `chrome.storage.local` (recents and bundled catalog), and `chrome.storage.session` (the bearer token, cleared when Chrome closes). Nothing is written outside Chrome's extension storage.
-
-### `tabs`
-
-> Discover open AWS console tabs so the side panel can show them, observe their URL/title, and reopen recently-closed ones at the same account/role/region. Also used to launch the chosen console URL in a new tab when the user clicks an account/service combination.
-
-### `webNavigation`
-
-> Detect when an open AWS console tab navigates away to the signin or IAM Identity Center start URL — that signals the multi-session console session for that account has ended, and the extension drops the matching session entry from its local store so future clicks don't try to reuse a dead session.
+> Used to detect whether a multi-session AWS console tab is live before launching, so we can deep-link to the direct console URL instead of routing through the slower federation redirect. The extension only checks for the presence and expiry of cookies on AWS console subdomains. It never reads cookie values.
 
 ### `webRequest`
 
-> Read the `Authorization: Bearer` header on outgoing requests to `portal.sso.<region>.amazonaws.com` so the extension can call the same AWS portal API on the user's behalf to enumerate their assigned accounts and roles. Only request headers on portal hosts are inspected; the bearer token is never sent off the device. The extension does not block, redirect, or modify network traffic via webRequest.
+> Used to read the `Authorization: Bearer` request header on outgoing requests to the AWS portal API (`portal.sso.*.amazonaws.com`). The extension uses that bearer token to call the same portal API your browser already calls, in order to enumerate your assigned accounts and roles. The token never leaves your device.
 
-## Remote code
+### `declarativeNetRequest` / `declarativeNetRequestWithHostAccess`
 
-> **Answer: No, I am not using remote code.**
->
-> All JavaScript is bundled inside the extension package. The only remote fetch is a JSON service catalog (data, not executed as code). No `eval`, no remote `<script>`, no dynamic `import()`.
+> Used to rewrite the `Origin` and `Referer` headers on extension-initiated requests to the AWS portal API. The portal API rejects requests with `Origin: chrome-extension://...`; without this rewrite, the API will not respond. The rule is scoped to the portal hosts only.
 
-## Data collection disclosures
+### `tabs` / `scripting`
 
-Tick exactly these three on the form:
+> Used to detect open AWS console tabs and inject a small content script on `*.console.aws.amazon.com` that observes the current tab's account ID, role name, region, color band, and multi-session subdomain. This keeps the side panel in sync with what's already open and lets the extension correctly identify which account a tab belongs to.
 
-- ☑ **Authentication information** — the IAM Identity Center bearer token, held in `chrome.storage.session` (cleared when Chrome closes), never sent off-device.
-- ☑ **Web history** — URLs/titles of the user's open AWS console tabs, used for tab observations and the recently-closed list.
-- ☑ **Website content** — the content script reads small DOM bits on `*.console.aws.amazon.com` (account color band, role name, region) and reports them to the side panel.
+### `sidePanel`
 
-Leave everything else unticked. The extension does not collect PII, health, financial, location, communications, or user-activity data.
+> The primary user interface — the side panel itself.
 
-Tick all three certifications:
+### `storage`
 
-- ☑ I do not sell or transfer user data to third parties (outside approved use cases).
-- ☑ I do not use or transfer user data for purposes unrelated to the item's single purpose.
-- ☑ I do not use or transfer user data to determine creditworthiness or for lending.
+> Persists the user's portal config, account list, role/region preferences, favorites, and side-panel layout in `chrome.storage.sync`. Persists recently-closed tab history in `chrome.storage.local`. Holds the bearer token in `chrome.storage.session` for the lifetime of the browser session.
+
+### `notifications`
+
+> Surfaces a single non-blocking notification when an account scan finishes, so the user knows when the panel is ready.
+
+### `alarms`
+
+> Schedules the once-per-24-hour service catalog refresh from the public CDN.
 
 ## Privacy policy URL
 
@@ -130,9 +95,25 @@ Tick all three certifications:
 
 | Asset | Spec | Status |
 |---|---|---|
-| Store icon | 128×128 PNG | [`src/assets/icons/icon-128.png`](../src/assets/icons/icon-128.png) ✓ |
-| Screenshot 1 (hero) | 1280×800 PNG | [`docs/screenshots/01-hero.png`](screenshots/01-hero.png) ✓ |
-| Screenshot 2 (money shot) | 1280×800 PNG | [`docs/screenshots/02-money-shot.png`](screenshots/02-money-shot.png) ✓ |
-| Screenshot 3 (onboarding) | 1280×800 PNG | [`docs/screenshots/03-onboarding-connect.png`](screenshots/03-onboarding-connect.png) ✓ |
-| Small promo tile | 440×280 PNG/JPEG | optional, skip for v1 |
-| Marquee promo tile | 1400×560 | optional, skip for v1 |
+| Store icon | 128×128 PNG | `src/assets/icons/icon-128.png` ✓ |
+| Screenshot | 1280×800 or 640×400 PNG/JPEG, ≥1, up to 5 | TODO — capture sidepanel + console launch |
+| Small promo tile | 440×280 PNG/JPEG | optional but recommended |
+| Marquee promo tile | 1400×560 | optional |
+
+## Screenshot capture plan
+
+Aim for 3–5 screenshots, 1280×800 each.
+
+1. **Hero** — sidepanel open with account list + service search active, on a real-looking Chrome window.
+2. **Service search** — query `lambda` showing fuzzy-ranked results + feature dropdown.
+3. **Favorites** — populated favorites list with custom labels.
+4. **Tabs/recents** — recently-closed tab list ready to relaunch.
+5. **Onboarding** — connect step with placeholder portal URL.
+
+Capture flow on macOS:
+
+```
+Cmd+Shift+4 → Space → click Chrome window → save
+```
+
+Crop to 1280×800 if needed. Use a clean Chrome profile (no personal bookmarks, no other extension icons).
