@@ -147,3 +147,4 @@ vite.config.ts.timestamp-*
 
 # Web Store release zips (built from dist/)
 release/
+.DS_Store
