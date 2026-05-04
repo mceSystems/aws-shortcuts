@@ -5,32 +5,51 @@
 
   **One-click access to any AWS account, role, region, and service — straight from your browser.**
 
-  No CLI. No credentials on disk. Piggybacks on your IAM Identity Center (AWS SSO) session.
+  No CLI. No credentials on disk. No new login. Piggybacks on your existing IAM Identity Center (AWS SSO) browser session.
 </div>
 
 ---
 
-<!-- Replace with a real recording once captured. See "Recording the demo" below. -->
 <p align="center">
   <img src="docs/demo.gif" alt="AWS Shortcut demo" width="640" />
 </p>
 
-## Features
+## Why
 
-- **Side panel UI** — picks any account / role / region / service in 2–3 keystrokes.
-- **Multi-session direct launch** — when AWS multi-session console is enabled, opens the target console URL directly, skipping the federation redirect.
-- **Portal fallback** — automatically falls back to the IAM Identity Center federation flow when no live session matches.
-- **Service search** — fuzzy-ranked catalog of all AWS services + common features. Bundled offline + auto-refreshed every 24h.
-- **Favorites + recents** — pin frequently-used `account / role / region / service` combos. Reopen recently-closed console tabs in one click.
-- **Tab observations** — detects color, role, and region of open console tabs to keep the UI in sync.
-- **Keyboard shortcut** — `Cmd+Shift+A` (macOS) / `Ctrl+Shift+A` (Win/Linux) opens the side panel.
-- **Privacy-first** — no telemetry, no external servers. SSO bearer never leaves the extension.
+If you work across many AWS accounts, you know the dance:
+
+> Open IAM Identity Center → click your account → click the right role → wait for federation redirect → finally land in the console → realize you wanted a different region → repeat.
+
+AWS Shortcut collapses that into **one click in a side panel**. It reuses the AWS sign-in you already did — no second login, no proxy, no new identity provider.
+
+## What it does
+
+- 🔍 **Fuzzy service search** — type `lambda` to find Lambda. Type `instance` to find EC2 Instances. The extension ships with a catalog of every AWS service + the most common features inside each.
+- ⚡ **One click → console open** — pick `account · role · region · service`, and a console tab opens directly on that view.
+- 🪟 **Multi-session aware** — when you have AWS multi-session console enabled, it deep-links to the right `<account>-<session>.region.console.aws.amazon.com` subdomain so multiple accounts stay open simultaneously without signing each other out.
+- 📌 **Favorites** — pin combos you use daily (`Production · Lambda · Functions · us-east-1`). Click → console.
+- 🕒 **Recents** — recently-closed AWS console tabs are remembered. Click → reopen.
+- 🎨 **Account colors + region awareness** — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
+- ⌨️ **Keyboard shortcut** — `Cmd+Shift+A` (macOS) / `Ctrl+Shift+A` (Win/Linux). Search-as-you-type, Enter to launch.
+
+## What it does NOT do — privacy & identity guarantees
+
+This is the part that matters. Before you install:
+
+- ❌ **The extension does not replace AWS sign-in.** You still log in to IAM Identity Center the normal way, in a normal AWS-hosted tab. The extension never sees your username, password, or MFA code.
+- ❌ **The extension is not an identity provider.** It does not host an auth flow, it does not proxy your credentials through any server, and it does not run any backend. There are no servers operated by the extension authors — period.
+- ❌ **The extension does not store your SSO credentials.** It never sees your password. The bearer token your browser already sends to `portal.sso.<region>.amazonaws.com` is read in-memory inside the extension's service worker and held in `chrome.storage.session` (cleared when Chrome closes). It is never written to disk in plaintext, never sent anywhere, and never shared with another extension.
+- ❌ **No telemetry. No analytics. No remote logging. No ads.** The extension does not phone home.
+- ✅ **All data stays on your device.** Account list, role/region prefs, favorites, layout — all in `chrome.storage.sync` (Google syncs that across your own Chrome profile, encrypted in transit; nothing extra goes through the extension authors).
+- ✅ **Open source under MIT.** Every line of code that touches your data is in this repo. Audit before you trust.
+
+For the full data-flow disclosure, see [PRIVACY.md](PRIVACY.md).
 
 ## Install
 
 ### Chrome Web Store
 
-Coming soon.
+> Coming soon. Check back, or follow the [release notes](https://github.com/mceSystems/aws-shortcuts/releases).
 
 ### From source (manual unpacked)
 
@@ -41,57 +60,90 @@ npm install
 npm run build
 ```
 
-Then:
+Then in Chrome:
 
 1. Open `chrome://extensions`.
-2. Toggle **Developer mode** (top-right).
-3. Click **Load unpacked** → select the `dist/` folder.
-4. Pin the AWS Shortcut icon to your toolbar.
+2. Toggle **Developer mode** (top-right corner).
+3. Click **Load unpacked** → select the freshly built `dist/` folder.
+4. Pin the AWS Shortcut icon to your toolbar (puzzle-piece icon → pin).
 
-## First-time setup
+That's it. No npm globals, no CLI tools, no AWS credentials needed at install time.
 
-1. Click the toolbar icon (or hit `Cmd/Ctrl+Shift+A`) to open the side panel.
-2. **Connect** — paste your IAM Identity Center start URL (looks like `https://d-xxxxxxxxxx.awsapps.com/start/`). The extension will sign you in via the standard AWS portal.
-3. **Multi-session check** — verify that AWS multi-session console is enabled on your portal. The panel guides you through the AWS toggle if not.
-4. **Scan** — the extension reads your assigned accounts/roles from the portal API and stores them in `chrome.storage.sync` (synced across your Chrome profile).
+## First-time setup (≈ 2 minutes)
 
-You're done. Click any account row → pick a role → pick a service → console opens.
+When you first click the toolbar icon, you'll see a 3-step onboarding:
 
-## How it works
+### 1. Connect your access portal
+
+Paste your IAM Identity Center **start URL**. It looks like:
 
 ```
-   ┌──────────────┐    RESOLVE_LAUNCH_URL     ┌────────────────────┐
-   │  Side panel  │ ────────────────────────► │  Service worker    │
-   └──────────────┘                           │                    │
-                                              │  • cookies probe   │
-                                              │  • session cache   │
-                                              │  • portal fallback │
-                                              └─────────┬──────────┘
-                                                        ▼
-                                              direct console URL
-                                              or federation redirect
+https://d-xxxxxxxxxx.awsapps.com/start/
 ```
 
-- The service worker captures your portal SSO bearer token (read once from outgoing `Authorization: Bearer …` headers on `portal.sso.<region>.amazonaws.com`) to enumerate your accounts/roles via the portal API.
-- A content script on `*.console.aws.amazon.com` reports the current account color band, role, region, and multi-session subdomain so the panel stays in sync with what you have open.
-- Service catalog (`catalog/services.json`) is bundled with the extension and refreshed daily from this repo via jsDelivr CDN.
+(You can find it in the AWS console under *IAM Identity Center → Settings → AWS access portal URL*.)
+
+If you already have the portal open in another tab, the extension will auto-detect it — just click the suggestion.
+
+The extension does not log you in. Clicking **Open & scan** opens your portal in the normal AWS sign-in flow if you're not already signed in. Once you complete AWS's own login (with your usual MFA, etc.), control returns to the extension.
+
+### 2. Enable multi-session
+
+For best results, turn on AWS multi-session console (top-right of `console.aws.amazon.com` → **Multi-session** → *Turn on*). The extension uses this so switching accounts in the side panel doesn't sign you out of the others.
+
+If you skip this step, the extension still works — it just falls back to the federation redirect every time, which is slower.
+
+### 3. Scan
+
+The extension calls the AWS portal API (the same one your browser already calls when you visit the portal page) to enumerate the accounts and roles you have access to. The list is stored locally.
+
+Done. The side panel now shows your accounts.
+
+## Daily use
+
+Once set up, the typical flow is:
+
+1. Hit `Cmd/Ctrl+Shift+A` — side panel opens.
+2. **Pick an account** in the *Account* section (or it remembers the last one you used).
+3. **Type a service** in the search box — `lambda`, `s3`, `cloudwatch logs`, `instance`, anything fuzzy.
+4. **Press Enter** — a console tab opens at the right account, role, and region.
+
+Refinements:
+
+- **Different role / region for one click** — click the chip on the account row to change without setting a global default.
+- **Save a favorite** — when the right combo is selected, hit `Shift+Enter` (or click the ☆ icon) to pin it. Favorites tab → click → launch.
+- **Reopen a closed tab** — switch to the *Tabs* pill, then *Recently closed*. One click reopens at the same account/role/region.
+- **Reorder sections** — drag section headers in the side panel; collapse what you don't need today.
+
+You'll never type a password through this extension. The first time per browser session, AWS itself may ask you to re-authenticate (because IAM Identity Center bearer tokens expire) — that happens in the AWS-hosted portal tab, the same as without the extension.
+
+## How a click becomes a console tab
+
+Two paths, picked automatically:
+
+1. **Live session reuse** — if you already have a multi-session console tab open for the target account, the extension builds a direct URL to the chosen service + feature on that account's session subdomain (`<account>-<session>.<region>.console.aws.amazon.com/<service>/...`) and opens it. Instant — no redirect.
+2. **Identity portal launch** — if no live session matches, the extension builds a federation URL through your IAM Identity Center start page that lands directly on the chosen service/feature in the chosen account/role/region. AWS handles the sign-in (or reuses your existing portal cookies), then redirects to the right console URL.
+
+Either way, **you never re-enter credentials through the extension** — AWS does the auth, the extension only assembles the right URL.
 
 For a deeper architecture write-up, see [`design.md`](design.md) (UI spec) and [`docs/CATALOG.md`](docs/CATALOG.md) (catalog pipeline).
 
 ## Permissions
 
+The extension requests the minimum set needed for the features above:
+
 | Permission | Why |
 |---|---|
-| `cookies` | Detect a live AWS console session and skip the portal redirect. |
-| `webRequest` | Read your portal SSO bearer (request headers only) to call the portal API. |
-| `declarativeNetRequest` | Rewrite `Origin` / `Referer` headers — the portal API rejects `chrome-extension://` origins. |
-| `tabs` + `scripting` | Observe open AWS console tabs for color/role/region context. |
-| `sidePanel` | Primary UI surface. |
-| `storage`, `notifications`, `alarms` | Persist accounts/favorites/prefs; daily catalog refresh. |
-| Host access to `portal.sso.*.amazonaws.com`, `*.awsapps.com`, `*.console.aws.amazon.com`, `*.signin.aws.amazon.com` | Listed AWS endpoints the extension talks to. |
-| Host access to `cdn.jsdelivr.net` + `raw.githubusercontent.com` | Service catalog refresh. |
+| `cookies` | Detect whether your multi-session AWS console subdomain has a live session — only checks **presence + expiry**, never reads cookie values. |
+| `webRequest` | Read the `Authorization: Bearer` header on outgoing portal API calls so the extension can call the same API on your behalf. |
+| `declarativeNetRequest` | Rewrite `Origin` / `Referer` headers on extension-initiated requests so the portal API accepts them. |
+| `tabs` + `scripting` | Discover open AWS console tabs and inject the small content script that observes account/role/region. |
+| `sidePanel` | The side-panel UI itself. |
+| `storage`, `notifications`, `alarms` | Persist accounts/favorites/prefs locally; daily catalog refresh; "scan complete" notification. |
+| Host access to AWS endpoints (`portal.sso.*.amazonaws.com`, `*.awsapps.com`, `*.console.aws.amazon.com`, `*.signin.aws.amazon.com`) | The AWS endpoints the extension reads from. |
+| Host access to `cdn.jsdelivr.net` + `raw.githubusercontent.com` | Service catalog refresh from this public repo. |
 
-No data is sent to third-party servers. The bearer token never leaves your machine.
+Full permission justifications: see [PRIVACY.md](PRIVACY.md) and [docs/STORE_LISTING.md](docs/STORE_LISTING.md).
 
 ## Development
 
@@ -107,42 +159,22 @@ Load `dist/` as an unpacked extension while iterating.
 ### Service catalog updates
 
 ```bash
-npm run catalog:auth        # Save a Playwright SSO session (one-time)
-npm run catalog:services    # Harvest services from live AWS console
-npm run catalog:features    # Harvest per-service features
-npm run catalog:icons       # Build base64-encoded icon map
-npm run catalog:all         # All of the above in sequence
+npm run catalog:auth        # one-time Playwright SSO sign-in
+npm run catalog:services    # harvest services from live AWS console
+npm run catalog:features    # harvest per-service features
+npm run catalog:icons       # build base64-encoded icon map
+npm run catalog:all         # all of the above in sequence
 ```
 
-See [`docs/CATALOG.md`](docs/CATALOG.md) for details.
-
-### Recording the demo
-
-The hero GIF lives at `docs/demo.gif`. Drop a fresh recording in that path to update.
-
-Recommended tools (macOS):
-
-- **[Kap](https://getkap.co)** — free, drag-to-record, exports straight to GIF. Pick this if you want zero friction.
-- **QuickTime + `gifski`** — `Cmd+Shift+5` → record selection → export `.mov` → `gifski --fps 24 -o docs/demo.gif input.mov`.
-- **[LICEcap](https://www.cockos.com/licecap/)** — old-school, lightweight, GIF-native.
-
-Suggested capture (15–20 sec, ~640px wide):
-
-1. Toolbar click → side panel opens.
-2. Pick an account → role chip selects.
-3. Type a service in search (e.g. `lambda`) → press Enter.
-4. AWS console tab opens to the right service + region.
-5. Re-open extension → click a favorite → another console launch.
-
-Trim, target ~3–5 MB so it loads on slow connections.
+See [docs/CATALOG.md](docs/CATALOG.md) for details.
 
 ## Contributing
 
-PRs welcome. Before submitting:
+PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the quality bar.
 
-- `npm run typecheck` must pass.
-- `npm run build` must pass.
-- Catalog changes go through `npm run catalog:*` scripts — don't hand-edit `catalog/services.json` for harvest-derived data (manual entries belong in [`catalog/overrides.json`](catalog/overrides.json)).
+## Security
+
+For security vulnerabilities, please **do not open a public issue**. See [SECURITY.md](SECURITY.md) for the disclosure process.
 
 ## License
 
