@@ -6,8 +6,18 @@ import styles from '@/options/options.module.css';
 type Status =
   | { kind: 'idle' }
   | { kind: 'scanning' }
-  | { kind: 'ok'; added: number; total: number }
+  | {
+      kind: 'ok';
+      accountsAdded: number;
+      accountsTotal: number;
+      rolesAdded: number;
+      rolesTotal: number;
+    }
   | { kind: 'error'; message: string };
+
+function countRoles(accounts: { roles: { name: string }[] }[]): number {
+  return accounts.reduce((sum, a) => sum + a.roles.length, 0);
+}
 
 type Props = {
   onChangePortal: () => void;
@@ -25,7 +35,10 @@ export function PortalSection({ onChangePortal }: Props) {
 
   async function rescan() {
     setStatus({ kind: 'scanning' });
-    const before = (await getSync()).accounts?.length ?? 0;
+    const beforeSync = await getSync();
+    const accountsBefore = beforeSync.accounts?.length ?? 0;
+    const rolesBefore = countRoles(beforeSync.accounts ?? []);
+
     const res = await send({ type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' });
     if (!res.ok) {
       setStatus({
@@ -34,11 +47,16 @@ export function PortalSection({ onChangePortal }: Props) {
       });
       return;
     }
-    const after = (await getSync()).accounts?.length ?? 0;
+
+    const afterSync = await getSync();
+    const accountsAfter = afterSync.accounts?.length ?? 0;
+    const rolesAfter = countRoles(afterSync.accounts ?? []);
     setStatus({
       kind: 'ok',
-      added: Math.max(0, after - before),
-      total: after,
+      accountsAdded: Math.max(0, accountsAfter - accountsBefore),
+      accountsTotal: accountsAfter,
+      rolesAdded: Math.max(0, rolesAfter - rolesBefore),
+      rolesTotal: rolesAfter,
     });
   }
 
@@ -84,9 +102,20 @@ export function PortalSection({ onChangePortal }: Props) {
 
       {status.kind === 'ok' && (
         <p className={styles.successMsg}>
-          {status.added > 0
-            ? `Added ${status.added} account${status.added === 1 ? '' : 's'} (${status.total} total).`
-            : `Up to date — ${status.total} account${status.total === 1 ? '' : 's'}.`}
+          {(() => {
+            const a = `${status.accountsTotal} account${status.accountsTotal === 1 ? '' : 's'}`;
+            const r = `${status.rolesTotal} role${status.rolesTotal === 1 ? '' : 's'}`;
+            const noChanges = status.accountsAdded === 0 && status.rolesAdded === 0;
+            if (noChanges) return `Up to date — ${a}, ${r}.`;
+            const parts: string[] = [];
+            if (status.accountsAdded > 0) {
+              parts.push(`${status.accountsAdded} new account${status.accountsAdded === 1 ? '' : 's'}`);
+            }
+            if (status.rolesAdded > 0) {
+              parts.push(`${status.rolesAdded} new role${status.rolesAdded === 1 ? '' : 's'}`);
+            }
+            return `Added ${parts.join(' + ')} (${a}, ${r}).`;
+          })()}
         </p>
       )}
       {status.kind === 'error' && (
