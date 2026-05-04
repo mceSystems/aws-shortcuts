@@ -416,7 +416,10 @@ function Section({
         <div
           className={styles.collapsedBody}
           onClick={onToggleCollapsed}
-          aria-hidden
+          // `inert` removes the collapsed subtree from focus + a11y tree
+          // without the aria-hidden-with-focused-descendant warning Chrome
+          // emits. Cast: React 18 JSX types don't include `inert` yet.
+          {...({ inert: '' } as Record<string, string>)}
         >
           {children}
         </div>
