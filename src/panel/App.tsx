@@ -6,7 +6,7 @@ import { getSync } from '@/shared/storage';
 import type { SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
 
-type Phase = 'onboarding' | 'ready' | 'settings';
+type Phase = 'onboarding' | 'ready' | 'settings' | 'change-portal';
 
 const CACHE_KEY = 'aws-shortcut:bootstrap';
 
@@ -80,40 +80,14 @@ export function App() {
     writeCached(next);
     setSsoConfig(next.ssoConfig);
     setBoot(next);
-    // Don't auto-bounce the user out of the settings view they explicitly
-    // navigated into. Storage updates (e.g. account observations triggered
-    // by a harvest tab) shouldn't yank them back to the main panel.
-    setPhase((cur) => (cur === 'settings' ? 'settings' : isReady(next) ? 'ready' : 'onboarding'));
-  }
-
-  async function wipeAll() {
-    try {
-      await Promise.all([
-        chrome.storage.sync.clear(),
-        chrome.storage.local.clear(),
-        chrome.storage.session.clear(),
-      ]);
-    } catch (e) {
-      console.error('[aws-shortcut] storage wipe failed', e);
-    }
-    try {
-      const existing = await chrome.declarativeNetRequest.getDynamicRules();
-      if (existing.length > 0) {
-        await chrome.declarativeNetRequest.updateDynamicRules({
-          removeRuleIds: existing.map((r) => r.id),
-        });
-      }
-    } catch (e) {
-      console.error('[aws-shortcut] dnr wipe failed', e);
-    }
-    try {
-      window.localStorage.clear();
-    } catch {
-      // ignore
-    }
-    // Hard reload popup so no in-memory React state survives + storage
-    // listeners can't repopulate the cache mid-wipe.
-    window.location.reload();
+    // Don't auto-bounce the user out of the settings / change-portal flows
+    // they explicitly navigated into. Storage updates (e.g. account
+    // observations triggered by a harvest tab) shouldn't yank them back to
+    // the main panel.
+    setPhase((cur) => {
+      if (cur === 'settings' || cur === 'change-portal') return cur;
+      return isReady(next) ? 'ready' : 'onboarding';
+    });
   }
 
   if (phase === 'onboarding') {
@@ -128,20 +102,33 @@ export function App() {
     );
   }
 
+  if (phase === 'change-portal') {
+    return (
+      <div className={styles.app}>
+        <Onboarding
+          initialSsoConfig={ssoConfig}
+          skipMultiSession
+          onComplete={() => setPhase('settings')}
+          onCancel={() => setPhase('settings')}
+        />
+      </div>
+    );
+  }
+
   if (phase === 'settings') {
     return (
       <div className={styles.app}>
-        <SettingsView onBack={() => setPhase('ready')} />
+        <SettingsView
+          onBack={() => setPhase('ready')}
+          onChangePortal={() => setPhase('change-portal')}
+        />
       </div>
     );
   }
 
   return (
     <div className={styles.app}>
-      <Main
-        onOpenSettings={() => setPhase('settings')}
-        onWipe={import.meta.env.DEV ? wipeAll : undefined}
-      />
+      <Main onOpenSettings={() => setPhase('settings')} />
     </div>
   );
 }

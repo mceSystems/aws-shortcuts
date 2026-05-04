@@ -21,7 +21,6 @@ import styles from './Main.module.css';
 
 type Props = {
   onOpenSettings?: () => void;
-  onWipe?: () => void;
 };
 
 type SectionId = 'account' | 'service' | 'favorites';
@@ -44,7 +43,7 @@ const DEFAULT_LAYOUT: LayoutState = {
 const LAYOUT_STORAGE_KEY = 'panel.section.layout.v2';
 const MIN_SECTION_PX = 60;
 
-export function Main({ onOpenSettings, onWipe }: Props) {
+export function Main({ onOpenSettings }: Props) {
   const { accounts, accountOrder, hiddenAccountIds, ssoConfig, prefs, loaded } = useAccounts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -234,14 +233,6 @@ export function Main({ onOpenSettings, onWipe }: Props) {
         })}
       </div>
 
-      {onWipe && (
-        <div className={styles.devRow}>
-          <span className={styles.devLabel}>DEV</span>
-          <button type="button" className={styles.devBtn} onClick={onWipe}>
-            Wipe storage
-          </button>
-        </div>
-      )}
     </div>
   );
 }

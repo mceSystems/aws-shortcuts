@@ -8,11 +8,18 @@ import scan from './ScanStep.module.css';
 type Phase = 'scanning' | 'needsPortal';
 
 type Props = {
+  stepIndex?: number;
+  totalSteps?: number;
   onBack: () => void;
   onComplete: () => void;
 };
 
-export function ScanStep({ onBack, onComplete }: Props) {
+export function ScanStep({
+  stepIndex = 2,
+  totalSteps = 3,
+  onBack,
+  onComplete,
+}: Props) {
   const [phase, setPhase] = useState<Phase>('scanning');
   const [error, setError] = useState<string | null>(null);
   const [reloading, setReloading] = useState(false);
@@ -82,7 +89,7 @@ export function ScanStep({ onBack, onComplete }: Props) {
 
   return (
     <div className={styles.scene}>
-      <StepDots total={3} current={2} />
+      <StepDots total={totalSteps} current={stepIndex} />
       <div className={styles.body}>
         <div className={styles.titleBlock}>
           <h1 className={styles.title}>Scanning your portal</h1>
