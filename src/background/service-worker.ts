@@ -296,6 +296,12 @@ async function refreshOriginRule(): Promise<void> {
       });
       return;
     }
+    // urlFilter intentionally matches the substring "portal.sso.": the SSO
+    // portal API call begins on the user's awsapps.com host and redirects
+    // to portal.sso.<region>.amazonaws.com, and the redirected leg is the
+    // one whose Origin needs rewriting. `initiatorDomains` pins the rule
+    // to requests originating from THIS extension, so it cannot fire on
+    // unrelated browser traffic even though the urlFilter is loose.
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [ORIGIN_RULE_ID],
       addRules: [

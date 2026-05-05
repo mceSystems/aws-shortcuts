@@ -19,7 +19,6 @@ export default defineManifest({
     'webNavigation',
     'sidePanel',
     'cookies',
-    'notifications',
     'scripting',
     'alarms',
     'declarativeNetRequest',

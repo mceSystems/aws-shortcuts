@@ -17,11 +17,19 @@ type Suggestion = {
 
 type Props = {
   initialUrl?: string;
+  stepIndex?: number;
+  totalSteps?: number;
   onBack: () => void;
   onContinue: () => void;
 };
 
-export function ConnectStep({ initialUrl = '', onBack, onContinue }: Props) {
+export function ConnectStep({
+  initialUrl = '',
+  stepIndex = 1,
+  totalSteps = 3,
+  onBack,
+  onContinue,
+}: Props) {
   const [url, setUrl] = useState(initialUrl);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -73,7 +81,7 @@ export function ConnectStep({ initialUrl = '', onBack, onContinue }: Props) {
 
   return (
     <div className={styles.scene}>
-      <StepDots total={3} current={1} />
+      <StepDots total={totalSteps} current={stepIndex} />
       <div className={styles.body}>
         <Logo size={44} />
         <div className={styles.titleBlock}>

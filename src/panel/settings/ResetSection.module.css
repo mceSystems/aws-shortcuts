@@ -1,0 +1,33 @@
+.confirmBox {
+  border: 1px solid var(--ink-200);
+  border-radius: 12px;
+  padding: 12px;
+  background: color-mix(in srgb, #d92d20 8%, var(--surface-1) 92%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirmIntro {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-900);
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--ink-700);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .confirmBox {
+    background: color-mix(in srgb, #f04438 14%, var(--surface-1) 86%);
+  }
+}
