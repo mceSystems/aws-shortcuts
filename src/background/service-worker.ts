@@ -13,6 +13,8 @@ import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { MULTI_SESSION_HOST_RE, fullDedupeKey, parseConsoleUrl } from '@/shared/consoleUrl';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
+import { installTabGrouping, groupTabsByAccount } from './tabGrouping';
+import { clearStickySkip } from '@/shared/storage';
 import { bumpOpenCount } from '@/shared/openCounts';
 
 installCatalogRefresh();
@@ -262,6 +264,42 @@ async function harvestOpenTabs(): Promise<void> {
     console.warn('[aws-shortcut] harvest failed', e);
   }
 }
+
+/** Self-healing reconcile: query Chrome for live tabs, drop any openTabs
+ *  entries whose tabIds Chrome doesn't know about, and record them as
+ *  recents. MV3 SW lifecycle can occasionally miss `tabs.onRemoved`
+ *  events; this catches up regardless. */
+async function reconcileOpenTabs(): Promise<void> {
+  let liveIds: Set<number>;
+  try {
+    const tabs = await chrome.tabs.query({});
+    liveIds = new Set(tabs.map((t) => t.id).filter((x): x is number => x != null));
+  } catch (e) {
+    console.warn('[aws-shortcut] reconcile: tabs.query failed', e);
+    return;
+  }
+  await mutateOpenTabs((cur) => {
+    const stale = cur.filter((t) => !liveIds.has(t.tabId));
+    if (stale.length === 0) return cur;
+    for (const t of stale) void recordRecent(t);
+    return cur.filter((t) => liveIds.has(t.tabId));
+  });
+}
+
+// Periodic safety net — even if every event-driven path fails, the
+// alarm catches drift within ~30s.
+const RECONCILE_ALARM = 'open-tabs-reconcile';
+chrome.alarms.create(RECONCILE_ALARM, { periodInMinutes: 0.5 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === RECONCILE_ALARM) void reconcileOpenTabs();
+});
+
+// Window close fires onRemoved for each tab, but MV3 SW can drop events
+// when many fire at once. Trigger one explicit reconcile after the
+// window dies to catch up.
+chrome.windows.onRemoved.addListener(() => {
+  void reconcileOpenTabs();
+});
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'sync') return;
@@ -629,6 +667,50 @@ async function handle(msg: Msg): Promise<MsgResponse> {
           source: result.source,
         },
       };
+    }
+
+    case 'CLOSE_TAB': {
+      try {
+        await chrome.tabs.remove(msg.tabId);
+      } catch (e) {
+        return { ok: false, error: (e as Error).message };
+      }
+      // Defensive: don't rely on tabs.onRemoved listener to fire — MV3 SW
+      // lifecycle can drop events. Reconcile now so storage matches reality.
+      await reconcileOpenTabs();
+      return { ok: true };
+    }
+
+    case 'CLOSE_GROUP': {
+      try {
+        const tabs = await chrome.tabs.query({ groupId: msg.groupId });
+        const ids = tabs.map((t) => t.id).filter((x): x is number => x != null);
+        if (ids.length) await chrome.tabs.remove(ids);
+      } catch (e) {
+        return { ok: false, error: (e as Error).message };
+      }
+      await reconcileOpenTabs();
+      return { ok: true };
+    }
+
+    case 'RECONCILE_OPEN_TABS': {
+      await reconcileOpenTabs();
+      return { ok: true };
+    }
+
+    case 'GROUP_BY_ACCOUNT': {
+      await clearStickySkip();
+      await groupTabsByAccount({ minTabs: 1, respectStickySkip: false });
+      return { ok: true };
+    }
+
+    case 'TOGGLE_GROUP_COLLAPSED': {
+      try {
+        await chrome.tabGroups.update(msg.groupId, { collapsed: msg.collapsed });
+      } catch (e) {
+        return { ok: false, error: (e as Error).message };
+      }
+      return { ok: true };
     }
   }
 }
@@ -1026,5 +1108,11 @@ function mergeAccounts(existing: Account[], incoming: Account[]): Account[] {
     };
   });
 }
+
+// Tab-grouping module install — placed at the END of module load so any
+// throw inside cannot abort registration of critical listeners above
+// (chrome.runtime.onInstalled → harvestOpenTabs, chrome.tabs.onRemoved →
+// openTabs cleanup, message handler, etc.).
+installTabGrouping();
 
 export {};

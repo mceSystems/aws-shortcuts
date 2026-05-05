@@ -1,7 +1,9 @@
 import { Fragment, useState } from 'react';
 import type { Account } from '@/shared/types';
 import type { OpenTabInfo } from '@/shared/sessionStorage';
+import { send } from '@/shared/messages';
 import { TabRow } from './TabRow';
+import tabRowStyles from './TabRow.module.css';
 import { buildRowPendingFavorite } from './buildRowPendingFavorite';
 import { OpenInOtherPanel } from './OpenInOtherPanel';
 import type { PendingFavorite } from './SaveFavoriteBanner';
@@ -11,12 +13,28 @@ type Props = {
   openTabs: OpenTabInfo[];
   accounts: Account[];
   onRequestSaveFavorite?: (pending: PendingFavorite) => void;
+  /** When true, shows per-row close (×) button. Defaults true for OpenList
+   * usage but can be turned off when this is rendered inside a context
+   * that owns its own trailing controls. */
+  showClose?: boolean;
+  /** Optimistic-update hook from useOpenTabs. */
+  onTabRemovedLocally?: (tabId: number) => void;
+  /** When true, hides the empty-state message — caller renders its own. */
+  hideEmpty?: boolean;
 };
 
-export function OpenList({ openTabs, accounts, onRequestSaveFavorite }: Props) {
+export function OpenList({
+  openTabs,
+  accounts,
+  onRequestSaveFavorite,
+  showClose = true,
+  onTabRemovedLocally,
+  hideEmpty = false,
+}: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (openTabs.length === 0) {
+    if (hideEmpty) return null;
     return <div className={styles.empty}>No AWS console tabs open.</div>;
   }
   const accountById = new Map(accounts.map((a) => [a.accountId, a]));
@@ -51,6 +69,15 @@ export function OpenList({ openTabs, accounts, onRequestSaveFavorite }: Props) {
                     active={expanded}
                     onClick={() => setExpandedId(expanded ? null : rowId)}
                   />
+                  {showClose && (
+                    <CloseButton
+                      onClick={() => {
+                        const id = t.tabId;
+                        onTabRemovedLocally?.(id);
+                        void send({ type: 'CLOSE_TAB', tabId: id });
+                      }}
+                    />
+                  )}
                   <FocusIcon />
                 </>
               }
@@ -70,6 +97,35 @@ export function OpenList({ openTabs, accounts, onRequestSaveFavorite }: Props) {
         );
       })}
     </div>
+  );
+}
+
+function CloseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className={tabRowStyles.rowCloseBtn}
+      title="Close tab"
+      aria-label="Close tab"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
   );
 }
 

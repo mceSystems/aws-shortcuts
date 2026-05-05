@@ -15,6 +15,7 @@ export default defineManifest({
   permissions: [
     'storage',
     'tabs',
+    'tabGroups',
     'webRequest',
     'webNavigation',
     'sidePanel',

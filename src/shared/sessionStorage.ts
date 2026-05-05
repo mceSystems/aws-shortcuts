@@ -94,8 +94,30 @@ export function mutateOpenTabs(
   const next = openTabsMutateChain.then(async () => {
     const cur = await getOpenTabs();
     const updated = fn(cur);
-    if (updated !== cur) await setOpenTabs(updated);
+    if (updated === cur) return;
+    // Self-heal: every write filters out tabIds Chrome no longer has.
+    // MV3 SW occasionally drops `tabs.onRemoved` events; without this,
+    // handlers like SESSION_OBSERVED, upsertOpenTab, and harvest would
+    // happily write back stale entries that another race had failed to
+    // clean up. One cheap chrome.tabs.query per write is the price.
+    const reconciled = await filterToLiveTabs(updated);
+    await setOpenTabs(reconciled);
   });
   openTabsMutateChain = next.catch(() => {});
   return next;
+}
+
+async function filterToLiveTabs(list: OpenTabInfo[]): Promise<OpenTabInfo[]> {
+  if (list.length === 0) return list;
+  if (typeof chrome === 'undefined' || !chrome.tabs?.query) return list;
+  try {
+    const tabs = await chrome.tabs.query({});
+    const liveIds = new Set<number>(
+      tabs.map((t) => t.id).filter((x): x is number => x != null),
+    );
+    const cleaned = list.filter((t) => liveIds.has(t.tabId));
+    return cleaned.length === list.length ? list : cleaned;
+  } catch {
+    return list;
+  }
 }

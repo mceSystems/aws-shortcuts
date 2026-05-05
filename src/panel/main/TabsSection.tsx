@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Account } from '@/shared/types';
 import { send } from '@/shared/messages';
 import { FavoritesView } from './FavoritesView';
-import { OpenList } from './OpenList';
+import { OpenGroupedList } from './OpenGroupedList';
 import { RecentList } from './RecentList';
 import type { PendingFavorite } from './SaveFavoriteBanner';
 import { useFavorites } from './useFavorites';
@@ -36,7 +36,7 @@ export function TabsSection({
     else setPillUncontrolled(next);
   };
   const [favoritesEditing, setFavoritesEditing] = useState(false);
-  const { openTabs } = useOpenTabs();
+  const { openTabs, removeLocally: removeOpenTabLocally } = useOpenTabs();
   const { recents } = useRecents();
   const { favorites } = useFavorites();
 
@@ -125,10 +125,11 @@ export function TabsSection({
         ) : (
           <>
             <div className={styles.subLabel}>Open</div>
-            <OpenList
+            <OpenGroupedList
               openTabs={openTabs}
               accounts={accounts}
               onRequestSaveFavorite={onRequestSaveFavorite}
+              onTabRemovedLocally={removeOpenTabLocally}
             />
             <div className={styles.subLabelRow}>
               <span className={styles.subLabel}>Recently closed</span>
