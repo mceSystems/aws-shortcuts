@@ -1,4 +1,5 @@
 import { CatalogSection } from '@/options/CatalogSection';
+import { AutoCloseSection } from './AutoCloseSection';
 import { PortalSection } from './PortalSection';
 import { ResetSection } from './ResetSection';
 import styles from './SettingsView.module.css';
@@ -19,6 +20,7 @@ export function SettingsView({ onBack, onChangePortal }: Props) {
       </div>
       <div className={styles.body}>
         <PortalSection onChangePortal={onChangePortal} />
+        <AutoCloseSection />
         <CatalogSection />
         <ResetSection />
       </div>

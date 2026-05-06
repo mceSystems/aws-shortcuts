@@ -30,6 +30,7 @@ AWS Shortcut collapses that into **one click in a side panel**. It reuses the AW
 - 📌 **Favorites** — pin combos you use daily (`Production · Lambda · Functions · us-east-1`). Click → console.
 - 🕒 **Recents** — recently-closed AWS console tabs are remembered. Click → reopen.
 - 🎨 **Account colors + region awareness** — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
+- 🚪 **Auto-close after launch** *(optional)* — flip the toggle in *Settings → Close panel after opening a service* and the side panel dismisses itself the moment a console tab opens or refocuses. Off by default; ideal for users who only want the panel as a launcher.
 - ⌨️ **Keyboard shortcut** — `Cmd+Shift+A` (macOS) / `Ctrl+Shift+A` (Win/Linux). Search-as-you-type, Enter to launch.
 
 ## What it does NOT do — privacy & identity guarantees
@@ -116,6 +117,7 @@ Refinements:
 - **Save a favorite** — when the right combo is selected, hit `Shift+Enter` (or click the ☆ icon) to pin it. Favorites tab → click → launch.
 - **Reopen a closed tab** — switch to the *Tabs* pill, then *Recently closed*. One click reopens at the same account/role/region.
 - **Reorder sections** — drag section headers in the side panel; collapse what you don't need today.
+- **Dismiss the panel after each launch** — open *Settings* and turn on *Close panel after opening a service*. Once enabled, every successful launch (new tab, refocus from Tabs/Favorites/Recents, or open-in-other-account) auto-closes the side panel.
 
 You'll never type a password through this extension. The first time per browser session, AWS itself may ask you to re-authenticate (because IAM Identity Center bearer tokens expire) — that happens in the AWS-hosted portal tab, the same as without the extension.
 

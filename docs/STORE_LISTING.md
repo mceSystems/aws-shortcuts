@@ -35,6 +35,7 @@ WHAT IT DOES
 • Favorites — pin combos you use daily (Production · Lambda · Functions · us-east-1). Click → console.
 • Recents — recently-closed AWS console tabs are remembered. Click → reopen.
 • Account colors + region awareness — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
+• Auto-close after launch (optional) — flip a toggle in Settings to dismiss the side panel automatically as soon as a console tab opens or refocuses. Off by default; turn it on if you want the panel to behave purely as a launcher.
 • Keyboard shortcut — Cmd+Shift+A on macOS, Ctrl+Shift+A on Windows/Linux. Search-as-you-type, Enter to launch.
 
 

@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import type { Account } from '@/shared/types';
 import type { OpenTabInfo } from '@/shared/sessionStorage';
 import { send } from '@/shared/messages';
+import { closePanelIfPrefSet } from '@/shared/closePanel';
 import { TabRow } from './TabRow';
 import tabRowStyles from './TabRow.module.css';
 import { buildRowPendingFavorite } from './buildRowPendingFavorite';
@@ -133,6 +134,7 @@ async function focusTab(tabId: number, windowId: number): Promise<void> {
   try {
     await chrome.tabs.update(tabId, { active: true });
     if (windowId !== -1) await chrome.windows.update(windowId, { focused: true });
+    void closePanelIfPrefSet();
   } catch (e) {
     console.warn('[aws-shortcut/panel] focus tab failed', e);
   }

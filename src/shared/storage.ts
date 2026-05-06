@@ -16,7 +16,6 @@ export type LocalSchema = {
 };
 
 const DEFAULT_PREFS: Prefs = {
-  uiMode: 'popup',
   multiSessionVerified: false,
 };
 

@@ -4,6 +4,7 @@ import { type CatalogHit, rankCatalog } from '@/shared/serviceCatalog';
 import { subscribeCatalog } from '@/shared/catalogStore';
 import { OPEN_COUNTS_STORAGE_KEY } from '@/shared/openCounts';
 import { send } from '@/shared/messages';
+import { closePanelIfPrefSet } from '@/shared/closePanel';
 import { chipColor, NEUTRAL_COLOR } from '@/shared/colors';
 import { ServiceIcon } from './ServiceIcon';
 import styles from './ServiceSearch.module.css';
@@ -166,11 +167,12 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compa
       featurePath: featurePath,
     });
     if (!res.ok || !res.url) return;
-    void chrome.tabs.create({ url: res.url });
+    await chrome.tabs.create({ url: res.url });
     // Close picker so the next time the panel is visible the search input is
     // mounted and can receive focus + typing.
     setPickedFeature(null);
     inputRef.current?.focus();
+    void closePanelIfPrefSet();
   }
 
   function activate(hit: CatalogHit): void {
