@@ -20,11 +20,6 @@ Plain text only — Chrome Web Store does not render Markdown. Unicode bullets (
 One-click access to any AWS account, role, region, and service — straight from your browser. No CLI. No credentials on disk. No new login. Piggybacks on your existing IAM Identity Center (AWS SSO) browser session.
 
 
-WHAT'S NEW IN 1.0.1
-
-• Tab grouping by account. Collapse 20 open AWS tabs into one Chrome tab group per account. Trigger manually with the new "Group by account" button in the Tabs panel, or turn on auto-grouping in Settings to keep it tidy continuously. Group color matches each account's AWS color band — production stays visually distinct from staging.
-
-
 WHY
 
 If you work across many AWS accounts, you know the dance: open IAM Identity Center, click your account, click the right role, wait for the federation redirect, finally land in the console, realize you wanted a different region, repeat.
@@ -39,7 +34,6 @@ WHAT IT DOES
 • Multi-session aware — when you have AWS multi-session console enabled, it deep-links to the right <account>-<session>.region.console.aws.amazon.com subdomain so multiple accounts stay open simultaneously without signing each other out.
 • Favorites — pin combos you use daily (Production · Lambda · Functions · us-east-1). Click → console.
 • Recents — recently-closed AWS console tabs are remembered. Click → reopen.
-• Tab grouping by account — group your open AWS console tabs in Chrome's tab strip by account, manually or automatically. Set a minimum tabs-per-account threshold to skip noisy singletons.
 • Account colors + region awareness — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
 • Keyboard shortcut — Cmd+Shift+A on macOS, Ctrl+Shift+A on Windows/Linux. Search-as-you-type, Enter to launch.
 
@@ -99,7 +93,6 @@ PERMISSIONS (WHY EACH ONE IS NEEDED)
 • webRequest — read the Authorization: Bearer header on outgoing portal API calls so the extension can call the same API on your behalf.
 • declarativeNetRequest — rewrite Origin/Referer headers on extension-initiated requests so the portal API accepts them.
 • tabs + scripting — discover open AWS console tabs and inject the small content script that observes account/role/region.
-• tabGroups — create / update / remove Chrome tab groups when grouping AWS console tabs by account. Scoped to groups whose title matches a known AWS account.
 • sidePanel — the side-panel UI itself.
 • storage, notifications, alarms — persist accounts/favorites/prefs locally, daily catalog refresh, "scan complete" notification.
 • Host access to AWS endpoints (portal.sso.*.amazonaws.com, *.awsapps.com, *.console.aws.amazon.com, *.signin.aws.amazon.com) — the AWS endpoints the extension reads from.
@@ -140,10 +133,6 @@ Paste these into the dashboard form, one per permission, when prompted.
 ### `tabs` / `scripting`
 
 > Used to detect open AWS console tabs and inject a small content script on `*.console.aws.amazon.com` that observes the current tab's account ID, role name, region, color band, and multi-session subdomain. This keeps the side panel in sync with what's already open and lets the extension correctly identify which account a tab belongs to.
-
-### `tabGroups`
-
-> Used to group AWS console tabs by account in Chrome's tab strip. Triggered either manually (when the user clicks "Group by account" in the Tabs panel) or automatically (when the user enables auto-group in Settings). The extension only creates, updates, or removes tab groups whose title matches a known AWS account from the user's portal. It does not touch unrelated tab groups.
 
 ### `sidePanel`
 

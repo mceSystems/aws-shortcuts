@@ -13,8 +13,6 @@ import { buildPortalLaunchUrl, buildDirectConsoleUrl } from '@/shared/launcher';
 import { MULTI_SESSION_HOST_RE, fullDedupeKey, parseConsoleUrl } from '@/shared/consoleUrl';
 import { fetchAccounts } from './portal-api';
 import { installCatalogRefresh, refreshCatalog } from './catalogRefresh';
-import { installTabGrouping, groupTabsByAccount } from './tabGrouping';
-import { clearStickySkip } from '@/shared/storage';
 import { bumpOpenCount } from '@/shared/openCounts';
 
 installCatalogRefresh();
@@ -681,35 +679,8 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return { ok: true };
     }
 
-    case 'CLOSE_GROUP': {
-      try {
-        const tabs = await chrome.tabs.query({ groupId: msg.groupId });
-        const ids = tabs.map((t) => t.id).filter((x): x is number => x != null);
-        if (ids.length) await chrome.tabs.remove(ids);
-      } catch (e) {
-        return { ok: false, error: (e as Error).message };
-      }
-      await reconcileOpenTabs();
-      return { ok: true };
-    }
-
     case 'RECONCILE_OPEN_TABS': {
       await reconcileOpenTabs();
-      return { ok: true };
-    }
-
-    case 'GROUP_BY_ACCOUNT': {
-      await clearStickySkip();
-      await groupTabsByAccount({ minTabs: 1, respectStickySkip: false });
-      return { ok: true };
-    }
-
-    case 'TOGGLE_GROUP_COLLAPSED': {
-      try {
-        await chrome.tabGroups.update(msg.groupId, { collapsed: msg.collapsed });
-      } catch (e) {
-        return { ok: false, error: (e as Error).message };
-      }
       return { ok: true };
     }
   }
@@ -1108,11 +1079,5 @@ function mergeAccounts(existing: Account[], incoming: Account[]): Account[] {
     };
   });
 }
-
-// Tab-grouping module install — placed at the END of module load so any
-// throw inside cannot abort registration of critical listeners above
-// (chrome.runtime.onInstalled → harvestOpenTabs, chrome.tabs.onRemoved →
-// openTabs cleanup, message handler, etc.).
-installTabGrouping();
 
 export {};

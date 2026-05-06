@@ -22,25 +22,3 @@ export function awsColorToHex(name: string | undefined): string | undefined {
 export function chipColor(stored: string | undefined): string {
   return stored || NEUTRAL_COLOR;
 }
-
-export function awsColorToChromeGroupColor(
-  hexOrName: string | undefined,
-): chrome.tabGroups.ColorEnum {
-  if (!hexOrName) return 'grey';
-  const lower = hexOrName.trim().toLowerCase();
-  // Reverse-lookup hex → AWS color name first; fall back to direct name match.
-  const nameFromHex = Object.entries(AWS_COLOR_MAP).find(
-    ([, hex]) => hex.toLowerCase() === lower,
-  )?.[0];
-  switch (nameFromHex ?? lower) {
-    case 'red': return 'red';
-    case 'orange': return 'orange';
-    case 'yellow': return 'yellow';
-    case 'green': return 'green';
-    case 'teal': return 'cyan';
-    case 'blue': return 'blue';
-    case 'purple': return 'purple';
-    case 'pink': return 'pink';
-    default: return 'grey';
-  }
-}

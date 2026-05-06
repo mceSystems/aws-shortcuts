@@ -29,7 +29,6 @@ AWS Shortcut collapses that into **one click in a side panel**. It reuses the AW
 - 🪟 **Multi-session aware** — when you have AWS multi-session console enabled, it deep-links to the right `<account>-<session>.region.console.aws.amazon.com` subdomain so multiple accounts stay open simultaneously without signing each other out.
 - 📌 **Favorites** — pin combos you use daily (`Production · Lambda · Functions · us-east-1`). Click → console.
 - 🕒 **Recents** — recently-closed AWS console tabs are remembered. Click → reopen.
-- 🗂️ **Tab grouping by account** *(new in 1.0.1)* — collapse the chaos of 20 open AWS tabs into one group per account in Chrome's tab strip. Click **Group by account** in the Tabs panel for a one-shot regroup, or turn on auto-group in Settings to do it continuously. Group color mirrors each account's AWS color band. Tweak the minimum tabs-per-account threshold (1–10) to skip noisy singletons.
 - 🎨 **Account colors + region awareness** — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
 - ⌨️ **Keyboard shortcut** — `Cmd+Shift+A` (macOS) / `Ctrl+Shift+A` (Win/Linux). Search-as-you-type, Enter to launch.
 
@@ -117,7 +116,6 @@ Refinements:
 - **Save a favorite** — when the right combo is selected, hit `Shift+Enter` (or click the ☆ icon) to pin it. Favorites tab → click → launch.
 - **Reopen a closed tab** — switch to the *Tabs* pill, then *Recently closed*. One click reopens at the same account/role/region.
 - **Reorder sections** — drag section headers in the side panel; collapse what you don't need today.
-- **Group your AWS tabs by account** — switch to the *Tabs* pill and click **Group by account**, or enable auto-group in *Settings → Tab grouping*. Each group inherits the account's color band so production stays visually distinct.
 
 You'll never type a password through this extension. The first time per browser session, AWS itself may ask you to re-authenticate (because IAM Identity Center bearer tokens expire) — that happens in the AWS-hosted portal tab, the same as without the extension.
 
@@ -142,7 +140,6 @@ The extension requests the minimum set needed for the features above:
 | `webRequest` | Read the `Authorization: Bearer` header on outgoing portal API calls so the extension can call the same API on your behalf. |
 | `declarativeNetRequest` | Rewrite `Origin` / `Referer` headers on extension-initiated requests so the portal API accepts them. |
 | `tabs` + `scripting` | Discover open AWS console tabs and inject the small content script that observes account/role/region. |
-| `tabGroups` | Create / update / remove Chrome tab groups when grouping AWS console tabs by account. Only touches groups whose title matches a known AWS account. |
 | `sidePanel` | The side-panel UI itself. |
 | `storage`, `notifications`, `alarms` | Persist accounts/favorites/prefs locally; daily catalog refresh; "scan complete" notification. |
 | Host access to AWS endpoints (`portal.sso.*.amazonaws.com`, `*.awsapps.com`, `*.console.aws.amazon.com`, `*.signin.aws.amazon.com`) | The AWS endpoints the extension reads from. |

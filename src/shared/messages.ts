@@ -43,9 +43,6 @@ export type Msg =
   | { type: 'DELETE_FAVORITE'; id: string }
   | { type: 'REORDER_FAVORITES'; ids: string[] }
   | { type: 'CLOSE_TAB'; tabId: number }
-  | { type: 'CLOSE_GROUP'; groupId: number }
-  | { type: 'GROUP_BY_ACCOUNT' }
-  | { type: 'TOGGLE_GROUP_COLLAPSED'; groupId: number; collapsed: boolean }
   | { type: 'RECONCILE_OPEN_TABS' };
 
 /** Protocol for bg → content-script. Uses the same chrome.runtime channel. */

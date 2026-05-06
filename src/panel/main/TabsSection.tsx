@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Account } from '@/shared/types';
 import { send } from '@/shared/messages';
 import { FavoritesView } from './FavoritesView';
-import { OpenGroupedList } from './OpenGroupedList';
+import { OpenList } from './OpenList';
 import { RecentList } from './RecentList';
 import type { PendingFavorite } from './SaveFavoriteBanner';
 import { useFavorites } from './useFavorites';
@@ -125,7 +125,7 @@ export function TabsSection({
         ) : (
           <>
             <div className={styles.subLabel}>Open</div>
-            <OpenGroupedList
+            <OpenList
               openTabs={openTabs}
               accounts={accounts}
               onRequestSaveFavorite={onRequestSaveFavorite}

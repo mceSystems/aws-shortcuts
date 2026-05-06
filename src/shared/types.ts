@@ -103,8 +103,4 @@ export type Prefs = {
   catalogLastRefreshAt?: number;
   /** Last account selected in popup; restored on next popup open. */
   lastSelectedAccountId?: string;
-  /** When true, SW auto-groups AWS tabs by account. Off by default. */
-  autoGroupByAccount?: boolean;
-  /** Auto-group only when an account has at least this many tabs in a window. */
-  groupMinTabs?: number;
 };
