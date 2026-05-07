@@ -14,6 +14,8 @@
     "build": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "zip": "mkdir -p release && rm -f release/aws-shortcut-$npm_package_version.zip && cd dist && zip -r ../release/aws-shortcut-$npm_package_version.zip . -x '*.DS_Store' '*/.DS_Store'",
+    "package": "npm run build && npm run zip",
     "catalog:auth": "tsx scripts/auth.ts",
     "catalog:services": "tsx scripts/update-services.ts",
     "catalog:features": "tsx scripts/update-features.ts",

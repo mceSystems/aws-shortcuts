@@ -20,6 +20,15 @@ Plain text only — Chrome Web Store does not render Markdown. Unicode bullets (
 One-click access to any AWS account, role, region, and service — straight from your browser. No CLI. No credentials on disk. No new login. Piggybacks on your existing IAM Identity Center (AWS SSO) browser session.
 
 
+WHAT'S NEW IN 1.0.1
+
+• Settings → Rescan portal. Pull a fresh account/role list from IAM Identity Center without re-onboarding.
+• Settings → Change portal URL. Switch to a different IAM Identity Center portal without resetting the extension.
+• Settings → Reset extension. One-click wipe back to a fresh-install state.
+• Auto-close after launch (optional). New Settings toggle dismisses the side panel automatically the moment a console tab opens or refocuses. Off by default — flip it on if you only use the panel as a launcher.
+• Close tabs from the panel. Every row in the Tabs list now has a one-click close button.
+
+
 WHY
 
 If you work across many AWS accounts, you know the dance: open IAM Identity Center, click your account, click the right role, wait for the federation redirect, finally land in the console, realize you wanted a different region, repeat.
@@ -34,6 +43,7 @@ WHAT IT DOES
 • Multi-session aware — when you have AWS multi-session console enabled, it deep-links to the right <account>-<session>.region.console.aws.amazon.com subdomain so multiple accounts stay open simultaneously without signing each other out.
 • Favorites — pin combos you use daily (Production · Lambda · Functions · us-east-1). Click → console.
 • Recents — recently-closed AWS console tabs are remembered. Click → reopen.
+• Close tabs from the panel — each row in the Tabs list has a one-click close button. The list updates instantly without waiting on Chrome.
 • Account colors + region awareness — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
 • Auto-close after launch (optional) — flip a toggle in Settings to dismiss the side panel automatically as soon as a console tab opens or refocuses. Off by default; turn it on if you want the panel to behave purely as a launcher.
 • Keyboard shortcut — Cmd+Shift+A on macOS, Ctrl+Shift+A on Windows/Linux. Search-as-you-type, Enter to launch.
