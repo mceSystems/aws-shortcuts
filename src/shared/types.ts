@@ -98,9 +98,11 @@ export type SsoConfig = {
 };
 
 export type Prefs = {
-  uiMode: 'popup' | 'sidepanel' | 'both';
   multiSessionVerified: boolean;
   catalogLastRefreshAt?: number;
-  /** Last account selected in popup; restored on next popup open. */
+  /** Last account selected; restored on next side-panel open. */
   lastSelectedAccountId?: string;
+  /** When true, closes the side panel automatically after a successful
+   *  service/feature launch (new tab or refocus). Off by default. */
+  autoCloseOnOpen?: boolean;
 };

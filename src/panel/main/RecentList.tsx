@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import type { Account, Recent } from '@/shared/types';
 import type { OpenTabInfo } from '@/shared/sessionStorage';
 import { send } from '@/shared/messages';
+import { closePanelIfPrefSet } from '@/shared/closePanel';
 import { openOrFocusTab } from '@/shared/tabs';
 import { TabRow } from './TabRow';
 import { buildRowPendingFavorite } from './buildRowPendingFavorite';
@@ -90,6 +91,7 @@ async function relaunch(r: Recent): Promise<void> {
     return;
   }
   await openOrFocusTab(res.url);
+  void closePanelIfPrefSet();
 }
 
 function SaveButton({ onClick }: { onClick: () => void }) {

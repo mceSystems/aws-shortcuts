@@ -36,7 +36,7 @@ export function TabsSection({
     else setPillUncontrolled(next);
   };
   const [favoritesEditing, setFavoritesEditing] = useState(false);
-  const { openTabs } = useOpenTabs();
+  const { openTabs, removeLocally: removeOpenTabLocally } = useOpenTabs();
   const { recents } = useRecents();
   const { favorites } = useFavorites();
 
@@ -129,6 +129,7 @@ export function TabsSection({
               openTabs={openTabs}
               accounts={accounts}
               onRequestSaveFavorite={onRequestSaveFavorite}
+              onTabRemovedLocally={removeOpenTabLocally}
             />
             <div className={styles.subLabelRow}>
               <span className={styles.subLabel}>Recently closed</span>

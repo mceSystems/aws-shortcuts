@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Account } from '@/shared/types';
 import { chipColor } from '@/shared/colors';
 import { send } from '@/shared/messages';
+import { closePanelIfPrefSet } from '@/shared/closePanel';
 import { openOrFocusTab } from '@/shared/tabs';
 import { AWS_REGIONS } from '@/shared/regions';
 import styles from './OpenInOtherPanel.module.css';
@@ -81,6 +82,7 @@ export function OpenInOtherPanel(props: Props) {
     });
     if (res.ok && res.url) {
       await openOrFocusTab(res.url);
+      void closePanelIfPrefSet();
     } else {
       console.warn('[aws-shortcut/panel] open-in-other failed', res);
     }

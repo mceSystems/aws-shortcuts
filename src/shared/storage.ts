@@ -16,7 +16,6 @@ export type LocalSchema = {
 };
 
 const DEFAULT_PREFS: Prefs = {
-  uiMode: 'popup',
   multiSessionVerified: false,
 };
 
@@ -96,3 +95,4 @@ export function mutateLocal(
   localMutateChain = next.catch(() => {});
   return next;
 }
+

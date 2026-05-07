@@ -29,7 +29,9 @@ AWS Shortcut collapses that into **one click in a side panel**. It reuses the AW
 - 🪟 **Multi-session aware** — when you have AWS multi-session console enabled, it deep-links to the right `<account>-<session>.region.console.aws.amazon.com` subdomain so multiple accounts stay open simultaneously without signing each other out.
 - 📌 **Favorites** — pin combos you use daily (`Production · Lambda · Functions · us-east-1`). Click → console.
 - 🕒 **Recents** — recently-closed AWS console tabs are remembered. Click → reopen.
+- ✕ **Close tabs from the panel** — every row in the *Tabs* list has a one-click close button. The list updates instantly, no waiting on Chrome.
 - 🎨 **Account colors + region awareness** — the panel mirrors the color band you set on each account in the AWS console, so production stands out from staging at a glance.
+- 🚪 **Auto-close after launch** *(optional)* — flip the toggle in *Settings → Close panel after opening a service* and the side panel dismisses itself the moment a console tab opens or refocuses. Off by default; ideal for users who only want the panel as a launcher.
 - ⌨️ **Keyboard shortcut** — `Cmd+Shift+A` (macOS) / `Ctrl+Shift+A` (Win/Linux). Search-as-you-type, Enter to launch.
 
 ## What it does NOT do — privacy & identity guarantees
@@ -49,7 +51,9 @@ For the full data-flow disclosure, see [PRIVACY.md](PRIVACY.md).
 
 ### Chrome Web Store
 
-> Coming soon. Check back, or follow the [release notes](https://github.com/mceSystems/aws-shortcuts/releases).
+[**Install AWS Shortcut from the Chrome Web Store**](https://chromewebstore.google.com/detail/aws-shortcut/mghiiolahhdjkaddijlflhegpopdbbjd) — easiest path. Click *Add to Chrome*, pin the toolbar icon, you're done.
+
+For release notes, see the [GitHub releases page](https://github.com/mceSystems/aws-shortcuts/releases).
 
 ### From source (manual unpacked)
 
@@ -114,6 +118,9 @@ Refinements:
 - **Save a favorite** — when the right combo is selected, hit `Shift+Enter` (or click the ☆ icon) to pin it. Favorites tab → click → launch.
 - **Reopen a closed tab** — switch to the *Tabs* pill, then *Recently closed*. One click reopens at the same account/role/region.
 - **Reorder sections** — drag section headers in the side panel; collapse what you don't need today.
+- **Dismiss the panel after each launch** — open *Settings* and turn on *Close panel after opening a service*. Once enabled, every successful launch (new tab, refocus from Tabs/Favorites/Recents, or open-in-other-account) auto-closes the side panel.
+- **Rescan or change the portal** — *Settings → Rescan portal* pulls a fresh account/role list when your access changes; *Change portal URL* swaps to a different IAM Identity Center portal without resetting the extension.
+- **Reset extension** — *Settings → Reset extension* wipes accounts, favorites, recents, prefs, layout, the cached portal session, and AWS console cookies — back to a fresh-install state in one click.
 
 You'll never type a password through this extension. The first time per browser session, AWS itself may ask you to re-authenticate (because IAM Identity Center bearer tokens expire) — that happens in the AWS-hosted portal tab, the same as without the extension.
 

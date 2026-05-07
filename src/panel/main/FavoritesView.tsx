@@ -5,6 +5,7 @@ import { sanitizeConsolePathForFavorite } from '@/shared/consoleUrl';
 import { chipColor } from '@/shared/colors';
 import { findServiceById } from '@/shared/serviceCatalog';
 import { send } from '@/shared/messages';
+import { closePanelIfPrefSet } from '@/shared/closePanel';
 import { openOrFocusTab } from '@/shared/tabs';
 import { OpenInOtherPanel } from './OpenInOtherPanel';
 import { ServiceIcon } from './ServiceIcon';
@@ -258,6 +259,7 @@ async function launchFavorite(f: Favorite, openTabs: OpenTabInfo[]): Promise<voi
       if (match.windowId !== -1) {
         await chrome.windows.update(match.windowId, { focused: true });
       }
+      void closePanelIfPrefSet();
       return;
     } catch (e) {
       console.warn('[aws-shortcut/panel] focus existing tab failed; falling through', e);
@@ -277,6 +279,7 @@ async function launchFavorite(f: Favorite, openTabs: OpenTabInfo[]): Promise<voi
     return;
   }
   await openOrFocusTab(res.url);
+  void closePanelIfPrefSet();
 }
 
 function findExactOpenMatch(f: Favorite, openTabs: OpenTabInfo[]): OpenTabInfo | undefined {
