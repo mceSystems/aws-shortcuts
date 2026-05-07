@@ -90,6 +90,7 @@ let openTabsMutateChain: Promise<void> = Promise.resolve();
 
 export function mutateOpenTabs(
   fn: (cur: OpenTabInfo[]) => OpenTabInfo[],
+  opts: { skipSelfHeal?: boolean } = {},
 ): Promise<void> {
   const next = openTabsMutateChain.then(async () => {
     const cur = await getOpenTabs();
@@ -100,7 +101,9 @@ export function mutateOpenTabs(
     // handlers like SESSION_OBSERVED, upsertOpenTab, and harvest would
     // happily write back stale entries that another race had failed to
     // clean up. One cheap chrome.tabs.query per write is the price.
-    const reconciled = await filterToLiveTabs(updated);
+    // Callers that already filtered against a known-live id set (e.g.
+    // reconcileOpenTabs) pass `skipSelfHeal` so we don't query twice.
+    const reconciled = opts.skipSelfHeal ? updated : await filterToLiveTabs(updated);
     await setOpenTabs(reconciled);
   });
   openTabsMutateChain = next.catch(() => {});

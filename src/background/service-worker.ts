@@ -276,12 +276,15 @@ async function reconcileOpenTabs(): Promise<void> {
     console.warn('[aws-shortcut] reconcile: tabs.query failed', e);
     return;
   }
-  await mutateOpenTabs((cur) => {
-    const stale = cur.filter((t) => !liveIds.has(t.tabId));
-    if (stale.length === 0) return cur;
-    for (const t of stale) void recordRecent(t);
-    return cur.filter((t) => liveIds.has(t.tabId));
-  });
+  await mutateOpenTabs(
+    (cur) => {
+      const stale = cur.filter((t) => !liveIds.has(t.tabId));
+      if (stale.length === 0) return cur;
+      for (const t of stale) void recordRecent(t);
+      return cur.filter((t) => liveIds.has(t.tabId));
+    },
+    { skipSelfHeal: true },
+  );
 }
 
 // Periodic safety net — even if every event-driven path fails, the
