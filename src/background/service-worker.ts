@@ -824,17 +824,9 @@ function reconcileOrder(
   };
 }
 
-// Capture a fresh bearer + run the scan, without breaking the user's flow.
-//
-// - If a portal tab exists AND is not the user's currently focused tab,
-//   reload it in place (no focus shift, popup survives). Don't close it after.
-// - Otherwise (no portal tab, or the user IS on the portal right now), open
-//   a new background tab, wait for the bearer, then close it after scan.
-//   Reloading the user's focused tab would steal focus and auto-close the
-//   popup, so we leave it alone.
-//
-// Concurrent callers share the same in-flight capture — strict-mode double
-// mounts and storage-onChanged retries used to spin up multiple tabs.
+// Capture a fresh bearer + run the scan. Side-panel-mode: reloading any
+// portal tab (focused or not) is safe — the panel doesn't close on focus
+// shifts. Concurrent callers share the same in-flight capture.
 let inFlightCapture: Promise<MsgResponse> | null = null;
 
 function captureAndScanViaBgTab(): Promise<MsgResponse> {
@@ -855,19 +847,14 @@ async function runCaptureAndScan(): Promise<MsgResponse> {
 
   const beforeCapturedAt = (await getSessionState()).bearerCapturedAt ?? 0;
   const existing = await findPortalTab(portalHost);
-  const focusedTabId = await getFocusedTabId();
-  const userIsOnPortal = existing?.id !== undefined && existing.id === focusedTabId;
 
-  // Side-panel-only policy: focus tabs (no hidden bg open), and never
-  // auto-close a tab we created. The user keeps control of their tabs.
-  if (existing && !userIsOnPortal) {
+  if (existing) {
     try {
       await chrome.tabs.reload(existing.id!);
     } catch {
-      // Reload failed (tab vanished?); open a fresh portal tab.
       await chrome.tabs.create({ url: startUrl, active: true });
     }
-  } else if (!existing) {
+  } else {
     await chrome.tabs.create({ url: startUrl, active: true });
   }
 
@@ -948,18 +935,6 @@ async function findLiveSessionFromOpenTabs(
     console.warn('[aws-shortcut/launch] tab probe failed', e);
   }
   return undefined;
-}
-
-async function getFocusedTabId(): Promise<number | undefined> {
-  try {
-    // Filter to normal browser windows so the popup / devtools window doesn't
-    // get returned as the "focused" window from a service worker context.
-    const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
-    const tabs = await chrome.tabs.query({ active: true, windowId: win.id });
-    return tabs[0]?.id;
-  } catch {
-    return undefined;
-  }
 }
 
 function waitForBearer(after: number): Promise<void> {
