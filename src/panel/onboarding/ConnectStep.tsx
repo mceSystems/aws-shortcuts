@@ -45,7 +45,12 @@ export function ConnectStep({
     };
     refresh();
 
-    const onUpdated = (_id: number, change: chrome.tabs.TabChangeInfo) => {
+    const onUpdated = (
+      _id: number,
+      change: chrome.tabs.TabChangeInfo,
+      tab: chrome.tabs.Tab,
+    ) => {
+      if (!tab.url?.includes('.awsapps.com')) return;
       if (change.url || change.status === 'complete') refresh();
     };
     const onRemoved = () => refresh();

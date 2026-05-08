@@ -11,7 +11,7 @@ export type Msg =
   | { type: 'SET_ACCOUNT_PREFERRED_ROLE'; accountId: string; roleName: string }
   | { type: 'TOGGLE_ROLE_LOCK'; accountId: string; locked: boolean }
   | { type: 'RESCAN_OPEN_TABS' }
-  | { type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' }
+  | { type: 'CAPTURE_AND_SCAN' }
   | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] }
   | { type: 'SET_ACCOUNT_ALIAS'; accountId: string; alias: string }
   | {

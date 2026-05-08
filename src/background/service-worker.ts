@@ -396,8 +396,8 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return runScanPortal();
     }
 
-    case 'CAPTURE_AND_SCAN_VIA_BG_TAB': {
-      return captureAndScanViaBgTab();
+    case 'CAPTURE_AND_SCAN': {
+      return captureAndScan();
     }
 
     case 'ACCOUNT_COLOR_OBSERVED': {
@@ -829,7 +829,7 @@ function reconcileOrder(
 // shifts. Concurrent callers share the same in-flight capture.
 let inFlightCapture: Promise<MsgResponse> | null = null;
 
-function captureAndScanViaBgTab(): Promise<MsgResponse> {
+function captureAndScan(): Promise<MsgResponse> {
   if (inFlightCapture) return inFlightCapture;
   inFlightCapture = runCaptureAndScan().finally(() => {
     inFlightCapture = null;
