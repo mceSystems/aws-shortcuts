@@ -37,7 +37,31 @@ export function ConnectStep({
   const [pickedTabId, setPickedTabId] = useState<number | null>(null);
 
   useEffect(() => {
-    void findOpenPortalTabs().then(setSuggestions);
+    let alive = true;
+    const refresh = () => {
+      void findOpenPortalTabs().then((found) => {
+        if (alive) setSuggestions(found);
+      });
+    };
+    refresh();
+
+    const onUpdated = (_id: number, change: chrome.tabs.TabChangeInfo) => {
+      if (change.url || change.status === 'complete') refresh();
+    };
+    const onRemoved = () => refresh();
+    const onCreated = (tab: chrome.tabs.Tab) => {
+      if (tab.url?.includes('.awsapps.com/start')) refresh();
+    };
+
+    chrome.tabs.onUpdated.addListener(onUpdated);
+    chrome.tabs.onRemoved.addListener(onRemoved);
+    chrome.tabs.onCreated.addListener(onCreated);
+    return () => {
+      alive = false;
+      chrome.tabs.onUpdated.removeListener(onUpdated);
+      chrome.tabs.onRemoved.removeListener(onRemoved);
+      chrome.tabs.onCreated.removeListener(onCreated);
+    };
   }, []);
 
   function pickSuggestion(s: Suggestion) {
