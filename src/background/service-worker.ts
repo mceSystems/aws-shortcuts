@@ -720,7 +720,7 @@ async function resolveLaunchUrl(input: {
   // Real-time fallback: store may be empty on first click after install/reload
   // before harvest has propagated. Probe open tabs directly.
   if (!match) {
-    match = await findLiveSessionFromOpenTabs(input.accountId);
+    match = await findLiveSessionFromOpenTabs(input.accountId, input.roleName);
   }
 
   if (match) {
@@ -896,10 +896,13 @@ async function findPortalTab(
   }
 }
 
-// Probe open tabs for a multi-session console tab matching `accountId`. Used
-// as a real-time fallback when our session store hasn't been populated yet.
+// Probe open tabs for a multi-session console tab matching `accountId` AND
+// `roleName`. Subdomains are bound to (account, role) on AWS side, so a
+// tab's subdomain is only safe to reuse when consoleSessions confirms its
+// role matches. Without role confirmation, fall through to portal launch.
 async function findLiveSessionFromOpenTabs(
   accountId: string,
+  roleName: string,
 ): Promise<
   | {
       accountId: string;
@@ -915,6 +918,7 @@ async function findLiveSessionFromOpenTabs(
     const tabs = await chrome.tabs.query({
       url: ['https://*.console.aws.amazon.com/*'],
     });
+    const sessions = await getConsoleSessions();
     for (const tab of tabs) {
       if (!tab.url || tab.id === undefined) continue;
       let host: string;
@@ -926,10 +930,15 @@ async function findLiveSessionFromOpenTabs(
       const m = MULTI_SESSION_HOST_RE.exec(host);
       if (!m) continue;
       if (m[1] !== accountId) continue;
+      const subdomain = m[2];
+      const known = sessions.find(
+        (s) => s.accountId === accountId && s.sessionSubdomain === subdomain,
+      );
+      if (!known || known.roleName !== roleName) continue;
       return {
         accountId,
-        roleName: '',
-        sessionSubdomain: m[2],
+        roleName,
+        sessionSubdomain: subdomain,
         region: m[3],
         tabIds: [tab.id],
         observedAt: Date.now(),
