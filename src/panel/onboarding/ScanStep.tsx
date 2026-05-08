@@ -59,7 +59,7 @@ export function ScanStep({
     if (!autoReloadedRef.current) {
       autoReloadedRef.current = true;
       setReloading(true);
-      const bg = await send({ type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' });
+      const bg = await send({ type: 'CAPTURE_AND_SCAN' });
       if (bg.ok) {
         onComplete();
         return;
@@ -77,7 +77,7 @@ export function ScanStep({
     setReloading(true);
     setError(null);
     setPhase('scanning');
-    const bg = await send({ type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' });
+    const bg = await send({ type: 'CAPTURE_AND_SCAN' });
     if (bg.ok) {
       onComplete();
       return;

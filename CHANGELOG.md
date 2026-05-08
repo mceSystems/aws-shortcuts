@@ -2,6 +2,13 @@
 
 All notable changes to AWS Shortcut are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.0.2] — 2026-05-08
+
+### Fixed
+- **Onboarding portal suggestions update live.** The "Connect your access portal" step now refreshes its open-tab suggestion list whenever a portal tab is opened, navigated, or closed — no more stepping Back and Next to see a portal you just opened.
+- **Scan no longer hangs when portal tab is focused.** Capture-and-scan reloads any existing portal tab regardless of focus, so a fresh bearer token is captured every time. Previously, if the portal tab was the user's focused tab and no bearer was cached (e.g. after Reset extension), scanning would stall on "Waiting for portal…" until the user manually refreshed the portal page.
+- **Launch always opens the requested role.** When an account already had one role open in another tab, launching a *different* role on the same account could land on the existing role instead. The direct-launch fallback used to match by account ID only and reuse whatever subdomain was already open; it now requires a verified role match before reusing a session, and falls back to a fresh portal launch otherwise.
+
 ## [1.0.1] — 2026-05-07
 
 ### Added
@@ -23,5 +30,6 @@ All notable changes to AWS Shortcut are documented here. Format follows [Keep a 
 - Daily catalog refresh from the public GitHub repo via jsDelivr CDN.
 - Privacy: no telemetry, no remote logging, all state in `chrome.storage.sync` / `local` / `session`.
 
+[1.0.2]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.2
 [1.0.1]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.1
 [1.0.0]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.0

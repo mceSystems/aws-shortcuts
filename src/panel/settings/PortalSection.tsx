@@ -39,7 +39,7 @@ export function PortalSection({ onChangePortal }: Props) {
     const accountsBefore = beforeSync.accounts?.length ?? 0;
     const rolesBefore = countRoles(beforeSync.accounts ?? []);
 
-    const res = await send({ type: 'CAPTURE_AND_SCAN_VIA_BG_TAB' });
+    const res = await send({ type: 'CAPTURE_AND_SCAN' });
     if (!res.ok) {
       setStatus({
         kind: 'error',

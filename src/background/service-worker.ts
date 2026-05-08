@@ -396,8 +396,8 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       return runScanPortal();
     }
 
-    case 'CAPTURE_AND_SCAN_VIA_BG_TAB': {
-      return captureAndScanViaBgTab();
+    case 'CAPTURE_AND_SCAN': {
+      return captureAndScan();
     }
 
     case 'ACCOUNT_COLOR_OBSERVED': {
@@ -720,7 +720,7 @@ async function resolveLaunchUrl(input: {
   // Real-time fallback: store may be empty on first click after install/reload
   // before harvest has propagated. Probe open tabs directly.
   if (!match) {
-    match = await findLiveSessionFromOpenTabs(input.accountId);
+    match = await findLiveSessionFromOpenTabs(input.accountId, input.roleName);
   }
 
   if (match) {
@@ -824,20 +824,12 @@ function reconcileOrder(
   };
 }
 
-// Capture a fresh bearer + run the scan, without breaking the user's flow.
-//
-// - If a portal tab exists AND is not the user's currently focused tab,
-//   reload it in place (no focus shift, popup survives). Don't close it after.
-// - Otherwise (no portal tab, or the user IS on the portal right now), open
-//   a new background tab, wait for the bearer, then close it after scan.
-//   Reloading the user's focused tab would steal focus and auto-close the
-//   popup, so we leave it alone.
-//
-// Concurrent callers share the same in-flight capture — strict-mode double
-// mounts and storage-onChanged retries used to spin up multiple tabs.
+// Capture a fresh bearer + run the scan. Side-panel-mode: reloading any
+// portal tab (focused or not) is safe — the panel doesn't close on focus
+// shifts. Concurrent callers share the same in-flight capture.
 let inFlightCapture: Promise<MsgResponse> | null = null;
 
-function captureAndScanViaBgTab(): Promise<MsgResponse> {
+function captureAndScan(): Promise<MsgResponse> {
   if (inFlightCapture) return inFlightCapture;
   inFlightCapture = runCaptureAndScan().finally(() => {
     inFlightCapture = null;
@@ -855,19 +847,14 @@ async function runCaptureAndScan(): Promise<MsgResponse> {
 
   const beforeCapturedAt = (await getSessionState()).bearerCapturedAt ?? 0;
   const existing = await findPortalTab(portalHost);
-  const focusedTabId = await getFocusedTabId();
-  const userIsOnPortal = existing?.id !== undefined && existing.id === focusedTabId;
 
-  // Side-panel-only policy: focus tabs (no hidden bg open), and never
-  // auto-close a tab we created. The user keeps control of their tabs.
-  if (existing && !userIsOnPortal) {
+  if (existing) {
     try {
       await chrome.tabs.reload(existing.id!);
     } catch {
-      // Reload failed (tab vanished?); open a fresh portal tab.
       await chrome.tabs.create({ url: startUrl, active: true });
     }
-  } else if (!existing) {
+  } else {
     await chrome.tabs.create({ url: startUrl, active: true });
   }
 
@@ -896,10 +883,13 @@ async function findPortalTab(
   }
 }
 
-// Probe open tabs for a multi-session console tab matching `accountId`. Used
-// as a real-time fallback when our session store hasn't been populated yet.
+// Probe open tabs for a multi-session console tab matching `accountId` AND
+// `roleName`. Subdomains are bound to (account, role) on AWS side, so a
+// tab's subdomain is only safe to reuse when consoleSessions confirms its
+// role matches. Without role confirmation, fall through to portal launch.
 async function findLiveSessionFromOpenTabs(
   accountId: string,
+  roleName: string,
 ): Promise<
   | {
       accountId: string;
@@ -915,6 +905,7 @@ async function findLiveSessionFromOpenTabs(
     const tabs = await chrome.tabs.query({
       url: ['https://*.console.aws.amazon.com/*'],
     });
+    const sessions = await getConsoleSessions();
     for (const tab of tabs) {
       if (!tab.url || tab.id === undefined) continue;
       let host: string;
@@ -926,10 +917,15 @@ async function findLiveSessionFromOpenTabs(
       const m = MULTI_SESSION_HOST_RE.exec(host);
       if (!m) continue;
       if (m[1] !== accountId) continue;
+      const subdomain = m[2];
+      const known = sessions.find(
+        (s) => s.accountId === accountId && s.sessionSubdomain === subdomain,
+      );
+      if (!known || known.roleName !== roleName) continue;
       return {
         accountId,
-        roleName: '',
-        sessionSubdomain: m[2],
+        roleName,
+        sessionSubdomain: subdomain,
         region: m[3],
         tabIds: [tab.id],
         observedAt: Date.now(),
@@ -939,18 +935,6 @@ async function findLiveSessionFromOpenTabs(
     console.warn('[aws-shortcut/launch] tab probe failed', e);
   }
   return undefined;
-}
-
-async function getFocusedTabId(): Promise<number | undefined> {
-  try {
-    // Filter to normal browser windows so the popup / devtools window doesn't
-    // get returned as the "focused" window from a service worker context.
-    const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'] });
-    const tabs = await chrome.tabs.query({ active: true, windowId: win.id });
-    return tabs[0]?.id;
-  } catch {
-    return undefined;
-  }
 }
 
 function waitForBearer(after: number): Promise<void> {
