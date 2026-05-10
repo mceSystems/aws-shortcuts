@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AWS Shortcut · Mockups</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    body {
+      padding: var(--space-7);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, color-mix(in oklch, var(--c-iris) 14%, transparent), transparent 60%),
+        radial-gradient(900px 500px at 110% 110%, color-mix(in oklch, var(--c-mint) 12%, transparent), transparent 60%),
+        var(--surface-0);
+      min-height: 100vh;
+    }
+
+    .gallery {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-7);
+    }
+
+    .gallery__title {
+      font-size: 28px;
+      line-height: 32px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink-900);
+      margin: 0;
+    }
+
+    .gallery__sub { color: var(--ink-500); font-size: 14px; margin-top: var(--space-2); }
+
+    .gallery__nav {
+      position: sticky;
+      top: var(--space-4);
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      padding: var(--space-3);
+      background: var(--surface-glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--surface-glass-border);
+      border-radius: var(--radius-md);
+      z-index: 20;
+      box-shadow: var(--elev-2);
+    }
+
+    .gallery__nav a {
+      padding: 6px 12px;
+      border-radius: var(--radius-xs);
+      color: var(--ink-700);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .gallery__nav a:hover { background: var(--ink-100); }
+
+    .surface-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .surface-card__head h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink-900);
+      letter-spacing: -0.01em;
+    }
+
+    .surface-card__head p {
+      margin: 4px 0 0 0;
+      color: var(--ink-500);
+      font-size: 13px;
+    }
+
+    .stage {
+      padding: var(--space-6);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--c-iris) 4%, var(--surface-1)), var(--surface-1));
+      box-shadow: var(--elev-1);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    /* ─── popup surface ─── */
+
+    /* Chrome popup hard cap = 800px wide × 600px tall.
+       We design at 420 × 600 so favorites + chip rows fit without overflow. */
+    .popup {
+      width: 420px;
+      height: 600px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .popup__header {
+      height: 52px;
+      padding: 0 var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      border-bottom: 1px solid var(--ink-200);
+      flex-shrink: 0;
+    }
+
+    .popup__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink-900);
+      letter-spacing: -0.01em;
+    }
+
+    .popup__logo-glyph {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--c-iris), var(--c-lilac));
+      box-shadow: 0 4px 10px color-mix(in oklch, var(--c-iris) 45%, transparent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .popup__body {
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .popup__body::-webkit-scrollbar { width: 6px; }
+    .popup__body::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 999px; }
+
+    .chip-grid { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+    .preview {
+      padding: var(--space-3) var(--space-4);
+      background: color-mix(in oklch, var(--accent) 4%, var(--surface-1));
+      border: 1px solid color-mix(in oklch, var(--accent) 14%, transparent);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .preview__bottom {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: var(--space-3);
+    }
+
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-2);
+    }
+
+    .favorites-grid .tile { width: auto; padding: 12px 14px 12px 18px; }
+    .favorites-grid .tile__name { font-size: 13px; }
+
+    /* ─── side panel surface ─── */
+
+    .sidepanel {
+      width: 360px;
+      height: 720px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidepanel__body {
+      padding: var(--space-4);
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .sidepanel .chip-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
+    }
+
+    .sidepanel .chip { min-width: 0; }
+
+    .sidepanel .favorites-grid { grid-template-columns: 1fr 1fr; }
+
+    .sidepanel .tile { width: auto; }
+
+    /* ─── palette surface ─── */
+
+    .palette-stage {
+      width: 100%;
+      max-width: 920px;
+      height: 540px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(450px 280px at 30% 20%, color-mix(in oklch, var(--c-iris) 25%, transparent), transparent 70%),
+        radial-gradient(380px 240px at 80% 80%, color-mix(in oklch, var(--c-rose) 25%, transparent), transparent 70%),
+        linear-gradient(135deg, #1B1F2A, #0E1014);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+    }
+
+    .palette-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 13, 18, 0.32);
+      backdrop-filter: blur(8px);
+    }
+
+    .palette {
+      position: relative;
+      z-index: 1;
+      width: 560px;
+      max-width: 90%;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: saturate(180%) blur(28px);
+      -webkit-backdrop-filter: saturate(180%) blur(28px);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      overflow: hidden;
+      animation: palette-in 280ms var(--ease-out);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .palette {
+        background: rgba(28, 31, 38, 0.7);
+        border-color: rgba(255,255,255,0.08);
+      }
+    }
+
+    @keyframes palette-in {
+      from { transform: translateY(8px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .palette__input {
+      width: 100%;
+      height: 56px;
+      padding: 0 24px;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--ink-900);
+      outline: none;
+      border-bottom: 1px solid var(--ink-200);
+    }
+
+    .palette__input::placeholder { color: var(--ink-400); }
+
+    .palette__caret {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .palette__results {
+      list-style: none;
+      margin: 0;
+      padding: var(--space-2) 0;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .palette__row {
+      padding: 10px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+      position: relative;
+      transition: background var(--dur-fast) var(--ease-out);
+    }
+
+    .palette__row:hover { background: var(--ink-100); }
+
+    .palette__row--active {
+      background: var(--accent-soft);
+    }
+
+    .palette__row--active::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .palette__row-title { font-size: 14px; font-weight: 500; color: var(--ink-900); }
+    .palette__row-sub { font-size: 12px; color: var(--ink-500); }
+
+    .palette__hint {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 10px 24px;
+      border-top: 1px solid var(--ink-200);
+      background: color-mix(in oklch, var(--ink-100) 60%, transparent);
+      font-size: 11px;
+      color: var(--ink-500);
+      letter-spacing: 0.02em;
+    }
+
+    .palette__hint .kbd {
+      position: static;
+      padding: 2px 6px;
+      font-size: 10px;
+    }
+
+    /* ─── wizard surface ─── */
+
+    .wizard {
+      width: 480px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .wizard__steps {
+      display: flex;
+      gap: var(--space-1);
+    }
+
+    .wizard__steps span {
+      flex: 1;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--ink-200);
+    }
+
+    .wizard__steps span.active { background: var(--accent); }
+
+    .wizard__title {
+      font-size: 22px;
+      line-height: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink-900);
+      margin: 0;
+    }
+
+    .wizard__lede {
+      color: var(--ink-500);
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .wizard__field { display: flex; flex-direction: column; gap: 6px; }
+    .wizard__field-label { font-size: 12px; font-weight: 500; color: var(--ink-500); letter-spacing: 0.02em; }
+
+    .wizard__shot {
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, color-mix(in oklch, var(--c-iris) 8%, var(--surface-1)), var(--surface-1));
+      border: 1px solid var(--ink-200);
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-400);
+      font-size: 12px;
+    }
+
+    .wizard__actions { display: flex; justify-content: flex-end; gap: var(--space-3); }
+
+    /* ─── add favorite sheet ─── */
+
+    .sheet {
+      width: 480px;
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-3);
+      overflow: hidden;
+    }
+
+    .sheet__head {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--ink-200);
+    }
+
+    .sheet__head h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--ink-900); letter-spacing: -0.01em; }
+
+    .sheet__body { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
+
+    .sheet__field { display: flex; flex-direction: column; gap: 6px; }
+
+    .mini-chips { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+    .mini-chip {
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-1);
+      border: 1px solid var(--ink-200);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-700);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+    }
+
+    .mini-chip:hover { background: var(--ink-100); }
+
+    .mini-chip--active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--ink-900);
+    }
+
+    .mini-chip__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mc, var(--c-iris)); }
+
+    .select {
+      height: 40px;
+      border: 1px solid var(--ink-200);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      background: var(--surface-1);
+      color: var(--ink-900);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sheet__foot {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--ink-200);
+      background: color-mix(in oklch, var(--ink-100) 50%, transparent);
+    }
+
+    /* ─── options surface ─── */
+
+    .options {
+      width: 880px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .options__title {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink-900);
+      margin: 0;
+    }
+
+    .options-card {
+      background: var(--surface-1);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-1);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .options-card h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink-900);
+    }
+
+    .seg {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      background: var(--ink-100);
+      gap: 2px;
+    }
+
+    .seg button {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: var(--radius-xs);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-500);
+    }
+
+    .seg button.active {
+      background: var(--surface-1);
+      color: var(--ink-900);
+      box-shadow: var(--elev-1);
+    }
+
+    .acct-row {
+      display: grid;
+      grid-template-columns: 24px 1fr 160px 160px 32px;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-3);
+      border-radius: var(--radius-sm);
+      transition: background var(--dur-fast);
+    }
+
+    .acct-row:hover { background: var(--ink-100); }
+
+    .acct-row__color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .acct-row__name { font-weight: 500; color: var(--ink-900); }
+    .acct-row__id { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px; color: var(--ink-500); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .badge--success {
+      background: color-mix(in oklch, var(--success) 10%, transparent);
+      color: var(--success);
+    }
+    .badge--warning {
+      background: color-mix(in oklch, var(--warning) 10%, transparent);
+      color: var(--warning);
+    }
+
+    .badge__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <header>
+      <h1 class="gallery__title">AWS Shortcut · Mockups</h1>
+      <p class="gallery__sub">High-fidelity surfaces using the design system in <code>design.md</code>. Open in Chrome for full fidelity. Toggle OS dark mode to preview both palettes.</p>
+    </header>
+
+    <nav class="gallery__nav">
+      <a href="#popup">Popup</a>
+      <a href="#sidepanel">Side panel</a>
+      <a href="#palette">cmd+k</a>
+      <a href="#wizard">Onboarding</a>
+      <a href="#sheet">Add favorite</a>
+      <a href="#options">Settings</a>
+    </nav>
+
+    <!-- ───────────── POPUP ───────────── -->
+    <section class="surface-card" id="popup">
+      <header class="surface-card__head">
+        <h2>Popup · 420 × 600 (Chrome max 800 × 600)</h2>
+        <p>Toolbar action click. Pill chips, service search, preview, favorites. Body scrolls.</p>
+      </header>
+
+      <div class="stage">
+        <div class="popup">
+          <header class="popup__header">
+            <span class="popup__logo">
+              <span class="popup__logo-glyph">◐</span>
+              AWS Shortcut
+            </span>
+            <span class="spacer"></span>
+            <button class="btn--icon" title="cmd+k palette">⌘K</button>
+            <button class="btn--icon" title="Refresh">↻</button>
+            <button class="btn--icon" title="Settings">⚙</button>
+          </header>
+
+          <div class="popup__body">
+            <div class="tab-banner">
+              <span class="tab-banner__icon">✦</span>
+              <div class="tab-banner__main">
+                <span class="tab-banner__title">Current tab is on AWS console</span>
+                <span class="tab-banner__detail">CloudWatch Logs · MCE-STG · us-west-2</span>
+              </div>
+              <button class="tab-banner__action">★ Save</button>
+            </div>
+
+            <section>
+              <div class="section-label">Account</div>
+              <div class="chip-grid">
+                <span class="chip" style="--chip-color: var(--c-iris);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">mce main</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-amber);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-TEST</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">ReadOnly</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                </span>
+                <span class="chip chip--selected" style="--chip-color: var(--c-mint);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-DEV</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-lilac);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-AI-DEV</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-coral);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-STG</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-west-2</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-label">Service in MCE-DEV</div>
+              <div class="input-wrap">
+                <span class="input-wrap__icon">🔍</span>
+                <input class="input" type="text" value="cloudwatch" placeholder="type to filter, ⏎ to open" />
+                <span class="kbd">⌘K</span>
+              </div>
+              <ul class="result-list">
+                <li class="result-list__row result-list__row--active">
+                  <span class="result-list__name">CloudWatch Logs</span>
+                  <span class="result-list__sub">us-east-1 · Admin</span>
+                </li>
+                <li class="result-list__row">
+                  <span class="result-list__name">CloudWatch Insights</span>
+                  <span class="result-list__sub">us-east-1 · Admin</span>
+                </li>
+                <li class="result-list__row">
+                  <span class="result-list__name">CloudWatch Alarms</span>
+                  <span class="result-list__sub">us-east-1 · Admin</span>
+                </li>
+                <li class="result-list__row">
+                  <span class="result-list__name">CloudFormation</span>
+                  <span class="result-list__sub">us-east-1 · Admin</span>
+                </li>
+              </ul>
+              <div style="font-size: 11px; color: var(--ink-400); margin-top: 8px;">
+                Click row to open, or ⏎ to open the highlighted one.
+              </div>
+            </section>
+
+            <section>
+              <div class="tabs">
+                <button class="tabs__btn tabs__btn--active">Favorites <span class="tabs__count">5</span></button>
+                <button class="tabs__btn">Recent <span class="tabs__count">12</span></button>
+              </div>
+
+              <!-- Favorites view -->
+              <div class="favorites-grid" style="margin-top: var(--space-3);">
+                <button class="tile" style="--tile-color: var(--c-coral);">
+                  <span class="tile__name">CW Logs</span>
+                  <span class="tile__meta">MCE-STG · us-west-2</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-mint);">
+                  <span class="tile__name">EC2</span>
+                  <span class="tile__meta">MCE-DEV · us-east-1</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-iris);">
+                  <span class="tile__name">IAM</span>
+                  <span class="tile__meta">mce-main · us-east-1</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-amber);">
+                  <span class="tile__name">S3</span>
+                  <span class="tile__meta">MCE-TEST · us-east-1</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-sky);">
+                  <span class="tile__name">Lambda</span>
+                  <span class="tile__meta">MCE-DEV · us-east-1</span>
+                </button>
+                <button class="tile tile--add"><span>＋ Add</span></button>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-label">Recent (alt view of tabs above)</div>
+              <div class="col" style="gap: 2px;">
+                <div class="list-row" style="--row-color: var(--c-coral);">
+                  <span class="list-row__stripe"></span>
+                  <div class="list-row__main">
+                    <span class="list-row__title">CloudWatch Logs · /aws/lambda/api-prod</span>
+                    <span class="list-row__sub">MCE-STG · Admin · us-west-2</span>
+                  </div>
+                  <span class="list-row__time">3m</span>
+                  <button class="list-row__star" title="Save as favorite">★</button>
+                </div>
+                <div class="list-row" style="--row-color: var(--c-mint);">
+                  <span class="list-row__stripe"></span>
+                  <div class="list-row__main">
+                    <span class="list-row__title">EC2 · Instances</span>
+                    <span class="list-row__sub">MCE-DEV · Admin · us-east-1</span>
+                  </div>
+                  <span class="list-row__time">12m</span>
+                  <button class="list-row__star list-row__star--saved" title="Saved as favorite">★</button>
+                </div>
+                <div class="list-row" style="--row-color: var(--c-iris);">
+                  <span class="list-row__stripe"></span>
+                  <div class="list-row__main">
+                    <span class="list-row__title">IAM · Users</span>
+                    <span class="list-row__sub">mce-main · Admin · us-east-1</span>
+                  </div>
+                  <span class="list-row__time">1h</span>
+                  <button class="list-row__star" title="Save as favorite">★</button>
+                </div>
+                <div class="list-row" style="--row-color: var(--c-coral);">
+                  <span class="list-row__stripe"></span>
+                  <div class="list-row__main">
+                    <span class="list-row__title">S3 · prod-logs-bucket</span>
+                    <span class="list-row__sub">MCE-STG · Admin · us-west-2</span>
+                  </div>
+                  <span class="list-row__time">2h</span>
+                  <button class="list-row__star" title="Save as favorite">★</button>
+                </div>
+                <div class="list-row" style="--row-color: var(--c-mint);">
+                  <span class="list-row__stripe"></span>
+                  <div class="list-row__main">
+                    <span class="list-row__title">Lambda · api-handler</span>
+                    <span class="list-row__sub">MCE-DEV · Admin · us-east-1</span>
+                  </div>
+                  <span class="list-row__time">yesterday</span>
+                  <button class="list-row__star" title="Save as favorite">★</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── SIDE PANEL ───────────── -->
+    <section class="surface-card" id="sidepanel">
+      <header class="surface-card__head">
+        <h2>Side panel · 360 × viewport</h2>
+        <p>Persistent right side. Same content stacked, chips two per row, scrollable body.</p>
+      </header>
+
+      <div class="stage">
+        <div class="sidepanel">
+          <header class="popup__header">
+            <span class="popup__logo">
+              <span class="popup__logo-glyph">◐</span>
+              AWS Shortcut
+            </span>
+            <span class="spacer"></span>
+            <button class="btn--icon" title="cmd+k palette">⌘K</button>
+            <button class="btn--icon" title="Settings">⚙</button>
+          </header>
+          <div class="sidepanel__body">
+            <section>
+              <div class="section-label">Accounts</div>
+              <div class="chip-grid">
+                <span class="chip" style="--chip-color: var(--c-iris);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">mce main</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-amber);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-TEST</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">ReadOnly</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                </span>
+                <span class="chip chip--selected" style="--chip-color: var(--c-mint);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-DEV</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-lilac);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-AI-DEV</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-east-1</span>
+                  </span>
+                </span>
+                <span class="chip" style="--chip-color: var(--c-coral);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-STG</span>
+                  <span class="chip__meta">
+                    <span class="chip__meta-item">Admin</span>
+                    <span class="chip__sep">·</span>
+                    <span class="chip__meta-item">us-west-2</span>
+                  </span>
+                  <span class="chip__live"></span>
+                </span>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-label">Service</div>
+              <div class="input-wrap">
+                <span class="input-wrap__icon">🔍</span>
+                <input class="input" type="text" placeholder="Search service..." />
+                <span class="kbd">⌘K</span>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-label">Favorites</div>
+              <div class="favorites-grid">
+                <button class="tile" style="--tile-color: var(--c-coral);">
+                  <span class="tile__name">CW Logs</span>
+                  <span class="tile__meta">MCE-STG</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-mint);">
+                  <span class="tile__name">EC2</span>
+                  <span class="tile__meta">MCE-DEV</span>
+                </button>
+                <button class="tile" style="--tile-color: var(--c-iris);">
+                  <span class="tile__name">IAM</span>
+                  <span class="tile__meta">mce-main</span>
+                </button>
+                <button class="tile tile--add">＋ Add</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── PALETTE ───────────── -->
+    <section class="surface-card" id="palette">
+      <header class="surface-card__head">
+        <h2>cmd+k Palette · global overlay</h2>
+        <p>Cmd+Shift+A from any page. Frosted glass over scrim. Single fuzzy input over (account × role × service × feature).</p>
+      </header>
+
+      <div class="palette-stage">
+        <div class="palette">
+          <input class="palette__input" type="text" value="cw logs prod" autofocus />
+          <ul class="palette__results">
+            <li class="palette__row palette__row--active">
+              <span class="palette__row-title">CloudWatch Logs</span>
+              <span class="palette__row-sub">MCE-STG · Admin · us-west-2</span>
+            </li>
+            <li class="palette__row">
+              <span class="palette__row-title">CloudWatch Logs</span>
+              <span class="palette__row-sub">mce-main · Admin · us-east-1</span>
+            </li>
+            <li class="palette__row">
+              <span class="palette__row-title">CloudWatch Logs</span>
+              <span class="palette__row-sub">MCE-DEV · Admin · us-east-1</span>
+            </li>
+            <li class="palette__row">
+              <span class="palette__row-title">CloudWatch Insights</span>
+              <span class="palette__row-sub">MCE-STG · Admin · us-west-2</span>
+            </li>
+            <li class="palette__row">
+              <span class="palette__row-title">CloudWatch Alarms</span>
+              <span class="palette__row-sub">MCE-STG · Admin · us-west-2</span>
+            </li>
+          </ul>
+          <div class="palette__hint">
+            <span class="kbd">↑↓</span> navigate
+            <span class="kbd">⏎</span> open
+            <span class="kbd">esc</span> close
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── WIZARD ───────────── -->
+    <section class="surface-card" id="wizard">
+      <header class="surface-card__head">
+        <h2>Onboarding · 3-step wizard</h2>
+        <p>Connect portal → Enable multi-session → Default region. Re-runnable from settings.</p>
+      </header>
+
+      <div class="stage" style="gap: var(--space-5);">
+
+        <div class="wizard">
+          <div class="wizard__steps">
+            <span class="active"></span><span></span><span></span>
+          </div>
+          <div>
+            <div class="popup__logo-glyph" style="width:40px;height:40px;border-radius:12px;font-size:20px;">◐</div>
+          </div>
+          <h2 class="wizard__title">Connect your access portal</h2>
+          <p class="wizard__lede">We'll read your accounts, roles, and default regions — all locally in your browser.</p>
+          <div class="wizard__field">
+            <span class="wizard__field-label">Portal URL</span>
+            <input class="input" value="https://d-90679c71d5.awsapps.com/start/" />
+          </div>
+          <div class="wizard__actions">
+            <button class="btn btn--primary">Open & scan ▸</button>
+          </div>
+        </div>
+
+        <div class="wizard">
+          <div class="wizard__steps">
+            <span></span><span class="active"></span><span></span>
+          </div>
+          <h2 class="wizard__title">Enable multi-session</h2>
+          <p class="wizard__lede">AWS lets you keep up to 5 accounts open at once — we depend on this.</p>
+          <div class="wizard__shot">screenshot · console account menu</div>
+          <p class="wizard__lede" style="font-size: 13px; color: var(--ink-700);">Open console → top-right account menu → <strong>Turn on multi-session</strong>.</p>
+          <div class="wizard__actions">
+            <button class="btn btn--ghost">Open console</button>
+            <button class="btn btn--primary">I enabled it ▸</button>
+          </div>
+        </div>
+
+        <div class="wizard">
+          <div class="wizard__steps">
+            <span></span><span></span><span class="active"></span>
+          </div>
+          <h2 class="wizard__title">Default region</h2>
+          <p class="wizard__lede">Used when a favorite has no pinned region.</p>
+          <div class="wizard__field">
+            <span class="wizard__field-label">Region</span>
+            <div class="select"><span>us-east-1</span><span>▾</span></div>
+          </div>
+          <div class="wizard__actions">
+            <button class="btn btn--primary">All set →</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ───────────── ADD FAVORITE ───────────── -->
+    <section class="surface-card" id="sheet">
+      <header class="surface-card__head">
+        <h2>Add favorite · sheet</h2>
+        <p>Slides up from composer. One account, one service, optional feature, optional label.</p>
+      </header>
+
+      <div class="stage">
+        <div class="sheet">
+          <header class="sheet__head">
+            <h3>New favorite</h3>
+            <button class="btn--icon">✕</button>
+          </header>
+          <div class="sheet__body">
+
+            <div class="sheet__field">
+              <span class="wizard__field-label">Account</span>
+              <div class="chip-grid">
+                <span class="chip chip--compact" style="--chip-color: var(--c-iris);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">mce main</span>
+                </span>
+                <span class="chip chip--compact chip--selected" style="--chip-color: var(--c-mint);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-DEV</span>
+                </span>
+                <span class="chip chip--compact" style="--chip-color: var(--c-amber);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-TEST</span>
+                </span>
+                <span class="chip chip--compact" style="--chip-color: var(--c-lilac);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-AI-DEV</span>
+                </span>
+                <span class="chip chip--compact" style="--chip-color: var(--c-coral);">
+                  <span class="chip__dot"></span>
+                  <span class="chip__name">MCE-STG</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="sheet__field">
+              <span class="wizard__field-label">Role</span>
+              <div class="select"><span>AdministratorAccess</span><span>▾</span></div>
+            </div>
+
+            <div class="sheet__field">
+              <span class="wizard__field-label">Region</span>
+              <div class="select"><span>us-east-1 (account default)</span><span>▾</span></div>
+            </div>
+
+            <div class="sheet__field">
+              <span class="wizard__field-label">Service</span>
+              <div class="input-wrap">
+                <span class="input-wrap__icon">🔍</span>
+                <input class="input" value="cloudwatch logs" />
+              </div>
+              <ul class="result-list">
+                <li class="result-list__row result-list__row--active">
+                  <span class="result-list__name">CloudWatch Logs</span>
+                  <span class="result-list__sub">/cloudwatch/home#logsV2</span>
+                </li>
+                <li class="result-list__row">
+                  <span class="result-list__name">Logs Insights</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="sheet__field">
+              <span class="wizard__field-label">Label (optional)</span>
+              <input class="input" placeholder="e.g. CW Logs (prod)" />
+            </div>
+
+          </div>
+          <footer class="sheet__foot">
+            <button class="btn btn--ghost">Cancel</button>
+            <button class="btn btn--primary">Save favorite</button>
+          </footer>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── OPTIONS ───────────── -->
+    <section class="surface-card" id="options">
+      <header class="surface-card__head">
+        <h2>Settings · full tab</h2>
+        <p>Interface preference, account defaults, multi-session status, catalog refresh, maintenance.</p>
+      </header>
+
+      <div class="stage" style="padding: var(--space-7) var(--space-5);">
+        <div class="options">
+          <h1 class="options__title">AWS Shortcut · Settings</h1>
+
+          <article class="options-card">
+            <h3>Interface</h3>
+            <div class="row">
+              <div class="col" style="gap: 4px;">
+                <span class="wizard__field-label">UI surface</span>
+                <div class="seg">
+                  <button>Popup</button>
+                  <button class="active">Side panel</button>
+                  <button>Both</button>
+                </div>
+              </div>
+              <span class="spacer"></span>
+              <span style="color: var(--ink-500); font-size: 12px; max-width: 280px; text-align: right;">
+                Default region is set per account, in the table below.
+              </span>
+            </div>
+          </article>
+
+          <article class="options-card">
+            <div class="row">
+              <h3 style="margin: 0;">Accounts <span style="color: var(--ink-400); font-weight: 500;">· 5</span></h3>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost">↻ Re-scan portal</button>
+            </div>
+
+            <div class="col" style="gap: 0;">
+              <div class="acct-row">
+                <span class="acct-row__color" style="background: var(--c-iris);"></span>
+                <div class="col" style="gap: 0;">
+                  <span class="acct-row__name">mce main</span>
+                  <span class="acct-row__id">674421773238</span>
+                </div>
+                <div class="select"><span>AdministratorAccess</span><span>▾</span></div>
+                <div class="select"><span>us-east-1</span><span>▾</span></div>
+                <button class="btn--icon">⋯</button>
+              </div>
+              <div class="acct-row">
+                <span class="acct-row__color" style="background: var(--c-amber);"></span>
+                <div class="col" style="gap: 0;">
+                  <span class="acct-row__name">MCE-TEST</span>
+                  <span class="acct-row__id">525130365548</span>
+                </div>
+                <div class="select"><span>ReadOnlyAccess</span><span>▾</span></div>
+                <div class="select"><span>us-east-1</span><span>▾</span></div>
+                <button class="btn--icon">⋯</button>
+              </div>
+              <div class="acct-row">
+                <span class="acct-row__color" style="background: var(--c-mint);"></span>
+                <div class="col" style="gap: 0;">
+                  <span class="acct-row__name">MCE-DEV</span>
+                  <span class="acct-row__id">538388751167</span>
+                </div>
+                <div class="select"><span>AdministratorAccess</span><span>▾</span></div>
+                <div class="select"><span>us-east-1</span><span>▾</span></div>
+                <button class="btn--icon">⋯</button>
+              </div>
+              <div class="acct-row">
+                <span class="acct-row__color" style="background: var(--c-lilac);"></span>
+                <div class="col" style="gap: 0;">
+                  <span class="acct-row__name">MCE-AI-DEV</span>
+                  <span class="acct-row__id">651706742960</span>
+                </div>
+                <div class="select"><span>AdministratorAccess</span><span>▾</span></div>
+                <div class="select"><span>us-east-1</span><span>▾</span></div>
+                <button class="btn--icon">⋯</button>
+              </div>
+              <div class="acct-row">
+                <span class="acct-row__color" style="background: var(--c-coral);"></span>
+                <div class="col" style="gap: 0;">
+                  <span class="acct-row__name">MCE-STG</span>
+                  <span class="acct-row__id">851725346834</span>
+                </div>
+                <div class="select"><span>AdministratorAccess</span><span>▾</span></div>
+                <div class="select"><span>us-west-2</span><span>▾</span></div>
+                <button class="btn--icon">⋯</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="options-card">
+            <div class="row">
+              <h3 style="margin: 0;">Multi-session</h3>
+              <span class="spacer"></span>
+              <span class="badge badge--success"><span class="badge__dot"></span>Enabled · verified 2 min ago</span>
+            </div>
+            <p style="margin: 0; color: var(--ink-500);">Up to 5 simultaneous account sessions in this browser.</p>
+            <div><button class="btn btn--ghost">Re-verify</button></div>
+          </article>
+
+          <article class="options-card">
+            <div class="row">
+              <h3 style="margin: 0;">Service catalog</h3>
+              <span class="spacer"></span>
+              <span class="acct-row__id">247 services · refreshed 2d ago</span>
+            </div>
+            <div><button class="btn btn--ghost">Refresh now</button></div>
+          </article>
+
+          <article class="options-card">
+            <h3>Maintenance</h3>
+            <div class="row">
+              <button class="btn btn--ghost">Re-run wizard</button>
+              <button class="btn btn--ghost">Export data</button>
+              <span class="spacer"></span>
+              <button class="btn btn--danger">Clear all data</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer style="color: var(--ink-400); font-size: 12px; padding: var(--space-5) 0;">
+      Tokens: <code>mocks/tokens.css</code> · Spec: <code>design.md</code>
+    </footer>
+  </main>
+</body>
+</html>

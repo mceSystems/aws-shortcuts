@@ -1,0 +1,180 @@
+.row {
+  --row-color: var(--c-iris);
+  position: relative;
+  display: grid;
+  grid-template-columns: 4px 10px 1fr auto auto 14px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 12px 0 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink-700);
+  transition: background var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.row:hover {
+  background: color-mix(in oklch, var(--row-color) 5%, var(--surface-1));
+  border-color: color-mix(in oklch, var(--row-color) 18%, transparent);
+}
+
+.stripe {
+  width: 4px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--row-color);
+  margin-left: 6px;
+  opacity: 0.55;
+  transition: opacity var(--dur-fast);
+}
+
+.row:hover .stripe { opacity: 0.85; }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--row-color);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--row-color) 22%, transparent);
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.roleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 8px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--ink-100);
+  color: var(--ink-700);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.roleBtn:hover {
+  background: color-mix(in oklch, var(--ink-200) 70%, transparent);
+  color: var(--ink-900);
+}
+
+.roleBtnEmpty {
+  font-style: italic;
+  color: var(--ink-400);
+}
+
+.caret {
+  font-size: 9px;
+  color: var(--ink-400);
+}
+
+.region {
+  font-size: 11px;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.regionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 8px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-500);
+  font-size: 11px;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.regionBtn:hover {
+  background: var(--ink-100);
+  color: var(--ink-900);
+}
+
+.regionBtnEmpty {
+  font-style: italic;
+  color: var(--ink-400);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+
+.live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.live[data-live="true"] {
+  background: var(--success);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--success) 22%, transparent);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.selected {
+  background: color-mix(in oklch, var(--row-color) 10%, var(--surface-1));
+  border-color: color-mix(in oklch, var(--row-color) 35%, transparent);
+}
+
+.selected .stripe { opacity: 1; }
+.selected .name { color: var(--ink-900); }
+
+/* Neutral state: no color set yet, awaiting AWS console preference. */
+.neutral .stripe {
+  background: var(--ink-200);
+  opacity: 0.8;
+}
+
+.neutral .dot {
+  background: var(--ink-200);
+  box-shadow: 0 0 0 2px var(--ink-100);
+}
+
+.neutral:hover {
+  background: var(--ink-100);
+  border-color: var(--ink-200);
+}
+
+.neutral.selected {
+  background: var(--ink-100);
+  border-color: var(--ink-200);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live[data-live="true"] { animation: none; }
+}
