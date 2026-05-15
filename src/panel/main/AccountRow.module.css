@@ -2,8 +2,10 @@
   --row-color: var(--c-iris);
   position: relative;
   display: grid;
-  /* minmax keeps the name readable; pills shrink first under width pressure. */
-  grid-template-columns: 4px 8px minmax(64px, 1fr) auto auto 10px;
+  /* minmax keeps the name readable; pills shrink first under width pressure.
+   * Extra `auto` slot before role pill holds the optional IdC badge — only
+   * rendered when 2+ Identity Centers exist. Collapses to 0 width otherwise. */
+  grid-template-columns: 4px 8px minmax(64px, 1fr) auto auto auto 10px;
   align-items: center;
   gap: 6px;
   width: 100%;
@@ -82,6 +84,29 @@
   color: var(--ink-400);
   font-weight: 400;
   font-style: italic;
+}
+
+.idcBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--row-color) 16%, transparent);
+  color: color-mix(in oklch, var(--row-color) 60%, var(--ink-700));
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.neutral .idcBadge {
+  background: var(--ink-100);
+  color: var(--ink-500);
 }
 
 .roleBtn {

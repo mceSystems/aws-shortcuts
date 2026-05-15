@@ -29,6 +29,7 @@ export function RolePicker({ account, onClose }: Props) {
   async function pick(roleName: string) {
     await send({
       type: 'SET_ACCOUNT_PREFERRED_ROLE',
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       roleName,
     });
@@ -38,6 +39,7 @@ export function RolePicker({ account, onClose }: Props) {
   async function toggleLock() {
     await send({
       type: 'TOGGLE_ROLE_LOCK',
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       locked: !account.roleLocked,
     });

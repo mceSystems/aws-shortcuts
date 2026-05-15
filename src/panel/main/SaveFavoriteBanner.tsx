@@ -5,6 +5,7 @@ import styles from './SaveFavoriteBanner.module.css';
 
 export type PendingFavorite = {
   defaultLabel: string;
+  identityCenterId: string;
   accountId: string;
   roleName: string;
   region: string;
@@ -34,6 +35,7 @@ export function SaveFavoriteBanner({ pending, onClose }: Props) {
     const label = draft.trim() || pending.defaultLabel;
     const fav: Favorite = {
       id: `f_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+      identityCenterId: pending.identityCenterId,
       accountId: pending.accountId,
       roleName: pending.roleName,
       region: pending.region,

@@ -267,6 +267,7 @@ async function launchFavorite(f: Favorite, openTabs: OpenTabInfo[]): Promise<voi
   }
   const res = await send({
     type: 'RESOLVE_LAUNCH_URL',
+    identityCenterId: f.identityCenterId,
     accountId: f.accountId,
     roleName: f.roleName,
     region: f.region,

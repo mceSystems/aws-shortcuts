@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react';
-import type { Account } from '@/shared/types';
+import type { Account, IdentityCenter } from '@/shared/types';
 import { send } from '@/shared/messages';
+import { rowKey } from '@/shared/storage';
 import { AccountRow } from './AccountRow';
 import styles from './AccountList.module.css';
 
 type Props = {
   accounts: Account[];
+  /** Composite row keys (`${identityCenterId}:${accountId}`) in display order. */
   accountOrder: string[];
+  /** Composite row keys hidden by the user. */
   hiddenAccountIds: string[];
+  identityCenters: IdentityCenter[];
   selectedId: string | null;
-  onSelect: (accountId: string) => void;
+  onSelect: (rowKey: string) => void;
   editing: boolean;
   /** Header-only render for collapsed section: only the selected row, or nothing. */
   compactSelected?: boolean;
@@ -24,39 +28,51 @@ export function AccountList({
   accounts,
   accountOrder,
   hiddenAccountIds,
+  identityCenters,
   selectedId,
   onSelect,
   editing,
   compactSelected,
 }: Props) {
-  const byId = useMemo(() => {
+  const byKey = useMemo(() => {
     const m = new Map<string, Account>();
-    for (const a of accounts) m.set(a.accountId, a);
+    for (const a of accounts) m.set(rowKey(a.identityCenterId, a.accountId), a);
     return m;
   }, [accounts]);
 
+  const idcById = useMemo(() => {
+    const m = new Map<string, IdentityCenter>();
+    for (const i of identityCenters) m.set(i.id, i);
+    return m;
+  }, [identityCenters]);
+
+  const showIdcBadge = identityCenters.length > 1;
+
   if (compactSelected) {
-    const selected = selectedId ? byId.get(selectedId) : undefined;
+    const selected = selectedId ? byKey.get(selectedId) : undefined;
     if (!selected) return null;
+    const selectedKey = rowKey(selected.identityCenterId, selected.accountId);
     return (
       <div className={styles.list}>
         <AccountRow
           account={selected}
+          identityCenter={idcById.get(selected.identityCenterId)}
+          showIdcBadge={showIdcBadge}
           selected
-          onClick={() => onSelect(selected.accountId)}
+          onClick={() => onSelect(selectedKey)}
         />
       </div>
     );
   }
 
   const visible = useMemo(
-    () => accountOrder.map((id) => byId.get(id)).filter((a): a is Account => Boolean(a)),
-    [accountOrder, byId],
+    () => accountOrder.map((k) => byKey.get(k)).filter((a): a is Account => Boolean(a)),
+    [accountOrder, byKey],
   );
   const hidden = useMemo(
     () =>
-      hiddenAccountIds.map((id) => byId.get(id)).filter((a): a is Account => Boolean(a)),
-    [hiddenAccountIds, byId],
+      hiddenAccountIds.map((k) => byKey.get(k)).filter((a): a is Account => Boolean(a)),
+    [hiddenAccountIds, byKey],
   );
 
   const [userExpanded, setUserExpanded] = useState(false);
@@ -76,8 +92,8 @@ export function AccountList({
 
   function commitDrop(target: DropTarget) {
     if (!draggingId || !target) return;
-    const newVisible = accountOrder.filter((id) => id !== draggingId);
-    const newHidden = hiddenAccountIds.filter((id) => id !== draggingId);
+    const newVisible = accountOrder.filter((k) => k !== draggingId);
+    const newHidden = hiddenAccountIds.filter((k) => k !== draggingId);
     if (target.kind === 'divider') {
       // Drop on chevron → top of hidden.
       newHidden.unshift(draggingId);
@@ -158,7 +174,8 @@ export function AccountList({
           setDropTarget({ kind: 'divider' });
         } else {
           const last = hidden[hidden.length - 1];
-          setDropTarget({ kind: 'row', section: 'hidden', id: last.accountId, before: false });
+          const lastKey = rowKey(last.identityCenterId, last.accountId);
+          setDropTarget({ kind: 'row', section: 'hidden', id: lastKey, before: false });
         }
       },
       onDrop: (e: React.DragEvent) => {
@@ -175,22 +192,23 @@ export function AccountList({
   return (
     <div className={[styles.list, editing ? styles.editing : ''].filter(Boolean).join(' ')}>
       {visible.map((a) => {
-        const isDragging = draggingId === a.accountId;
+        const key = rowKey(a.identityCenterId, a.accountId);
+        const isDragging = draggingId === key;
         const indicator =
           dropTarget?.kind === 'row' &&
           dropTarget.section === 'visible' &&
-          dropTarget.id === a.accountId
+          dropTarget.id === key
             ? dropTarget.before
               ? styles.dropBefore
               : styles.dropAfter
             : '';
         return (
           <div
-            key={a.accountId}
+            key={key}
             className={[styles.rowWrap, indicator, isDragging ? styles.dragging : '']
               .filter(Boolean)
               .join(' ')}
-            {...rowDragHandlers('visible', a.accountId)}
+            {...rowDragHandlers('visible', key)}
           >
             {editing && (
               <span className={styles.handle} aria-hidden>
@@ -199,9 +217,11 @@ export function AccountList({
             )}
             <AccountRow
               account={a}
-              selected={selectedId === a.accountId}
+              identityCenter={idcById.get(a.identityCenterId)}
+              showIdcBadge={showIdcBadge}
+              selected={selectedId === key}
               compact={editing}
-              onClick={() => onSelect(a.accountId)}
+              onClick={() => onSelect(key)}
             />
           </div>
         );
@@ -230,18 +250,19 @@ export function AccountList({
 
       {expanded &&
         hidden.map((a) => {
-          const isDragging = draggingId === a.accountId;
+          const key = rowKey(a.identityCenterId, a.accountId);
+          const isDragging = draggingId === key;
           const indicator =
             dropTarget?.kind === 'row' &&
             dropTarget.section === 'hidden' &&
-            dropTarget.id === a.accountId
+            dropTarget.id === key
               ? dropTarget.before
                 ? styles.dropBefore
                 : styles.dropAfter
               : '';
           return (
             <div
-              key={a.accountId}
+              key={key}
               className={[
                 styles.rowWrap,
                 styles.hiddenRow,
@@ -250,7 +271,7 @@ export function AccountList({
               ]
                 .filter(Boolean)
                 .join(' ')}
-              {...rowDragHandlers('hidden', a.accountId)}
+              {...rowDragHandlers('hidden', key)}
             >
               {editing && (
                 <span className={styles.handle} aria-hidden>
@@ -259,9 +280,11 @@ export function AccountList({
               )}
               <AccountRow
                 account={a}
-                selected={selectedId === a.accountId}
+                identityCenter={idcById.get(a.identityCenterId)}
+                showIdcBadge={showIdcBadge}
+                selected={selectedId === key}
                 compact={editing}
-                onClick={() => onSelect(a.accountId)}
+                onClick={() => onSelect(key)}
               />
             </div>
           );

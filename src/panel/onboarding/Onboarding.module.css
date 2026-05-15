@@ -144,7 +144,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
 }
 
 .suggestRow {
@@ -163,9 +163,30 @@
               background var(--dur-fast) var(--ease-out);
 }
 
-.suggestRow:hover {
+.suggestRow:hover:not(:disabled) {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+.suggestRow:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.suggestBadge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-100);
+  color: var(--ink-500);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 }
 
 .suggestIcon {

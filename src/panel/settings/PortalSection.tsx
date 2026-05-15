@@ -1,126 +1,239 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { send } from '@/shared/messages';
 import { getSync } from '@/shared/storage';
+import type { Account, IdentityCenter } from '@/shared/types';
 import styles from '@/options/options.module.css';
+import row from './IdentityCenters.module.css';
 
-type Status =
+type ScanStatus =
   | { kind: 'idle' }
   | { kind: 'scanning' }
-  | {
-      kind: 'ok';
-      accountsAdded: number;
-      accountsTotal: number;
-      rolesAdded: number;
-      rolesTotal: number;
-    }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; message: string }
+  | { kind: 'ok'; accountsAdded: number; rolesAdded: number };
 
-function countRoles(accounts: { roles: { name: string }[] }[]): number {
+type RemoveStatus = 'idle' | 'confirm';
+
+type Props = {
+  onAddIdentityCenter: () => void;
+};
+
+function countRoles(accounts: Account[]): number {
   return accounts.reduce((sum, a) => sum + a.roles.length, 0);
 }
 
-type Props = {
-  onChangePortal: () => void;
-};
-
-export function PortalSection({ onChangePortal }: Props) {
-  const [portalUrl, setPortalUrl] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>({ kind: 'idle' });
+export function IdentityCentersSection({ onAddIdentityCenter }: Props) {
+  const [identityCenters, setIdentityCenters] = useState<IdentityCenter[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [scanByIdc, setScanByIdc] = useState<Record<string, ScanStatus>>({});
+  const [removeByIdc, setRemoveByIdc] = useState<Record<string, RemoveStatus>>({});
+  const [renameDraft, setRenameDraft] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    void getSync().then((sync) => {
-      setPortalUrl(sync.ssoConfig?.startUrl ?? null);
-    });
+    void hydrate();
+    const handler = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string,
+    ) => {
+      if (area !== 'sync') return;
+      if (changes.identityCenters || changes.accounts) void hydrate();
+    };
+    chrome.storage.onChanged.addListener(handler);
+    return () => chrome.storage.onChanged.removeListener(handler);
   }, []);
 
-  async function rescan() {
-    setStatus({ kind: 'scanning' });
-    const beforeSync = await getSync();
-    const accountsBefore = beforeSync.accounts?.length ?? 0;
-    const rolesBefore = countRoles(beforeSync.accounts ?? []);
+  async function hydrate() {
+    const sync = await getSync();
+    setIdentityCenters(sync.identityCenters);
+    setAccounts(sync.accounts);
+  }
 
-    const res = await send({ type: 'CAPTURE_AND_SCAN' });
+  const accountsByIdc = useMemo(() => {
+    const m = new Map<string, Account[]>();
+    for (const a of accounts) {
+      const arr = m.get(a.identityCenterId) ?? [];
+      arr.push(a);
+      m.set(a.identityCenterId, arr);
+    }
+    return m;
+  }, [accounts]);
+
+  async function rescan(idcId: string) {
+    setScanByIdc((s) => ({ ...s, [idcId]: { kind: 'scanning' } }));
+    const before = accountsByIdc.get(idcId) ?? [];
+    const accountsBefore = before.length;
+    const rolesBefore = countRoles(before);
+
+    const res = await send({ type: 'CAPTURE_AND_SCAN', identityCenterId: idcId });
     if (!res.ok) {
-      setStatus({
-        kind: 'error',
-        message: res.error ?? 'Scan failed.',
+      setScanByIdc((s) => ({ ...s, [idcId]: { kind: 'error', message: res.error } }));
+      return;
+    }
+    const after = await getSync();
+    const afterList = after.accounts.filter((a) => a.identityCenterId === idcId);
+    setScanByIdc((s) => ({
+      ...s,
+      [idcId]: {
+        kind: 'ok',
+        accountsAdded: Math.max(0, afterList.length - accountsBefore),
+        rolesAdded: Math.max(0, countRoles(afterList) - rolesBefore),
+      },
+    }));
+  }
+
+  async function confirmRemove(idcId: string) {
+    await send({ type: 'REMOVE_IDENTITY_CENTER', id: idcId });
+    setRemoveByIdc((s) => {
+      const next = { ...s };
+      delete next[idcId];
+      return next;
+    });
+  }
+
+  async function commitRename(idcId: string) {
+    const next = renameDraft[idcId];
+    if (next === undefined) return;
+    const trimmed = next.trim();
+    const cur = identityCenters.find((i) => i.id === idcId);
+    if (!cur || !trimmed || trimmed === cur.name) {
+      setRenameDraft((s) => {
+        const cp = { ...s };
+        delete cp[idcId];
+        return cp;
       });
       return;
     }
-
-    const afterSync = await getSync();
-    const accountsAfter = afterSync.accounts?.length ?? 0;
-    const rolesAfter = countRoles(afterSync.accounts ?? []);
-    setStatus({
-      kind: 'ok',
-      accountsAdded: Math.max(0, accountsAfter - accountsBefore),
-      accountsTotal: accountsAfter,
-      rolesAdded: Math.max(0, rolesAfter - rolesBefore),
-      rolesTotal: rolesAfter,
+    await send({ type: 'RENAME_IDENTITY_CENTER', id: idcId, name: trimmed });
+    setRenameDraft((s) => {
+      const cp = { ...s };
+      delete cp[idcId];
+      return cp;
     });
   }
 
   return (
     <section className={styles.section}>
       <div className={styles.sectionHead}>
-        <h2 className={styles.sectionTitle}>Portal connection</h2>
+        <h2 className={styles.sectionTitle}>Identity Centers</h2>
         <p className={styles.sectionHint}>
-          The IAM Identity Center start URL the extension reads accounts and
-          roles from.
+          Each portal you connect lets the extension read its accounts and roles. Same account
+          across two portals shows up as two rows.
         </p>
       </div>
 
-      <dl className={styles.statGrid}>
-        <div className={styles.stat} style={{ gridColumn: '1 / -1' }}>
-          <dt className={styles.statLabel}>Current portal</dt>
-          <dd
-            className={styles.statValue}
-            style={{ fontSize: 13, wordBreak: 'break-all' }}
-          >
-            {portalUrl ?? '—'}
-          </dd>
-        </div>
-      </dl>
+      <ul className={row.list}>
+        {identityCenters.map((idc) => {
+          const list = accountsByIdc.get(idc.id) ?? [];
+          const status = scanByIdc[idc.id] ?? { kind: 'idle' };
+          const removeStage = removeByIdc[idc.id] ?? 'idle';
+          const draft = renameDraft[idc.id];
+          return (
+            <li key={idc.id} className={row.idc}>
+              <div className={row.head}>
+                <input
+                  type="text"
+                  className={row.nameInput}
+                  value={draft ?? idc.name}
+                  onChange={(e) =>
+                    setRenameDraft((s) => ({ ...s, [idc.id]: e.target.value }))
+                  }
+                  onBlur={() => commitRename(idc.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                    else if (e.key === 'Escape') {
+                      setRenameDraft((s) => {
+                        const cp = { ...s };
+                        delete cp[idc.id];
+                        return cp;
+                      });
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  spellCheck={false}
+                />
+                <div className={row.headActions}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => rescan(idc.id)}
+                    disabled={status.kind === 'scanning'}
+                  >
+                    {status.kind === 'scanning' ? 'Rescanning…' : 'Rescan'}
+                  </button>
+                  {removeStage === 'idle' ? (
+                    <button
+                      type="button"
+                      className={styles.dangerButton}
+                      onClick={() =>
+                        setRemoveByIdc((s) => ({ ...s, [idc.id]: 'confirm' }))
+                      }
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <span className={row.confirmRow}>
+                      <button
+                        type="button"
+                        className={styles.dangerButton}
+                        onClick={() => void confirmRemove(idc.id)}
+                      >
+                        Confirm remove {list.length} account{list.length === 1 ? '' : 's'}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() =>
+                          setRemoveByIdc((s) => {
+                            const cp = { ...s };
+                            delete cp[idc.id];
+                            return cp;
+                          })
+                        }
+                      >
+                        Cancel
+                      </button>
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className={row.urlLine} title={idc.startUrl}>
+                {idc.startUrl}
+              </div>
+              <div className={row.statLine}>
+                <span>{list.length} account{list.length === 1 ? '' : 's'}</span>
+                <span aria-hidden> · </span>
+                <span>
+                  {countRoles(list)} role{countRoles(list) === 1 ? '' : 's'}
+                </span>
+                <span aria-hidden> · </span>
+                <span className={row.region}>{idc.region}</span>
+              </div>
+              {status.kind === 'error' && (
+                <p className={styles.errorMsg}>{status.message}</p>
+              )}
+              {status.kind === 'ok' && (
+                <p className={styles.successMsg}>
+                  {status.accountsAdded === 0 && status.rolesAdded === 0
+                    ? 'Up to date.'
+                    : `Added ${status.accountsAdded} accounts, ${status.rolesAdded} roles.`}
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
 
       <div className={styles.actionRow}>
         <button
           type="button"
           className={styles.primaryButton}
-          onClick={rescan}
-          disabled={status.kind === 'scanning' || !portalUrl}
+          onClick={onAddIdentityCenter}
         >
-          {status.kind === 'scanning' ? 'Rescanning…' : 'Rescan portal'}
-        </button>
-        <button
-          type="button"
-          className={styles.secondaryButton}
-          onClick={onChangePortal}
-        >
-          Change portal URL
+          Add Identity Center
         </button>
       </div>
-
-      {status.kind === 'ok' && (
-        <p className={styles.successMsg}>
-          {(() => {
-            const a = `${status.accountsTotal} account${status.accountsTotal === 1 ? '' : 's'}`;
-            const r = `${status.rolesTotal} role${status.rolesTotal === 1 ? '' : 's'}`;
-            const noChanges = status.accountsAdded === 0 && status.rolesAdded === 0;
-            if (noChanges) return `Up to date — ${a}, ${r}.`;
-            const parts: string[] = [];
-            if (status.accountsAdded > 0) {
-              parts.push(`${status.accountsAdded} new account${status.accountsAdded === 1 ? '' : 's'}`);
-            }
-            if (status.rolesAdded > 0) {
-              parts.push(`${status.rolesAdded} new role${status.rolesAdded === 1 ? '' : 's'}`);
-            }
-            return `Added ${parts.join(' + ')} (${a}, ${r}).`;
-          })()}
-        </p>
-      )}
-      {status.kind === 'error' && (
-        <p className={styles.errorMsg}>{status.message}</p>
-      )}
     </section>
   );
 }
+
+/** Backwards-compatible alias for callers wired to the old name. */
+export const PortalSection = IdentityCentersSection;

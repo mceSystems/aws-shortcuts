@@ -1,13 +1,13 @@
-import type { Account, Favorite, Prefs, Recent, SsoConfig } from './types';
+import type { Account, Favorite, IdentityCenter, Prefs, Recent, SsoConfig } from './types';
 
 export type SyncSchema = {
-  ssoConfig?: SsoConfig;
+  identityCenters: IdentityCenter[];
   accounts: Account[];
   favorites: Favorite[];
   prefs: Prefs;
-  /** Visible accountIds in display order. New accounts append. */
+  /** Visible row keys in display order. Row key = `${identityCenterId}:${accountId}`. */
   accountOrder: string[];
-  /** Hidden accountIds in display order (within the hidden section). */
+  /** Hidden row keys in display order. Row key = `${identityCenterId}:${accountId}`. */
   hiddenAccountIds: string[];
 };
 
@@ -20,6 +20,7 @@ const DEFAULT_PREFS: Prefs = {
 };
 
 const DEFAULT_SYNC: SyncSchema = {
+  identityCenters: [],
   accounts: [],
   favorites: [],
   prefs: DEFAULT_PREFS,
@@ -31,7 +32,8 @@ const DEFAULT_LOCAL: LocalSchema = {
   recents: [],
 };
 
-const SYNC_KEYS: (keyof SyncSchema)[] = [
+const SYNC_KEYS: (keyof SyncSchema | 'ssoConfig')[] = [
+  'identityCenters',
   'ssoConfig',
   'accounts',
   'favorites',
@@ -40,14 +42,99 @@ const SYNC_KEYS: (keyof SyncSchema)[] = [
   'hiddenAccountIds',
 ];
 
-export async function getSync(): Promise<SyncSchema> {
-  const raw = await chrome.storage.sync.get(SYNC_KEYS);
-  return { ...DEFAULT_SYNC, ...(raw as Partial<SyncSchema>) };
+/** Build a deterministic IdC id from its portal host. Same host always
+ *  yields the same id, so re-adding a portal merges into existing rows. */
+export function identityCenterIdFromHost(portalHost: string): string {
+  try {
+    return new URL(portalHost).hostname.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  } catch {
+    return portalHost.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  }
 }
 
-export async function getSsoConfig(): Promise<SsoConfig | undefined> {
-  const raw = await chrome.storage.sync.get('ssoConfig');
-  return (raw as { ssoConfig?: SsoConfig }).ssoConfig;
+export function rowKey(identityCenterId: string, accountId: string): string {
+  return `${identityCenterId}:${accountId}`;
+}
+
+function legacySsoConfigToIdc(cfg: SsoConfig): IdentityCenter {
+  const id = identityCenterIdFromHost(cfg.portalHost);
+  let name = id;
+  try {
+    name = new URL(cfg.portalHost).hostname;
+  } catch {
+    // fall through
+  }
+  return {
+    id,
+    name,
+    startUrl: cfg.startUrl,
+    portalHost: cfg.portalHost,
+    region: cfg.region,
+  };
+}
+
+/** Read raw sync storage and apply legacy-shape migration if needed.
+ *  Returns the post-migration schema and the migrated patch (if any) so
+ *  callers that want to persist can. Most callers should use `getSync`. */
+async function readAndMigrate(): Promise<SyncSchema> {
+  const raw = (await chrome.storage.sync.get(SYNC_KEYS)) as Record<string, unknown>;
+  const existingIdcs = (raw.identityCenters as IdentityCenter[] | undefined) ?? [];
+  const ssoConfig = raw.ssoConfig as SsoConfig | undefined;
+  let identityCenters = existingIdcs;
+  let accounts = (raw.accounts as Account[] | undefined) ?? [];
+  let favorites = (raw.favorites as Favorite[] | undefined) ?? [];
+  let accountOrder = (raw.accountOrder as string[] | undefined) ?? [];
+  let hiddenAccountIds = (raw.hiddenAccountIds as string[] | undefined) ?? [];
+  let migrationPatch: Partial<SyncSchema> | null = null;
+
+  // Legacy → identityCenters[] migration. Triggered when:
+  //  - identityCenters is empty (or missing)
+  //  - ssoConfig exists (legacy single-portal install)
+  // Stamps existing accounts/favorites with the legacy IdC id so they
+  // appear in the UI right after update without re-onboarding.
+  if (identityCenters.length === 0 && ssoConfig) {
+    const idc = legacySsoConfigToIdc(ssoConfig);
+    identityCenters = [idc];
+    accounts = accounts.map((a) =>
+      a.identityCenterId ? a : { ...a, identityCenterId: idc.id },
+    );
+    favorites = favorites.map((f) =>
+      f.identityCenterId ? f : { ...f, identityCenterId: idc.id },
+    );
+    // accountOrder + hiddenAccountIds previously held bare accountIds. Rewrite
+    // to composite row keys so AccountList lookup matches the new scheme.
+    accountOrder = accountOrder.map((k) =>
+      k.includes(':') ? k : rowKey(idc.id, k),
+    );
+    hiddenAccountIds = hiddenAccountIds.map((k) =>
+      k.includes(':') ? k : rowKey(idc.id, k),
+    );
+    migrationPatch = {
+      identityCenters,
+      accounts,
+      favorites,
+      accountOrder,
+      hiddenAccountIds,
+    };
+  }
+
+  if (migrationPatch) {
+    await chrome.storage.sync.set(migrationPatch);
+    await chrome.storage.sync.remove('ssoConfig');
+  }
+
+  return {
+    identityCenters,
+    accounts,
+    favorites,
+    prefs: { ...DEFAULT_PREFS, ...((raw.prefs as Prefs | undefined) ?? {}) },
+    accountOrder,
+    hiddenAccountIds,
+  };
+}
+
+export async function getSync(): Promise<SyncSchema> {
+  return { ...DEFAULT_SYNC, ...(await readAndMigrate()) };
 }
 
 export async function setSync(patch: Partial<SyncSchema>): Promise<void> {
@@ -95,4 +182,3 @@ export function mutateLocal(
   localMutateChain = next.catch(() => {});
   return next;
 }
-

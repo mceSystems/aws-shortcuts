@@ -8,6 +8,7 @@ import scan from './ScanStep.module.css';
 type Phase = 'scanning' | 'needsPortal';
 
 type Props = {
+  identityCenterId: string;
   stepIndex?: number;
   totalSteps?: number;
   onBack: () => void;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function ScanStep({
+  identityCenterId,
   stepIndex = 2,
   totalSteps = 3,
   onBack,
@@ -30,25 +32,25 @@ export function ScanStep({
   useEffect(() => {
     void runScan();
 
-    // Auto-retry scan when bearer lands in session storage.
+    // Auto-retry scan when a new bearer lands in session storage.
     const handler = (
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
-      if (area === 'session' && changes.bearerToken && changes.bearerToken.newValue) {
+      if (area === 'session' && (changes.bearers || changes.bearerTick)) {
         void runScan();
       }
     };
     chrome.storage.onChanged.addListener(handler);
     return () => chrome.storage.onChanged.removeListener(handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [identityCenterId]);
 
   async function runScan() {
     setPhase('scanning');
     setError(null);
     setReloading(false);
-    const res = await send({ type: 'SCAN_PORTAL' });
+    const res = await send({ type: 'SCAN_PORTAL', identityCenterId });
     if (res.ok) {
       onComplete();
       return;
@@ -59,7 +61,7 @@ export function ScanStep({
     if (!autoReloadedRef.current) {
       autoReloadedRef.current = true;
       setReloading(true);
-      const bg = await send({ type: 'CAPTURE_AND_SCAN' });
+      const bg = await send({ type: 'CAPTURE_AND_SCAN', identityCenterId });
       if (bg.ok) {
         onComplete();
         return;
@@ -77,7 +79,7 @@ export function ScanStep({
     setReloading(true);
     setError(null);
     setPhase('scanning');
-    const bg = await send({ type: 'CAPTURE_AND_SCAN' });
+    const bg = await send({ type: 'CAPTURE_AND_SCAN', identityCenterId });
     if (bg.ok) {
       onComplete();
       return;

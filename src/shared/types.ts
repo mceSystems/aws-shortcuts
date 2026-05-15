@@ -14,7 +14,22 @@ export type RoleObservation = {
   lastSeenAt: number;
 };
 
+export type IdentityCenter = {
+  /** Stable id derived from portalHost on creation (e.g. `d-xxxxxx-awsapps-com`). */
+  id: string;
+  /** User-editable display label. Defaults to portal hostname. */
+  name: string;
+  startUrl: string;
+  portalHost: string;
+  /** Portal API region (where portal.sso.<region>.amazonaws.com lives). */
+  region: string;
+};
+
 export type Account = {
+  /** Which Identity Center this row belongs to. Composite identity is
+   * (identityCenterId, accountId): same AWS account reachable from two
+   * Identity Centers shows as two distinct rows with different role sets. */
+  identityCenterId: string;
   accountId: string;
   name: string;
   /** User-set display alias. Falls back to `name` in UI. */
@@ -39,6 +54,7 @@ export type Account = {
 
 export type Favorite = {
   id: string;
+  identityCenterId: string;
   accountId: string;
   roleName: string;
   region: string;
@@ -52,6 +68,7 @@ export type Favorite = {
 
 export type Recent = {
   id: string;
+  identityCenterId: string;
   accountId: string;
   roleName: string;
   region: string;

@@ -31,6 +31,7 @@ export function RegionPicker({ account, onClose }: Props) {
   async function pick(region: string) {
     await send({
       type: 'SET_ACCOUNT_PREFERRED_REGION',
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       region,
     });
@@ -40,6 +41,7 @@ export function RegionPicker({ account, onClose }: Props) {
   async function toggleLock() {
     await send({
       type: 'TOGGLE_REGION_LOCK',
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       locked: !account.regionLocked,
     });

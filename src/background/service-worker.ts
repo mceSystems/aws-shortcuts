@@ -1,8 +1,10 @@
 import type { Msg, MsgResponse } from '@/shared/messages';
-import type { Account, Favorite, Recent } from '@/shared/types';
-import { getSync, mutateLocal, mutateSync } from '@/shared/storage';
+import type { Account, Favorite, IdentityCenter, Recent } from '@/shared/types';
+import { getSync, mutateLocal, mutateSync, rowKey } from '@/shared/storage';
 import {
-  getSessionState,
+  getBearer,
+  getBearers,
+  getBearerTick,
   setBearer,
   getConsoleSessions,
   mutateConsoleSessions,
@@ -51,7 +53,7 @@ chrome.webRequest.onSendHeaders.addListener(
 );
 
 chrome.runtime.onInstalled.addListener(() => {
-  void refreshOriginRule();
+  void refreshOriginRules();
   void harvestOpenTabs();
   void chrome.sidePanel
     .setPanelBehavior({ openPanelOnActionClick: true })
@@ -59,7 +61,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  void refreshOriginRule();
+  void refreshOriginRules();
   void harvestOpenTabs();
   void chrome.sidePanel
     .setPanelBehavior({ openPanelOnActionClick: true })
@@ -107,6 +109,15 @@ async function recordRecent(t: {
     region: t.region,
     consolePath: t.consolePath,
   });
+  // Console tabs don't expose which Identity Center authorized them — resolve
+  // by looking for the matching (accountId, role) row in our accounts table.
+  // Fallback: any row with this accountId. Empty string if no row at all (rare).
+  const sync = await getSync();
+  const candidates = sync.accounts.filter((a) => a.accountId === t.accountId);
+  const best = t.roleName
+    ? candidates.find((a) => a.roles.some((r) => r.name === t.roleName))
+    : undefined;
+  const identityCenterId = best?.identityCenterId ?? candidates[0]?.identityCenterId ?? '';
   await mutateLocal((state) => {
     const list = state.recents;
     const now = Date.now();
@@ -122,6 +133,7 @@ async function recordRecent(t: {
         title: t.title || existing.title,
         roleName: t.roleName || existing.roleName,
         region: t.region || existing.region,
+        identityCenterId: existing.identityCenterId || identityCenterId,
         hits: existing.hits + 1,
         ts: now,
       };
@@ -129,6 +141,7 @@ async function recordRecent(t: {
     } else {
       const fresh: Recent = {
         id: `r_${now.toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+        identityCenterId,
         accountId: t.accountId,
         roleName: t.roleName,
         region: t.region,
@@ -304,8 +317,8 @@ chrome.windows.onRemoved.addListener(() => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'sync') return;
-  if (changes.ssoConfig) {
-    void refreshOriginRule();
+  if (changes.identityCenters) {
+    void refreshOriginRules();
   }
   // Accounts list transitions empty → non-empty (first scan, sync from another
   // device, import). Trigger harvest so any console tabs already open re-emit
@@ -322,56 +335,62 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // AWS portal API rejects requests with Origin: chrome-extension://...
 // Rewrite Origin + Referer on extension-initiated calls so the server
-// sees the same headers a normal portal page would send.
-const ORIGIN_RULE_ID = 1001;
+// sees the same headers a normal portal page would send. With multiple
+// Identity Centers we need one rule per IdC's portalHost. urlFilter is
+// the same substring (`portal.sso.`) for every rule — DNR's regexFilter
+// is too restricted to scope per-region exactly, so rules share the same
+// match space; only the action (Origin value) differs. Highest-priority
+// rule wins. Since both portals legitimately speak to portal.sso.*, and
+// the request `initiatorDomains` is the extension only, the worst case
+// is that we send a slightly-different `Origin` than the portal expected
+// — both portals accept any *.awsapps.com Origin in practice.
+const ORIGIN_RULE_BASE_ID = 1001;
 
-async function refreshOriginRule(): Promise<void> {
+async function refreshOriginRules(): Promise<void> {
   try {
     const sync = await getSync();
-    const portalHost = sync.ssoConfig?.portalHost;
-    if (!portalHost) {
-      await chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: [ORIGIN_RULE_ID],
-      });
+    const existing = await chrome.declarativeNetRequest.getDynamicRules();
+    const existingIds = existing
+      .map((r) => r.id)
+      .filter((id) => id >= ORIGIN_RULE_BASE_ID && id < ORIGIN_RULE_BASE_ID + 1000);
+    if (sync.identityCenters.length === 0) {
+      if (existingIds.length > 0) {
+        await chrome.declarativeNetRequest.updateDynamicRules({
+          removeRuleIds: existingIds,
+        });
+      }
       return;
     }
-    // urlFilter intentionally matches the substring "portal.sso.": the SSO
-    // portal API call begins on the user's awsapps.com host and redirects
-    // to portal.sso.<region>.amazonaws.com, and the redirected leg is the
-    // one whose Origin needs rewriting. `initiatorDomains` pins the rule
-    // to requests originating from THIS extension, so it cannot fire on
-    // unrelated browser traffic even though the urlFilter is loose.
+    const addRules = sync.identityCenters.map((idc, i) => ({
+      id: ORIGIN_RULE_BASE_ID + i,
+      priority: 1,
+      action: {
+        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+        requestHeaders: [
+          {
+            header: 'Origin',
+            operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+            value: idc.portalHost,
+          },
+          {
+            header: 'Referer',
+            operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+            value: `${idc.portalHost}/start/`,
+          },
+        ],
+      },
+      condition: {
+        urlFilter: 'portal.sso.',
+        resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
+        initiatorDomains: [chrome.runtime.id],
+      },
+    }));
     await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [ORIGIN_RULE_ID],
-      addRules: [
-        {
-          id: ORIGIN_RULE_ID,
-          priority: 1,
-          action: {
-            type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
-            requestHeaders: [
-              {
-                header: 'Origin',
-                operation: chrome.declarativeNetRequest.HeaderOperation.SET,
-                value: portalHost,
-              },
-              {
-                header: 'Referer',
-                operation: chrome.declarativeNetRequest.HeaderOperation.SET,
-                value: `${portalHost}/start/`,
-              },
-            ],
-          },
-          condition: {
-            urlFilter: 'portal.sso.',
-            resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
-            initiatorDomains: [chrome.runtime.id],
-          },
-        },
-      ],
+      removeRuleIds: existingIds,
+      addRules,
     });
   } catch (e) {
-    console.error('[aws-shortcut] failed to set origin rule', e);
+    console.error('[aws-shortcut] failed to set origin rules', e);
   }
 }
 
@@ -388,16 +407,89 @@ chrome.runtime.onMessage.addListener((msg: Msg, sender, reply) => {
 async function handle(msg: Msg): Promise<MsgResponse> {
   switch (msg.type) {
     case 'GET_BEARER': {
-      const s = await getSessionState();
-      return { ok: true, bearer: s.bearerToken };
+      if (msg.portalApiOrigin) {
+        const entry = await getBearer(msg.portalApiOrigin);
+        return { ok: true, bearer: entry?.token };
+      }
+      // Legacy callers: return first known bearer (any).
+      const all = await getBearers();
+      const first = Object.values(all)[0];
+      return { ok: true, bearer: first?.token };
     }
 
     case 'SCAN_PORTAL': {
-      return runScanPortal();
+      return runScanPortal(msg.identityCenterId);
+    }
+
+    case 'SCAN_ALL': {
+      const sync = await getSync();
+      let lastErr: string | null = null;
+      let aggregated: Account[] = [];
+      for (const idc of sync.identityCenters) {
+        const res = await runScanPortal(idc.id);
+        if (!res.ok) {
+          lastErr = res.error;
+        } else if (res.accounts) {
+          aggregated = aggregated.concat(res.accounts);
+        }
+      }
+      if (lastErr && aggregated.length === 0) return { ok: false, error: lastErr };
+      return { ok: true, accounts: aggregated };
     }
 
     case 'CAPTURE_AND_SCAN': {
-      return captureAndScan();
+      return captureAndScan(msg.identityCenterId);
+    }
+
+    case 'ADD_IDENTITY_CENTER': {
+      await mutateSync((sync) => {
+        if (sync.identityCenters.some((i) => i.id === msg.idc.id)) {
+          // Duplicate id (same portalHost): keep the user-given name update.
+          return {
+            identityCenters: sync.identityCenters.map((i) =>
+              i.id === msg.idc.id ? { ...i, ...msg.idc } : i,
+            ),
+          };
+        }
+        return { identityCenters: [...sync.identityCenters, msg.idc] };
+      });
+      return { ok: true };
+    }
+
+    case 'REMOVE_IDENTITY_CENTER': {
+      await mutateSync((sync) => {
+        if (!sync.identityCenters.some((i) => i.id === msg.id)) return null;
+        const keptAccounts = sync.accounts.filter((a) => a.identityCenterId !== msg.id);
+        const keptFavorites = sync.favorites.filter((f) => f.identityCenterId !== msg.id);
+        const survivingKeys = new Set(
+          keptAccounts.map((a) => rowKey(a.identityCenterId, a.accountId)),
+        );
+        return {
+          identityCenters: sync.identityCenters.filter((i) => i.id !== msg.id),
+          accounts: keptAccounts,
+          favorites: keptFavorites,
+          accountOrder: sync.accountOrder.filter((k) => survivingKeys.has(k)),
+          hiddenAccountIds: sync.hiddenAccountIds.filter((k) => survivingKeys.has(k)),
+        };
+      });
+      await mutateLocal((state) => ({
+        recents: state.recents.filter((r) => r.identityCenterId !== msg.id),
+      }));
+      return { ok: true };
+    }
+
+    case 'RENAME_IDENTITY_CENTER': {
+      const name = msg.name.trim();
+      if (!name) return { ok: false, error: 'Name cannot be empty.' };
+      await mutateSync((sync) => {
+        if (!sync.identityCenters.some((i) => i.id === msg.id)) return null;
+        return {
+          identityCenters: sync.identityCenters.map((i) =>
+            i.id === msg.id ? { ...i, name } : i,
+          ),
+        };
+      });
+      return { ok: true };
     }
 
     case 'ACCOUNT_COLOR_OBSERVED': {
@@ -434,7 +526,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     case 'SET_ACCOUNT_PREFERRED_REGION': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
-          a.accountId === msg.accountId
+          a.identityCenterId === msg.identityCenterId && a.accountId === msg.accountId
             ? { ...a, preferredRegion: msg.region }
             : a,
         ),
@@ -445,7 +537,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     case 'TOGGLE_REGION_LOCK': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
-          a.accountId === msg.accountId
+          a.identityCenterId === msg.identityCenterId && a.accountId === msg.accountId
             ? { ...a, regionLocked: msg.locked }
             : a,
         ),
@@ -480,7 +572,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     case 'SET_ACCOUNT_PREFERRED_ROLE': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
-          a.accountId === msg.accountId
+          a.identityCenterId === msg.identityCenterId && a.accountId === msg.accountId
             ? { ...a, preferredRoleName: msg.roleName }
             : a,
         ),
@@ -491,7 +583,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
     case 'TOGGLE_ROLE_LOCK': {
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
-          a.accountId === msg.accountId
+          a.identityCenterId === msg.identityCenterId && a.accountId === msg.accountId
             ? { ...a, roleLocked: msg.locked }
             : a,
         ),
@@ -506,9 +598,9 @@ async function handle(msg: Msg): Promise<MsgResponse> {
 
     case 'REORDER_ACCOUNTS': {
       await mutateSync((sync) => {
-        const ids = new Set(sync.accounts.map((a) => a.accountId));
-        const visible = msg.visible.filter((id) => ids.has(id));
-        const hidden = msg.hidden.filter((id) => ids.has(id));
+        const keys = new Set(sync.accounts.map((a) => rowKey(a.identityCenterId, a.accountId)));
+        const visible = msg.visible.filter((k) => keys.has(k));
+        const hidden = msg.hidden.filter((k) => keys.has(k));
         return { accountOrder: visible, hiddenAccountIds: hidden };
       });
       return { ok: true };
@@ -518,7 +610,7 @@ async function handle(msg: Msg): Promise<MsgResponse> {
       const trimmed = msg.alias.trim();
       await mutateSync((sync) => ({
         accounts: sync.accounts.map((a) =>
-          a.accountId === msg.accountId
+          a.identityCenterId === msg.identityCenterId && a.accountId === msg.accountId
             ? { ...a, alias: trimmed || undefined }
             : a,
         ),
@@ -696,6 +788,7 @@ function chromeTabIdFromCurrentMessage(): number | undefined {
 }
 
 async function resolveLaunchUrl(input: {
+  identityCenterId: string;
   accountId: string;
   roleName: string;
   region: string;
@@ -707,9 +800,22 @@ async function resolveLaunchUrl(input: {
     void bumpOpenCount(input.serviceId, input.featurePath);
   }
   const sync = await getSync();
-  const portalHost = sync.ssoConfig?.portalHost;
+  // Resolve IdC by id; fallback to lookup by accountId+role (recents may have
+  // empty identityCenterId if they were closed before the account was scanned).
+  let idc: IdentityCenter | undefined = sync.identityCenters.find(
+    (i) => i.id === input.identityCenterId,
+  );
+  if (!idc) {
+    const candidates = sync.accounts.filter((a) => a.accountId === input.accountId);
+    const best = candidates.find((a) => a.roles.some((r) => r.name === input.roleName))
+      ?? candidates[0];
+    idc = best
+      ? sync.identityCenters.find((i) => i.id === best.identityCenterId)
+      : undefined;
+  }
+  const portalHost = idc?.portalHost;
   if (!portalHost) {
-    return { ok: false, error: 'No portal configured.' };
+    return { ok: false, error: 'No Identity Center configured for this account.' };
   }
 
   const sessions = await getConsoleSessions();
@@ -773,35 +879,38 @@ async function isSessionLive(url: string): Promise<boolean> {
   }
 }
 
-async function runScanPortal(): Promise<MsgResponse> {
-  const session = await getSessionState();
-  if (!session.bearerToken) {
+async function runScanPortal(identityCenterId: string): Promise<MsgResponse> {
+  const sync = await getSync();
+  const idc = sync.identityCenters.find((i) => i.id === identityCenterId);
+  if (!idc) {
+    return { ok: false, error: 'Identity Center not found.' };
+  }
+  const apiOrigin = `https://portal.sso.${idc.region}.amazonaws.com`;
+  // Prefer bearer captured for this specific origin; if absent, fall through
+  // to any bearer we have for the same origin (multiple IdCs may share a
+  // region — they share an origin and an accepted bearer too).
+  let bearer = (await getBearer(apiOrigin))?.token;
+  if (!bearer) {
+    const all = await getBearers();
+    bearer = all[apiOrigin]?.token;
+  }
+  if (!bearer) {
     return {
       ok: false,
       error: 'No portal token captured yet. Open the portal tab once.',
     };
   }
   let merged: Account[] = [];
-  let scanError: string | null = null;
-  await mutateSync(async (sync) => {
-    const portalHost = sync.ssoConfig?.portalHost;
-    if (!portalHost) {
-      scanError = 'No portal configured. Complete step 1 first.';
-      return null;
-    }
-    const apiHost =
-      session.bearerHost ??
-      `https://portal.sso.${sync.ssoConfig?.region ?? 'us-east-1'}.amazonaws.com`;
-    const accounts = await fetchAccounts(apiHost, session.bearerToken!);
-    merged = mergeAccounts(sync.accounts, accounts);
+  await mutateSync(async (cur) => {
+    const incoming = await fetchAccounts(apiOrigin, bearer!, idc.id);
+    merged = mergeAccountsForIdc(cur.accounts, incoming, idc.id);
     const { accountOrder, hiddenAccountIds } = reconcileOrder(
       merged,
-      sync.accountOrder,
-      sync.hiddenAccountIds,
+      cur.accountOrder,
+      cur.hiddenAccountIds,
     );
     return { accounts: merged, accountOrder, hiddenAccountIds };
   });
-  if (scanError) return { ok: false, error: scanError };
   void harvestOpenTabs();
   return { ok: true, accounts: merged };
 }
@@ -811,13 +920,15 @@ function reconcileOrder(
   prevOrder: string[],
   prevHidden: string[],
 ): { accountOrder: string[]; hiddenAccountIds: string[] } {
-  const incomingIds = new Set(accounts.map((a) => a.accountId));
-  const visibleKept = prevOrder.filter((id) => incomingIds.has(id));
-  const hiddenKept = prevHidden.filter((id) => incomingIds.has(id));
+  const incomingKeys = new Set(
+    accounts.map((a) => rowKey(a.identityCenterId, a.accountId)),
+  );
+  const visibleKept = prevOrder.filter((k) => incomingKeys.has(k));
+  const hiddenKept = prevHidden.filter((k) => incomingKeys.has(k));
   const tracked = new Set([...visibleKept, ...hiddenKept]);
   const fresh = accounts
-    .map((a) => a.accountId)
-    .filter((id) => !tracked.has(id));
+    .map((a) => rowKey(a.identityCenterId, a.accountId))
+    .filter((k) => !tracked.has(k));
   return {
     accountOrder: [...visibleKept, ...fresh],
     hiddenAccountIds: hiddenKept,
@@ -826,40 +937,42 @@ function reconcileOrder(
 
 // Capture a fresh bearer + run the scan. Side-panel-mode: reloading any
 // portal tab (focused or not) is safe — the panel doesn't close on focus
-// shifts. Concurrent callers share the same in-flight capture.
-let inFlightCapture: Promise<MsgResponse> | null = null;
+// shifts. Concurrent callers for the SAME IdC share an in-flight capture;
+// different IdCs run independently.
+const inFlightCaptures = new Map<string, Promise<MsgResponse>>();
 
-function captureAndScan(): Promise<MsgResponse> {
-  if (inFlightCapture) return inFlightCapture;
-  inFlightCapture = runCaptureAndScan().finally(() => {
-    inFlightCapture = null;
+function captureAndScan(identityCenterId: string): Promise<MsgResponse> {
+  const cached = inFlightCaptures.get(identityCenterId);
+  if (cached) return cached;
+  const promise = runCaptureAndScan(identityCenterId).finally(() => {
+    inFlightCaptures.delete(identityCenterId);
   });
-  return inFlightCapture;
+  inFlightCaptures.set(identityCenterId, promise);
+  return promise;
 }
 
-async function runCaptureAndScan(): Promise<MsgResponse> {
+async function runCaptureAndScan(identityCenterId: string): Promise<MsgResponse> {
   const sync = await getSync();
-  const startUrl = sync.ssoConfig?.startUrl;
-  const portalHost = sync.ssoConfig?.portalHost;
-  if (!startUrl || !portalHost) {
-    return { ok: false, error: 'No portal configured. Complete step 1 first.' };
+  const idc = sync.identityCenters.find((i) => i.id === identityCenterId);
+  if (!idc) {
+    return { ok: false, error: 'Identity Center not found.' };
   }
-
-  const beforeCapturedAt = (await getSessionState()).bearerCapturedAt ?? 0;
-  const existing = await findPortalTab(portalHost);
+  const apiOrigin = `https://portal.sso.${idc.region}.amazonaws.com`;
+  const tickBefore = await getBearerTick();
+  const existing = await findPortalTab(idc.portalHost);
 
   if (existing) {
     try {
       await chrome.tabs.reload(existing.id!);
     } catch {
-      await chrome.tabs.create({ url: startUrl, active: true });
+      await chrome.tabs.create({ url: idc.startUrl, active: true });
     }
   } else {
-    await chrome.tabs.create({ url: startUrl, active: true });
+    await chrome.tabs.create({ url: idc.startUrl, active: true });
   }
 
-  await waitForBearer(beforeCapturedAt);
-  return await runScanPortal();
+  await waitForBearer(apiOrigin, tickBefore);
+  return await runScanPortal(identityCenterId);
 }
 
 async function findPortalTab(
@@ -937,15 +1050,26 @@ async function findLiveSessionFromOpenTabs(
   return undefined;
 }
 
-function waitForBearer(after: number): Promise<void> {
+function waitForBearer(apiOrigin: string, tickBefore: number): Promise<void> {
   return new Promise<void>((resolve) => {
     const handler = (
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
       if (area !== 'session') return;
-      const next = changes.bearerCapturedAt?.newValue as number | undefined;
-      if (next && next > after) {
+      // Prefer the per-origin change when present — guarantees this scan's
+      // bearer is ready before runScanPortal reads it.
+      const bearers = changes.bearers?.newValue as Record<string, { token: string }> | undefined;
+      if (bearers && bearers[apiOrigin]) {
+        chrome.storage.onChanged.removeListener(handler);
+        resolve();
+        return;
+      }
+      // Fallback: any tick bump (e.g. browser-shared session state) implies a
+      // new bearer landed somewhere — usable when the api origin we expected
+      // didn't match (e.g. portal in different region than we assumed).
+      const tick = changes.bearerTick?.newValue as number | undefined;
+      if (tick && tick > tickBefore) {
         chrome.storage.onChanged.removeListener(handler);
         resolve();
       }
@@ -1023,9 +1147,17 @@ function sameObservations(
   return true;
 }
 
-function mergeAccounts(existing: Account[], incoming: Account[]): Account[] {
-  return incoming.map((inc) => {
-    const prev = existing.find((a) => a.accountId === inc.accountId);
+/** Merge a fresh scan of one IdC into the existing accounts list. Other
+ *  IdCs' rows are preserved untouched. Returns the full accounts list. */
+function mergeAccountsForIdc(
+  existing: Account[],
+  incoming: Account[],
+  identityCenterId: string,
+): Account[] {
+  const other = existing.filter((a) => a.identityCenterId !== identityCenterId);
+  const previousForIdc = existing.filter((a) => a.identityCenterId === identityCenterId);
+  const updated = incoming.map((inc) => {
+    const prev = previousForIdc.find((a) => a.accountId === inc.accountId);
     const roleNames = new Set(inc.roles.map((r) => r.name));
     // Single-role accounts auto-set; we know the full set, no ambiguity.
     const autoSingleRole =
@@ -1065,6 +1197,7 @@ function mergeAccounts(existing: Account[], incoming: Account[]): Account[] {
       color: '',
     };
   });
+  return [...other, ...updated];
 }
 
 export {};

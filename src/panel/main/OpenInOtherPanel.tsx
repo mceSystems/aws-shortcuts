@@ -73,6 +73,10 @@ export function OpenInOtherPanel(props: Props) {
     if (!accountId || !roleName || !region) return;
     const res = await send({
       type: 'RESOLVE_LAUNCH_URL',
+      // SW falls back to looking up IdC by (accountId, roleName) when the
+      // selected accountId has multiple rows across IdCs. Picker keys by
+      // accountId only — multi-IdC disambiguation deferred to SW resolve.
+      identityCenterId: account?.identityCenterId ?? '',
       accountId,
       roleName,
       region,
