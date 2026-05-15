@@ -45,12 +45,44 @@ chrome.webRequest.onSendHeaders.addListener(
     );
     if (!auth?.value?.startsWith('Bearer ')) return;
     const token = auth.value.slice('Bearer '.length);
-    const host = new URL(details.url).origin;
-    void setBearer(token, host);
+    if (details.tabId < 0) return;
+    void resolvePortalHostForTab(details.tabId).then((portalHost) => {
+      if (!portalHost) return;
+      void setBearer(token, portalHost);
+    });
   },
   { urls: PORTAL_API_URLS },
   ['requestHeaders', 'extraHeaders'],
 );
+
+// Map a webRequest tabId to the configured IDC's portalHost. Bearer is bound
+// to the SSO session that issued it, so cache by the portal that owns the tab,
+// not the regional API origin (two IDCs in same region collide otherwise).
+async function resolvePortalHostForTab(tabId: number): Promise<string | null> {
+  let tabUrl: string | undefined;
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    tabUrl = tab.url;
+  } catch {
+    return null;
+  }
+  if (!tabUrl) return null;
+  let hostname: string;
+  try {
+    hostname = new URL(tabUrl).hostname;
+  } catch {
+    return null;
+  }
+  const sync = await getSync();
+  const idc = sync.identityCenters.find((i) => {
+    try {
+      return new URL(i.portalHost).hostname === hostname;
+    } catch {
+      return false;
+    }
+  });
+  return idc?.portalHost ?? null;
+}
 
 chrome.runtime.onInstalled.addListener(() => {
   void refreshOriginRules();
@@ -407,11 +439,10 @@ chrome.runtime.onMessage.addListener((msg: Msg, sender, reply) => {
 async function handle(msg: Msg): Promise<MsgResponse> {
   switch (msg.type) {
     case 'GET_BEARER': {
-      if (msg.portalApiOrigin) {
-        const entry = await getBearer(msg.portalApiOrigin);
+      if (msg.portalHost) {
+        const entry = await getBearer(msg.portalHost);
         return { ok: true, bearer: entry?.token };
       }
-      // Legacy callers: return first known bearer (any).
       const all = await getBearers();
       const first = Object.values(all)[0];
       return { ok: true, bearer: first?.token };
@@ -886,14 +917,9 @@ async function runScanPortal(identityCenterId: string): Promise<MsgResponse> {
     return { ok: false, error: 'Identity Center not found.' };
   }
   const apiOrigin = `https://portal.sso.${idc.region}.amazonaws.com`;
-  // Prefer bearer captured for this specific origin; if absent, fall through
-  // to any bearer we have for the same origin (multiple IdCs may share a
-  // region — they share an origin and an accepted bearer too).
-  let bearer = (await getBearer(apiOrigin))?.token;
-  if (!bearer) {
-    const all = await getBearers();
-    bearer = all[apiOrigin]?.token;
-  }
+  // Bearer is bound to the SSO portal session — key by portalHost so two IDCs
+  // in the same region don't overwrite each other's tokens.
+  const bearer = (await getBearer(idc.portalHost))?.token;
   if (!bearer) {
     return {
       ok: false,
@@ -957,7 +983,6 @@ async function runCaptureAndScan(identityCenterId: string): Promise<MsgResponse>
   if (!idc) {
     return { ok: false, error: 'Identity Center not found.' };
   }
-  const apiOrigin = `https://portal.sso.${idc.region}.amazonaws.com`;
   const tickBefore = await getBearerTick();
   const existing = await findPortalTab(idc.portalHost);
 
@@ -971,7 +996,7 @@ async function runCaptureAndScan(identityCenterId: string): Promise<MsgResponse>
     await chrome.tabs.create({ url: idc.startUrl, active: true });
   }
 
-  await waitForBearer(apiOrigin, tickBefore);
+  await waitForBearer(idc.portalHost, tickBefore);
   return await runScanPortal(identityCenterId);
 }
 
@@ -1050,24 +1075,23 @@ async function findLiveSessionFromOpenTabs(
   return undefined;
 }
 
-function waitForBearer(apiOrigin: string, tickBefore: number): Promise<void> {
+function waitForBearer(portalHost: string, tickBefore: number): Promise<void> {
   return new Promise<void>((resolve) => {
     const handler = (
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
       if (area !== 'session') return;
-      // Prefer the per-origin change when present — guarantees this scan's
-      // bearer is ready before runScanPortal reads it.
       const bearers = changes.bearers?.newValue as Record<string, { token: string }> | undefined;
-      if (bearers && bearers[apiOrigin]) {
+      if (bearers && bearers[portalHost]) {
         chrome.storage.onChanged.removeListener(handler);
         resolve();
         return;
       }
-      // Fallback: any tick bump (e.g. browser-shared session state) implies a
-      // new bearer landed somewhere — usable when the api origin we expected
-      // didn't match (e.g. portal in different region than we assumed).
+      // Fallback: tick bumped but our portalHost key never appeared
+      // (tab→IDC resolution missed, or unrelated IDC's tab fired). Let the
+      // subsequent runScanPortal surface "No portal token captured yet" so
+      // the user can retry rather than hanging forever.
       const tick = changes.bearerTick?.newValue as number | undefined;
       if (tick && tick > tickBefore) {
         chrome.storage.onChanged.removeListener(handler);

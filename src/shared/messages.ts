@@ -1,7 +1,7 @@
 import type { Account, Favorite, IdentityCenter } from './types';
 
 export type Msg =
-  | { type: 'GET_BEARER'; portalApiOrigin?: string }
+  | { type: 'GET_BEARER'; portalHost?: string }
   | { type: 'SCAN_PORTAL'; identityCenterId: string }
   | { type: 'SCAN_ALL' }
   | { type: 'ACCOUNT_COLOR_OBSERVED'; accountId: string; colorName: string }

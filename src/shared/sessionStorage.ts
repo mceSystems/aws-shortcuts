@@ -1,13 +1,14 @@
-/** Per-host bearer cache. Keyed by portal API origin
- *  (e.g. `https://portal.sso.us-east-1.amazonaws.com`).
- *  Multiple Identity Centers may share an origin (same region) — that's fine,
- *  whichever bearer captured most recently wins for that origin. */
+/** Per-IDC bearer cache. Keyed by the portal host
+ *  (e.g. `https://d-90679c71d5.awsapps.com`). Bearers are bound to the SSO
+ *  portal session that issued them — two IDCs in the same region share an
+ *  API origin but NOT a bearer; calling the API with the wrong tenant's
+ *  bearer returns the wrong tenant's accounts. */
 export type BearerEntry = {
   token: string;
   capturedAt: number;
 };
 
-export type Bearers = Record<string /* portalApiOrigin */, BearerEntry>;
+export type Bearers = Record<string /* portalHost */, BearerEntry>;
 
 const BEARERS_KEY = 'bearers';
 /** Monotonic counter bumped on every `setBearer`. Lets callers (ScanStep,
@@ -20,9 +21,9 @@ export async function getBearers(): Promise<Bearers> {
   return ((raw as { bearers?: Bearers }).bearers) ?? {};
 }
 
-export async function getBearer(portalApiOrigin: string): Promise<BearerEntry | undefined> {
+export async function getBearer(portalHost: string): Promise<BearerEntry | undefined> {
   const all = await getBearers();
-  return all[portalApiOrigin];
+  return all[portalHost];
 }
 
 export async function getBearerTick(): Promise<number> {
@@ -30,11 +31,11 @@ export async function getBearerTick(): Promise<number> {
   return ((raw as { bearerTick?: number }).bearerTick) ?? 0;
 }
 
-export async function setBearer(token: string, host: string): Promise<void> {
+export async function setBearer(token: string, portalHost: string): Promise<void> {
   const all = await getBearers();
   const next: Bearers = {
     ...all,
-    [host]: { token, capturedAt: Date.now() },
+    [portalHost]: { token, capturedAt: Date.now() },
   };
   const tick = await getBearerTick();
   await chrome.storage.session.set({
