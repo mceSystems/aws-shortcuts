@@ -20,11 +20,12 @@ Plain text only — Chrome Web Store does not render Markdown. Unicode bullets (
 One-click access to any AWS account, role, region, and service — straight from your browser. No CLI. No credentials on disk. No new login. Piggybacks on your existing IAM Identity Center (AWS SSO) browser session.
 
 
-WHAT'S NEW IN 1.0.2
+WHAT'S NEW IN 1.0.3
 
-• Onboarding suggestions update live. The "Connect your access portal" step now refreshes its open-tab suggestion list as portal tabs open, navigate, or close — no more stepping Back and Next to see a portal you just opened.
-• Scan no longer hangs when the portal tab is focused. Capture-and-scan reliably reloads the existing portal tab to grab a fresh bearer token, even when the user is already on it.
-• Launch always opens the requested role. If an account already had one role open, switching to a different role on the same account could land on the existing role instead. Fixed — direct-launch now verifies role before reusing an open session.
+• Multiple Identity Centers. Connect more than one IAM Identity Center portal at the same time. The same AWS account reachable from two portals shows up as two rows, so you can pick the role/portal you actually want. Add additional portals from Settings → Identity Centers → Add Identity Center; rename, rescan, or remove any of them from the same list.
+• Settings panel no longer bounces back to Main after onboarding. A stale in-flight scan callback could snap the view back to the main panel 1–2 seconds after opening Settings on a fresh install — fixed.
+• Reset confirmation auto-scrolls into view. Clicking Reset extension now scrolls the inline confirmation into view instead of leaving it hidden below the fold.
+• Misc onboarding and scan-flow fixes uncovered while wiring multi-IDC.
 
 
 WHY
