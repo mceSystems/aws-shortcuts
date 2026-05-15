@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Account, IdentityCenter } from '@/shared/types';
+import type { Account } from '@/shared/types';
 import { chipColor } from '@/shared/colors';
 import { send } from '@/shared/messages';
 import { RegionPicker } from './RegionPicker';
@@ -8,10 +8,6 @@ import styles from './AccountRow.module.css';
 
 type Props = {
   account: Account;
-  identityCenter?: IdentityCenter;
-  /** Show the Identity Center name badge. Caller passes true when there
-   *  are multiple IdCs configured — hides badge in single-IdC installs. */
-  showIdcBadge?: boolean;
   selected: boolean;
   live?: boolean;
   compact?: boolean;
@@ -20,8 +16,6 @@ type Props = {
 
 export function AccountRow({
   account,
-  identityCenter,
-  showIdcBadge,
   selected,
   live,
   compact,
@@ -105,11 +99,6 @@ export function AccountRow({
         />
       ) : (
         <span className={styles.name} title={account.name}>{displayName}</span>
-      )}
-      {!compact && showIdcBadge && identityCenter && (
-        <span className={styles.idcBadge} title={identityCenter.startUrl}>
-          {identityCenter.name}
-        </span>
       )}
       {!compact && (
         <>

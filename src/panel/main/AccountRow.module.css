@@ -86,29 +86,6 @@
   font-style: italic;
 }
 
-.idcBadge {
-  display: inline-flex;
-  align-items: center;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in oklch, var(--row-color) 16%, transparent);
-  color: color-mix(in oklch, var(--row-color) 60%, var(--ink-700));
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.neutral .idcBadge {
-  background: var(--ink-100);
-  color: var(--ink-500);
-}
-
 .roleBtn {
   display: inline-flex;
   align-items: center;

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Account, IdentityCenter } from '@/shared/types';
+import type { Account } from '@/shared/types';
 import { send } from '@/shared/messages';
 import { rowKey } from '@/shared/storage';
 import { AccountRow } from './AccountRow';
@@ -11,7 +11,6 @@ type Props = {
   accountOrder: string[];
   /** Composite row keys hidden by the user. */
   hiddenAccountIds: string[];
-  identityCenters: IdentityCenter[];
   selectedId: string | null;
   onSelect: (rowKey: string) => void;
   editing: boolean;
@@ -28,7 +27,6 @@ export function AccountList({
   accounts,
   accountOrder,
   hiddenAccountIds,
-  identityCenters,
   selectedId,
   onSelect,
   editing,
@@ -40,14 +38,6 @@ export function AccountList({
     return m;
   }, [accounts]);
 
-  const idcById = useMemo(() => {
-    const m = new Map<string, IdentityCenter>();
-    for (const i of identityCenters) m.set(i.id, i);
-    return m;
-  }, [identityCenters]);
-
-  const showIdcBadge = identityCenters.length > 1;
-
   if (compactSelected) {
     const selected = selectedId ? byKey.get(selectedId) : undefined;
     if (!selected) return null;
@@ -56,8 +46,6 @@ export function AccountList({
       <div className={styles.list}>
         <AccountRow
           account={selected}
-          identityCenter={idcById.get(selected.identityCenterId)}
-          showIdcBadge={showIdcBadge}
           selected
           onClick={() => onSelect(selectedKey)}
         />
@@ -217,8 +205,6 @@ export function AccountList({
             )}
             <AccountRow
               account={a}
-              identityCenter={idcById.get(a.identityCenterId)}
-              showIdcBadge={showIdcBadge}
               selected={selectedId === key}
               compact={editing}
               onClick={() => onSelect(key)}
@@ -280,8 +266,6 @@ export function AccountList({
               )}
               <AccountRow
                 account={a}
-                identityCenter={idcById.get(a.identityCenterId)}
-                showIdcBadge={showIdcBadge}
                 selected={selectedId === key}
                 compact={editing}
                 onClick={() => onSelect(key)}

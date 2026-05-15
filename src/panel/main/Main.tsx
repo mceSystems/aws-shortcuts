@@ -146,7 +146,6 @@ export function Main({ onOpenSettings }: Props) {
               accounts={accounts}
               accountOrder={accountOrder}
               hiddenAccountIds={hiddenAccountIds}
-              identityCenters={identityCenters}
               selectedId={selectedId}
               onSelect={(id) => { if (id !== selectedId) selectAccount(id); }}
               editing={editing}
