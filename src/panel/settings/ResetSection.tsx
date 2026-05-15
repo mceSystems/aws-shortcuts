@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { wipeAll } from '@/shared/wipe';
 import styles from '@/options/options.module.css';
 import own from './ResetSection.module.css';
@@ -15,6 +15,13 @@ const ITEMS = [
 
 export function ResetSection() {
   const [stage, setStage] = useState<'idle' | 'confirm' | 'wiping'>('idle');
+  const confirmRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (stage === 'confirm') {
+      confirmRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [stage]);
 
   async function doWipe() {
     setStage('wiping');
@@ -46,7 +53,7 @@ export function ResetSection() {
       )}
 
       {(stage === 'confirm' || stage === 'wiping') && (
-        <div className={own.confirmBox}>
+        <div ref={confirmRef} className={own.confirmBox}>
           <p className={own.confirmIntro}>
             This will permanently delete:
           </p>
