@@ -2,6 +2,17 @@
 
 All notable changes to AWS Shortcut are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/).
 
+## [1.0.3] — 2026-05-15
+
+### Added
+- **Multiple Identity Centers.** Connect more than one IAM Identity Center portal at a time. The same AWS account reachable from two portals shows up as two rows so you can pick the role/portal you actually want. Add additional portals from Settings → Identity Centers → *Add Identity Center*; rename or remove any of them from the same list.
+- **Per-Identity-Center settings.** Each connected portal is its own row in Settings with its own rename, rescan, and remove actions — no more global "current portal" assumption.
+
+### Fixed
+- **Settings panel no longer bounces back to Main after onboarding.** A stale in-flight scan callback fired after `ScanStep` had unmounted, calling `onComplete` from a dead closure and snapping `phase` back to `ready` 1–2 seconds after the user opened Settings. All async paths in `ScanStep` now check a mount-state ref before touching state or invoking `onComplete`.
+- **Reset confirmation now scrolls into view.** Clicking *Reset extension* in Settings auto-scrolls the inline confirm box into view instead of leaving it hidden below the fold.
+- **Scan robustness on initial onboarding.** Misc fixes to the bg-tab capture + scan flow that surfaced when adding multi-IDC support.
+
 ## [1.0.2] — 2026-05-08
 
 ### Fixed
@@ -30,6 +41,7 @@ All notable changes to AWS Shortcut are documented here. Format follows [Keep a 
 - Daily catalog refresh from the public GitHub repo via jsDelivr CDN.
 - Privacy: no telemetry, no remote logging, all state in `chrome.storage.sync` / `local` / `session`.
 
+[1.0.3]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.3
 [1.0.2]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.2
 [1.0.1]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.1
 [1.0.0]: https://github.com/mceSystems/aws-shortcuts/releases/tag/v1.0.0

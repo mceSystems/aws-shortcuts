@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { getSync } from '@/shared/storage';
-import type { Account, Prefs, SsoConfig } from '@/shared/types';
+import type { Account, IdentityCenter, Prefs } from '@/shared/types';
 
 type State = {
   accounts: Account[];
   accountOrder: string[];
   hiddenAccountIds: string[];
-  ssoConfig?: SsoConfig;
+  identityCenters: IdentityCenter[];
   prefs?: Prefs;
   loaded: boolean;
 };
@@ -16,7 +16,7 @@ export function useAccounts(): State {
     accounts: [],
     accountOrder: [],
     hiddenAccountIds: [],
-    ssoConfig: undefined,
+    identityCenters: [],
     prefs: undefined,
     loaded: false,
   });
@@ -29,7 +29,7 @@ export function useAccounts(): State {
         accounts: sync.accounts,
         accountOrder: sync.accountOrder,
         hiddenAccountIds: sync.hiddenAccountIds,
-        ssoConfig: sync.ssoConfig,
+        identityCenters: sync.identityCenters,
         prefs: sync.prefs,
         loaded: true,
       });
@@ -45,7 +45,8 @@ export function useAccounts(): State {
         accountOrder: (changes.accountOrder?.newValue as string[]) ?? prev.accountOrder,
         hiddenAccountIds:
           (changes.hiddenAccountIds?.newValue as string[]) ?? prev.hiddenAccountIds,
-        ssoConfig: (changes.ssoConfig?.newValue as SsoConfig | undefined) ?? prev.ssoConfig,
+        identityCenters:
+          (changes.identityCenters?.newValue as IdentityCenter[]) ?? prev.identityCenters,
         prefs: (changes.prefs?.newValue as Prefs | undefined) ?? prev.prefs,
       }));
     };

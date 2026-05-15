@@ -1,19 +1,23 @@
-import type { Account, Favorite } from './types';
+import type { Account, Favorite, IdentityCenter } from './types';
 
 export type Msg =
-  | { type: 'GET_BEARER' }
-  | { type: 'SCAN_PORTAL' }
+  | { type: 'GET_BEARER'; portalHost?: string }
+  | { type: 'SCAN_PORTAL'; identityCenterId: string }
+  | { type: 'SCAN_ALL' }
   | { type: 'ACCOUNT_COLOR_OBSERVED'; accountId: string; colorName: string }
   | { type: 'ACCOUNT_REGION_OBSERVED'; accountId: string; region: string }
-  | { type: 'SET_ACCOUNT_PREFERRED_REGION'; accountId: string; region: string }
-  | { type: 'TOGGLE_REGION_LOCK'; accountId: string; locked: boolean }
+  | { type: 'SET_ACCOUNT_PREFERRED_REGION'; identityCenterId: string; accountId: string; region: string }
+  | { type: 'TOGGLE_REGION_LOCK'; identityCenterId: string; accountId: string; locked: boolean }
   | { type: 'ACCOUNT_ROLE_OBSERVED'; accountId: string; roleName: string }
-  | { type: 'SET_ACCOUNT_PREFERRED_ROLE'; accountId: string; roleName: string }
-  | { type: 'TOGGLE_ROLE_LOCK'; accountId: string; locked: boolean }
+  | { type: 'SET_ACCOUNT_PREFERRED_ROLE'; identityCenterId: string; accountId: string; roleName: string }
+  | { type: 'TOGGLE_ROLE_LOCK'; identityCenterId: string; accountId: string; locked: boolean }
   | { type: 'RESCAN_OPEN_TABS' }
-  | { type: 'CAPTURE_AND_SCAN' }
+  | { type: 'CAPTURE_AND_SCAN'; identityCenterId: string }
   | { type: 'REORDER_ACCOUNTS'; visible: string[]; hidden: string[] }
-  | { type: 'SET_ACCOUNT_ALIAS'; accountId: string; alias: string }
+  | { type: 'SET_ACCOUNT_ALIAS'; identityCenterId: string; accountId: string; alias: string }
+  | { type: 'ADD_IDENTITY_CENTER'; idc: IdentityCenter }
+  | { type: 'REMOVE_IDENTITY_CENTER'; id: string }
+  | { type: 'RENAME_IDENTITY_CENTER'; id: string; name: string }
   | {
       type: 'SESSION_OBSERVED';
       accountId: string;
@@ -23,6 +27,7 @@ export type Msg =
     }
   | {
       type: 'RESOLVE_LAUNCH_URL';
+      identityCenterId: string;
       accountId: string;
       roleName: string;
       region: string;

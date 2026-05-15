@@ -2,8 +2,10 @@
   --row-color: var(--c-iris);
   position: relative;
   display: grid;
-  /* minmax keeps the name readable; pills shrink first under width pressure. */
-  grid-template-columns: 4px 8px minmax(64px, 1fr) auto auto 10px;
+  /* minmax keeps the name readable; pills shrink first under width pressure.
+   * Extra `auto` slot before role pill holds the optional IdC badge — only
+   * rendered when 2+ Identity Centers exist. Collapses to 0 width otherwise. */
+  grid-template-columns: 4px 8px minmax(64px, 1fr) auto auto auto 10px;
   align-items: center;
   gap: 6px;
   width: 100%;

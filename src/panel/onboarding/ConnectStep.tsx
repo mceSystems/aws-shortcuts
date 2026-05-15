@@ -3,7 +3,9 @@ import { Button } from '../components/Button';
 import { Logo } from '../components/Logo';
 import { StepDots } from '../components/StepDots';
 import { TextInput } from '../components/TextInput';
-import { setSync } from '@/shared/storage';
+import { send } from '@/shared/messages';
+import { getSync, identityCenterIdFromHost } from '@/shared/storage';
+import type { IdentityCenter } from '@/shared/types';
 import styles from './Onboarding.module.css';
 
 const PLACEHOLDER = 'https://d-XXXXXXXXXX.awsapps.com/start/';
@@ -17,24 +19,48 @@ type Suggestion = {
 
 type Props = {
   initialUrl?: string;
+  initialName?: string;
   stepIndex?: number;
   totalSteps?: number;
   onBack: () => void;
-  onContinue: () => void;
+  onContinue: (identityCenterId: string) => void;
 };
 
 export function ConnectStep({
   initialUrl = '',
+  initialName = '',
   stepIndex = 1,
   totalSteps = 3,
   onBack,
   onContinue,
 }: Props) {
   const [url, setUrl] = useState(initialUrl);
+  const [name, setName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [pickedTabId, setPickedTabId] = useState<number | null>(null);
+  const [existingHosts, setExistingHosts] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let alive = true;
+    void getSync().then((sync) => {
+      if (alive) setExistingHosts(new Set(sync.identityCenters.map((i) => i.portalHost)));
+    });
+    const handler = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string,
+    ) => {
+      if (area !== 'sync' || !changes.identityCenters) return;
+      const next = changes.identityCenters.newValue as IdentityCenter[] | undefined;
+      setExistingHosts(new Set((next ?? []).map((i) => i.portalHost)));
+    };
+    chrome.storage.onChanged.addListener(handler);
+    return () => {
+      alive = false;
+      chrome.storage.onChanged.removeListener(handler);
+    };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -72,6 +98,7 @@ export function ConnectStep({
   function pickSuggestion(s: Suggestion) {
     setUrl(s.startUrl);
     setPickedTabId(s.tabId ?? null);
+    if (!name) setName(s.hostname);
     if (error) setError(null);
   }
 
@@ -87,21 +114,27 @@ export function ConnectStep({
       setError('Enter your AWS access portal URL (e.g. https://d-xxxxxx.awsapps.com/start/).');
       return;
     }
+    const idc: IdentityCenter = {
+      id: identityCenterIdFromHost(parsed.portalHost),
+      name: name.trim() || new URL(parsed.portalHost).hostname,
+      startUrl: parsed.startUrl,
+      portalHost: parsed.portalHost,
+      region: 'us-east-1',
+    };
     setBusy(true);
     setError(null);
     try {
-      await setSync({
-        ssoConfig: {
-          startUrl: parsed.startUrl,
-          portalHost: parsed.portalHost,
-          region: 'us-east-1',
-        },
-      });
+      const res = await send({ type: 'ADD_IDENTITY_CENTER', idc });
+      if (!res.ok) {
+        setError(res.error);
+        setBusy(false);
+        return;
+      }
       // Don't open the portal here. ScanStep's bg-tab capture flow is the
       // single owner of "open portal" — opening here too would race the SW's
       // findPortalTab (URL not yet committed on a fresh tab) and end up with
       // two tabs.
-      onContinue();
+      onContinue(idc.id);
     } catch (e) {
       setError((e as Error).message);
       setBusy(false);
@@ -144,22 +177,48 @@ export function ConnectStep({
           )}
         </label>
 
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Display name</span>
+          <TextInput
+            type="text"
+            placeholder="Optional — defaults to portal hostname"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') void handleContinue();
+            }}
+            spellCheck={false}
+          />
+        </label>
+
         {suggestions.length > 0 && (
           <div className={styles.suggestions}>
             <span className={styles.fieldLabel}>Pick from your open tabs</span>
             <ul className={styles.suggestList}>
-              {suggestions.map((s) => (
-                <li key={s.tabId ?? s.startUrl}>
-                  <button
-                    type="button"
-                    className={styles.suggestRow}
-                    onClick={() => pickSuggestion(s)}
-                  >
-                    <span className={styles.suggestIcon} aria-hidden>↳</span>
-                    <span className={styles.suggestUrl}>{s.startUrl}</span>
-                  </button>
-                </li>
-              ))}
+              {suggestions.map((s) => {
+                const alreadyAdded = existingHosts.has(s.portalHost);
+                return (
+                  <li key={s.tabId ?? s.startUrl}>
+                    <button
+                      type="button"
+                      className={styles.suggestRow}
+                      onClick={() => pickSuggestion(s)}
+                      disabled={alreadyAdded}
+                      title={
+                        alreadyAdded
+                          ? 'Already added — find it in Settings → Identity Centers.'
+                          : undefined
+                      }
+                    >
+                      <span className={styles.suggestIcon} aria-hidden>↳</span>
+                      <span className={styles.suggestUrl}>{s.startUrl}</span>
+                      {alreadyAdded && (
+                        <span className={styles.suggestBadge}>already added</span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

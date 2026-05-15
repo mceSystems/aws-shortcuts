@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Account, ServiceCatalogEntry, SsoConfig } from '@/shared/types';
+import type { Account, IdentityCenter, ServiceCatalogEntry } from '@/shared/types';
 import { type CatalogHit, rankCatalog } from '@/shared/serviceCatalog';
 import { subscribeCatalog } from '@/shared/catalogStore';
 import { OPEN_COUNTS_STORAGE_KEY } from '@/shared/openCounts';
@@ -13,13 +13,20 @@ import type { PendingFavorite } from './SaveFavoriteBanner';
 
 type Props = {
   account: Account | null;
-  ssoConfig?: SsoConfig;
+  /** Resolved Identity Center for the selected account. Null when no account is
+   *  selected or when an account refers to an IdC that no longer exists. */
+  identityCenter: IdentityCenter | null;
   onRequestSaveFavorite?: (pending: PendingFavorite) => void;
   /** Header-only render for collapsed section: input row only, no list/picker. */
   compact?: boolean;
 };
 
-export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compact }: Props) {
+export function ServiceSearch({
+  account,
+  identityCenter,
+  onRequestSaveFavorite,
+  compact,
+}: Props) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const [featureCursor, setFeatureCursor] = useState(0);
@@ -144,7 +151,7 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compa
   const missingAccount = !account;
   const missingRole = Boolean(account) && !role;
   const missingRegion = Boolean(account) && !region;
-  const missingPortal = !ssoConfig?.portalHost;
+  const missingPortal = Boolean(account) && !identityCenter?.portalHost;
 
   async function open(service: ServiceCatalogEntry, featurePath?: string) {
     if (!account || missingRole || missingRegion || missingPortal) {
@@ -159,6 +166,7 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compa
     }
     const res = await send({
       type: 'RESOLVE_LAUNCH_URL',
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       roleName: role,
       region,
@@ -200,6 +208,7 @@ export function ServiceSearch({ account, ssoConfig, onRequestSaveFavorite, compa
     if (featureName) labelParts.push(featureName);
     return {
       defaultLabel: labelParts.join(' · '),
+      identityCenterId: account.identityCenterId,
       accountId: account.accountId,
       roleName: role,
       region,

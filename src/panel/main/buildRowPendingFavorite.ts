@@ -4,6 +4,11 @@ import { findServiceById } from '@/shared/serviceCatalog';
 import type { PendingFavorite } from './SaveFavoriteBanner';
 
 type RowInput = {
+  /** When the row's identityCenterId is known (favorites, freshly-recorded
+   * recents), it pins which IdC the favorite launches under. Empty string
+   * means "let SW resolve by accountId+role" — used for legacy recents
+   * recorded before the multi-IdC switch. */
+  identityCenterId?: string;
   accountId: string;
   roleName: string;
   region: string;
@@ -45,6 +50,7 @@ export function buildRowPendingFavorite(
 
   return {
     defaultLabel: labelParts.join(' · '),
+    identityCenterId: row.identityCenterId || account?.identityCenterId || '',
     accountId: row.accountId,
     roleName: row.roleName,
     region: row.region,

@@ -14,7 +14,13 @@ type Props = {
   onClick: () => void;
 };
 
-export function AccountRow({ account, selected, live, compact, onClick }: Props) {
+export function AccountRow({
+  account,
+  selected,
+  live,
+  compact,
+  onClick,
+}: Props) {
   const role = account.preferredRoleName || 'set role';
   const region = account.preferredRegion || 'set region';
   const isNeutral = !account.color;
@@ -35,6 +41,7 @@ export function AccountRow({ account, selected, live, compact, onClick }: Props)
     if (next !== (account.alias ?? '')) {
       void send({
         type: 'SET_ACCOUNT_ALIAS',
+        identityCenterId: account.identityCenterId,
         accountId: account.accountId,
         alias: next,
       });

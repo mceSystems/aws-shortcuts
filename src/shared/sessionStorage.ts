@@ -1,8 +1,48 @@
-type SessionState = {
-  bearerToken?: string;
-  bearerCapturedAt?: number;
-  bearerHost?: string;
+/** Per-IDC bearer cache. Keyed by the portal host
+ *  (e.g. `https://d-90679c71d5.awsapps.com`). Bearers are bound to the SSO
+ *  portal session that issued them — two IDCs in the same region share an
+ *  API origin but NOT a bearer; calling the API with the wrong tenant's
+ *  bearer returns the wrong tenant's accounts. */
+export type BearerEntry = {
+  token: string;
+  capturedAt: number;
 };
+
+export type Bearers = Record<string /* portalHost */, BearerEntry>;
+
+const BEARERS_KEY = 'bearers';
+/** Monotonic counter bumped on every `setBearer`. Lets callers (ScanStep,
+ *  service-worker captureAndScan) wait for *any* new bearer to land without
+ *  caring which origin produced it. */
+const BEARER_TICK_KEY = 'bearerTick';
+
+export async function getBearers(): Promise<Bearers> {
+  const raw = await chrome.storage.session.get(BEARERS_KEY);
+  return ((raw as { bearers?: Bearers }).bearers) ?? {};
+}
+
+export async function getBearer(portalHost: string): Promise<BearerEntry | undefined> {
+  const all = await getBearers();
+  return all[portalHost];
+}
+
+export async function getBearerTick(): Promise<number> {
+  const raw = await chrome.storage.session.get(BEARER_TICK_KEY);
+  return ((raw as { bearerTick?: number }).bearerTick) ?? 0;
+}
+
+export async function setBearer(token: string, portalHost: string): Promise<void> {
+  const all = await getBearers();
+  const next: Bearers = {
+    ...all,
+    [portalHost]: { token, capturedAt: Date.now() },
+  };
+  const tick = await getBearerTick();
+  await chrome.storage.session.set({
+    [BEARERS_KEY]: next,
+    [BEARER_TICK_KEY]: tick + 1,
+  });
+}
 
 export type ConsoleSessionInfo = {
   accountId: string;
@@ -12,19 +52,6 @@ export type ConsoleSessionInfo = {
   tabIds: number[];
   observedAt: number;
 };
-
-export async function getSessionState(): Promise<SessionState> {
-  const raw = await chrome.storage.session.get(['bearerToken', 'bearerCapturedAt', 'bearerHost']);
-  return raw as SessionState;
-}
-
-export async function setBearer(token: string, host: string): Promise<void> {
-  await chrome.storage.session.set({
-    bearerToken: token,
-    bearerCapturedAt: Date.now(),
-    bearerHost: host,
-  });
-}
 
 const SESSIONS_KEY = 'currentSessions';
 

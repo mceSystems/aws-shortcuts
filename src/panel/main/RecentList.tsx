@@ -80,6 +80,7 @@ export function RecentList({ recents, openTabs, accounts, onRequestSaveFavorite 
 async function relaunch(r: Recent): Promise<void> {
   const res = await send({
     type: 'RESOLVE_LAUNCH_URL',
+    identityCenterId: r.identityCenterId,
     accountId: r.accountId,
     roleName: r.roleName,
     region: r.region,

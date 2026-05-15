@@ -3,15 +3,14 @@ import { Onboarding } from './onboarding/Onboarding';
 import { Main } from './main/Main';
 import { SettingsView } from './settings/SettingsView';
 import { getSync } from '@/shared/storage';
-import type { SsoConfig } from '@/shared/types';
 import styles from './App.module.css';
 
-type Phase = 'onboarding' | 'ready' | 'settings' | 'change-portal';
+type Phase = 'onboarding' | 'ready' | 'settings' | 'add-identity-center';
 
 const CACHE_KEY = 'aws-shortcut:bootstrap';
 
 type Bootstrap = {
-  ssoConfig?: SsoConfig;
+  identityCentersCount: number;
   multiSessionVerified: boolean;
   hasAccounts: boolean;
 };
@@ -27,9 +26,9 @@ function readCached(): Bootstrap | undefined {
 
 function writeCached(boot: Bootstrap): void {
   try {
-    // Only cache once there's actual config to skip the onboarding flash on
-    // subsequent opens. No ssoConfig = no point caching defaults.
-    if (!boot.ssoConfig) {
+    // Only cache once there's an Identity Center configured, to skip the
+    // onboarding flash on subsequent opens. No IdC = onboarding always.
+    if (boot.identityCentersCount === 0) {
       window.localStorage.removeItem(CACHE_KEY);
       return;
     }
@@ -40,20 +39,21 @@ function writeCached(boot: Bootstrap): void {
 }
 
 function isReady(boot: Bootstrap | undefined): boolean {
-  return Boolean(boot?.ssoConfig && boot?.multiSessionVerified && boot?.hasAccounts);
+  return Boolean(
+    boot && boot.identityCentersCount > 0 && boot.multiSessionVerified && boot.hasAccounts,
+  );
 }
 
 function entryStep(boot: Bootstrap | undefined): number {
   if (!boot?.multiSessionVerified) return 0;
-  if (!boot?.ssoConfig) return 1;
-  if (!boot?.hasAccounts) return 2;
+  if (!boot || boot.identityCentersCount === 0) return 1;
+  if (!boot.hasAccounts) return 2;
   return 0;
 }
 
 export function App() {
   const cached = readCached();
   const [phase, setPhase] = useState<Phase>(isReady(cached) ? 'ready' : 'onboarding');
-  const [ssoConfig, setSsoConfig] = useState<SsoConfig | undefined>(cached?.ssoConfig);
   const [boot, setBoot] = useState<Bootstrap | undefined>(cached);
 
   useEffect(() => {
@@ -62,7 +62,10 @@ export function App() {
       changes: Record<string, chrome.storage.StorageChange>,
       area: string,
     ) => {
-      if (area === 'sync' && (changes.ssoConfig || changes.prefs || changes.accounts)) {
+      if (
+        area === 'sync' &&
+        (changes.identityCenters || changes.prefs || changes.accounts)
+      ) {
         void hydrate();
       }
     };
@@ -73,19 +76,18 @@ export function App() {
   async function hydrate() {
     const sync = await getSync();
     const next: Bootstrap = {
-      ssoConfig: sync.ssoConfig,
+      identityCentersCount: sync.identityCenters.length,
       multiSessionVerified: sync.prefs.multiSessionVerified,
       hasAccounts: sync.accounts.length > 0,
     };
     writeCached(next);
-    setSsoConfig(next.ssoConfig);
     setBoot(next);
-    // Don't auto-bounce the user out of the settings / change-portal flows
+    // Don't auto-bounce the user out of the settings flow / add-IdC flow
     // they explicitly navigated into. Storage updates (e.g. account
-    // observations triggered by a harvest tab) shouldn't yank them back to
-    // the main panel.
+    // observations triggered by a harvest tab) shouldn't yank them back
+    // to the main panel.
     setPhase((cur) => {
-      if (cur === 'settings' || cur === 'change-portal') return cur;
+      if (cur === 'settings' || cur === 'add-identity-center') return cur;
       return isReady(next) ? 'ready' : 'onboarding';
     });
   }
@@ -94,22 +96,8 @@ export function App() {
     return (
       <div className={styles.app}>
         <Onboarding
-          initialSsoConfig={ssoConfig}
           startStep={entryStep(boot)}
           onComplete={() => setPhase('ready')}
-        />
-      </div>
-    );
-  }
-
-  if (phase === 'change-portal') {
-    return (
-      <div className={styles.app}>
-        <Onboarding
-          initialSsoConfig={ssoConfig}
-          skipMultiSession
-          onComplete={() => setPhase('settings')}
-          onCancel={() => setPhase('settings')}
         />
       </div>
     );
@@ -120,7 +108,19 @@ export function App() {
       <div className={styles.app}>
         <SettingsView
           onBack={() => setPhase('ready')}
-          onChangePortal={() => setPhase('change-portal')}
+          onAddIdentityCenter={() => setPhase('add-identity-center')}
+        />
+      </div>
+    );
+  }
+
+  if (phase === 'add-identity-center') {
+    return (
+      <div className={styles.app}>
+        <Onboarding
+          skipMultiSession
+          onComplete={() => setPhase('settings')}
+          onCancel={() => setPhase('settings')}
         />
       </div>
     );

@@ -15,7 +15,7 @@ import { TabsSection } from './TabsSection';
 import { SaveFavoriteBanner, type PendingFavorite } from './SaveFavoriteBanner';
 import { useAccounts } from '../hooks/useAccounts';
 import { send } from '@/shared/messages';
-import { getSync, setSync } from '@/shared/storage';
+import { getSync, rowKey, setSync } from '@/shared/storage';
 import { openOrFocusTab } from '@/shared/tabs';
 import styles from './Main.module.css';
 
@@ -44,7 +44,16 @@ const LAYOUT_STORAGE_KEY = 'panel.section.layout.v2';
 const MIN_SECTION_PX = 60;
 
 export function Main({ onOpenSettings }: Props) {
-  const { accounts, accountOrder, hiddenAccountIds, ssoConfig, prefs, loaded } = useAccounts();
+  const {
+    accounts,
+    accountOrder,
+    hiddenAccountIds,
+    identityCenters,
+    prefs,
+    loaded,
+  } = useAccounts();
+  // selectedId is a composite row key (`${identityCenterId}:${accountId}`)
+  // so the same accountId in two IdCs can be selected independently.
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const initRef = useState({ done: false })[0];
@@ -63,7 +72,10 @@ export function Main({ onOpenSettings }: Props) {
     if (!loaded || initRef.done) return;
     initRef.done = true;
     const last = prefs?.lastSelectedAccountId;
-    if (last && accounts.some((a) => a.accountId === last)) {
+    if (
+      last &&
+      accounts.some((a) => rowKey(a.identityCenterId, a.accountId) === last)
+    ) {
       setSelectedId(last);
     }
   }, [loaded, prefs, accounts, initRef]);
@@ -74,9 +86,21 @@ export function Main({ onOpenSettings }: Props) {
   }
 
   const selectedAccount = useMemo(
-    () => accounts.find((a) => a.accountId === selectedId) ?? null,
+    () =>
+      accounts.find((a) => rowKey(a.identityCenterId, a.accountId) === selectedId) ?? null,
     [accounts, selectedId],
   );
+
+  const selectedIdentityCenter = useMemo(
+    () =>
+      selectedAccount
+        ? identityCenters.find((i) => i.id === selectedAccount.identityCenterId) ?? null
+        : null,
+    [identityCenters, selectedAccount],
+  );
+
+  // Header "open portal" target: selected account's IdC, else first IdC.
+  const headerPortal = selectedIdentityCenter ?? identityCenters[0];
 
   const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
     account: null,
@@ -136,7 +160,7 @@ export function Main({ onOpenSettings }: Props) {
         render: (compact) => (
           <ServiceSearch
             account={selectedAccount}
-            ssoConfig={ssoConfig}
+            identityCenter={selectedIdentityCenter}
             onRequestSaveFavorite={setPendingFavorite}
             compact={compact}
           />
@@ -160,10 +184,11 @@ export function Main({ onOpenSettings }: Props) {
       accounts,
       accountOrder,
       hiddenAccountIds,
+      identityCenters,
       selectedId,
       editing,
       selectedAccount,
-      ssoConfig,
+      selectedIdentityCenter,
       layout.favoritesPill,
     ],
   );
@@ -180,10 +205,12 @@ export function Main({ onOpenSettings }: Props) {
         onRefresh={() => {
           void send({ type: 'RESCAN_OPEN_TABS' });
         }}
-        portalUrl={ssoConfig?.startUrl}
+        portalUrl={headerPortal?.startUrl}
         onOpenPortal={() => {
-          if (ssoConfig?.startUrl) {
-            void openOrFocusTab(ssoConfig.startUrl, { reuseUrlPrefix: ssoConfig.startUrl });
+          if (headerPortal?.startUrl) {
+            void openOrFocusTab(headerPortal.startUrl, {
+              reuseUrlPrefix: headerPortal.startUrl,
+            });
           }
         }}
       />

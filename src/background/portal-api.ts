@@ -68,6 +68,7 @@ export async function listProfiles(
 export async function fetchAccounts(
   portalHost: string,
   bearer: string,
+  identityCenterId: string,
 ): Promise<Account[]> {
   const apps = await listAppInstances(portalHost, bearer);
   const out: Account[] = [];
@@ -77,6 +78,7 @@ export async function fetchAccounts(
     const profiles = await listProfiles(portalHost, bearer, app.id);
     const roles: Role[] = profiles.map((p) => ({ name: p.name }));
     out.push({
+      identityCenterId,
       accountId,
       name: app.searchMetadata?.AccountName ?? app.name,
       email: app.searchMetadata?.AccountEmail,

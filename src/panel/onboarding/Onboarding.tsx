@@ -2,21 +2,21 @@ import { useState } from 'react';
 import { ConnectStep } from './ConnectStep';
 import { MultiSessionStep } from './MultiSessionStep';
 import { ScanStep } from './ScanStep';
-import type { SsoConfig } from '@/shared/types';
 
 type Props = {
-  initialSsoConfig?: SsoConfig;
+  initialUrl?: string;
+  initialName?: string;
   startStep?: number;
-  // Skip the "Enable multi-session" guide. Used by the "Change portal URL"
-  // flow from Settings — the user has already completed it once and just
-  // wants to point the extension at a different portal.
+  // Skip the "Enable multi-session" guide. Used when the user already
+  // completed it once and is adding an additional Identity Center.
   skipMultiSession?: boolean;
   onComplete: () => void;
   onCancel?: () => void;
 };
 
 export function Onboarding({
-  initialSsoConfig,
+  initialUrl,
+  initialName,
   startStep,
   skipMultiSession = false,
   onComplete,
@@ -27,6 +27,7 @@ export function Onboarding({
   const totalSteps = skipMultiSession ? 2 : 3;
   const initial = startStep ?? (skipMultiSession ? 1 : 0);
   const [step, setStep] = useState(initial);
+  const [identityCenterId, setIdentityCenterId] = useState<string | null>(null);
 
   if (!skipMultiSession && step === 0) {
     return <MultiSessionStep onContinue={() => setStep(1)} />;
@@ -36,19 +37,28 @@ export function Onboarding({
     const stepIdx = skipMultiSession ? 0 : 1;
     return (
       <ConnectStep
-        initialUrl={initialSsoConfig?.startUrl ?? ''}
+        initialUrl={initialUrl ?? ''}
+        initialName={initialName ?? ''}
         stepIndex={stepIdx}
         totalSteps={totalSteps}
-        onBack={skipMultiSession ? (onCancel ?? (() => {})) : () => setStep(0)}
-        onContinue={() => setStep(2)}
+        onBack={
+          skipMultiSession
+            ? (onCancel ?? (() => setStep(1)))
+            : () => setStep(0)
+        }
+        onContinue={(idcId) => {
+          setIdentityCenterId(idcId);
+          setStep(2);
+        }}
       />
     );
   }
 
-  if (step === 2) {
+  if (step === 2 && identityCenterId) {
     const stepIdx = skipMultiSession ? 1 : 2;
     return (
       <ScanStep
+        identityCenterId={identityCenterId}
         stepIndex={stepIdx}
         totalSteps={totalSteps}
         onBack={() => setStep(1)}
