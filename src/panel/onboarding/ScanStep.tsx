@@ -28,8 +28,15 @@ export function ScanStep({
   // First scan miss auto-fires the bg-tab capture path. Subsequent misses
   // fall to the "Retry" button so the user can decide.
   const autoReloadedRef = useRef(false);
+  // bearerTick storage events can spawn concurrent runScans while one is
+  // already in flight. The first to resolve fires onComplete → unmounts us,
+  // but the others' awaits keep running and would call a stale onComplete
+  // (= setPhase('ready') in App) after the user has navigated to Settings,
+  // bouncing them back to Main. Guard every post-await side effect.
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     void runScan();
 
     // Auto-retry scan when a new bearer lands in session storage.
@@ -42,7 +49,10 @@ export function ScanStep({
       }
     };
     chrome.storage.onChanged.addListener(handler);
-    return () => chrome.storage.onChanged.removeListener(handler);
+    return () => {
+      mountedRef.current = false;
+      chrome.storage.onChanged.removeListener(handler);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [identityCenterId]);
 
@@ -51,6 +61,7 @@ export function ScanStep({
     setError(null);
     setReloading(false);
     const res = await send({ type: 'SCAN_PORTAL', identityCenterId });
+    if (!mountedRef.current) return;
     if (res.ok) {
       onComplete();
       return;
@@ -62,6 +73,7 @@ export function ScanStep({
       autoReloadedRef.current = true;
       setReloading(true);
       const bg = await send({ type: 'CAPTURE_AND_SCAN', identityCenterId });
+      if (!mountedRef.current) return;
       if (bg.ok) {
         onComplete();
         return;
@@ -80,6 +92,7 @@ export function ScanStep({
     setError(null);
     setPhase('scanning');
     const bg = await send({ type: 'CAPTURE_AND_SCAN', identityCenterId });
+    if (!mountedRef.current) return;
     if (bg.ok) {
       onComplete();
       return;
